@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Features &amp; Pricing — TradeX</title>
+<meta name="description" content="Platform features and transparent pricing for TradeX — charts, APIs, analytics, flat brokerage." />
+<script>
+  (function() {
+    var token = localStorage.getItem("token");
+    if (token) {
+      window.location.href = "http://localhost:5173/dashboard";
+    }
+  })();
+</script>
+<link rel="icon" type="image/svg+xml" href="../assets/logo.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css" />
+<style>
+  .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .plan { padding: 28px; border-radius: var(--radius); border: 1px solid var(--border);
+          background: linear-gradient(180deg, var(--surface), var(--surface-2)); }
+  .plan.featured { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,224,164,0.15); }
+  .plan h3 { margin: 0 0 4px; font-size: 20px; }
+  .plan .p { font-size: 36px; font-weight: 800; margin: 14px 0; }
+  .plan .p small { font-size: 14px; color: var(--muted); font-weight: 500; }
+  .plan ul { list-style: none; padding: 0; margin: 0 0 22px; }
+  .plan li { padding: 8px 0; color: var(--muted); font-size: 14.5px; border-bottom: 1px dashed var(--border); }
+  .plan li:last-child { border-bottom: none; }
+  .plan li::before { content: "✓  "; color: var(--primary); font-weight: 700; }
+  @media (max-width: 960px) { .price-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+ 
+<header class="site-header">
+  <div class="container nav">
+    <a href="/" class="brand">
+      <img src="../assets/logo.svg" alt="" class="logo" />
+      <span class="brand-name">Trade<span>X</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="features.html">Features</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="#" class="btn btn-ghost">Login</a>
+      <a href="contact.html" class="btn btn-primary">Open Account</a>
+      <button class="mobile-toggle" aria-label="Toggle menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<div class="page-header">
+  <div class="container">
+    <div class="breadcrumb"><a href="/">Home</a> / Features</div>
+    <h1>Built for speed, clarity and control</h1>
+    <p>A modern trading stack that gets out of your way — with the depth professionals expect and the ease beginners need.</p>
+  </div>
+</div>
+
+<section>
+  <div class="container grid-3">
+    <div class="card"><div class="icon">📊</div><h3>Advanced charts</h3><p>100+ indicators, 14 chart types, drawing tools, templates and multi-chart layouts.</p></div>
+    <div class="card"><div class="icon">🧠</div><h3>Strategy builder</h3><p>Construct multi-leg options trades with risk &amp; payoff visualisations before you click buy.</p></div>
+    <div class="card"><div class="icon">🔔</div><h3>Price &amp; event alerts</h3><p>Alerts on price, indicator crossovers, earnings and corporate actions — delivered via push, SMS or email.</p></div>
+    <div class="card"><div class="icon">🧾</div><h3>Unified reports</h3><p>One consolidated P&amp;L, tax report and capital-gains statement across every product.</p></div>
+    <div class="card"><div class="icon">⚙️</div><h3>APIs &amp; algos</h3><p>REST + WebSocket APIs with sandbox, plus a simple rule engine for no-code strategies.</p></div>
+    <div class="card"><div class="icon">👥</div><h3>Baskets &amp; copy ideas</h3><p>Invest in curated baskets and follow research-backed model portfolios.</p></div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="container">
+    <div class="section-head">
+      <span class="pill">Pricing</span>
+      <h2>Transparent, flat pricing</h2>
+      <p>No hidden charges. No quarterly maintenance fees for first-year users.</p>
+    </div>
+
+    <div class="price-grid">
+      <div class="plan">
+        <h3>Starter</h3>
+        <p style="color:var(--muted);margin:0;">For new investors</p>
+        <div class="p">₹0 <small>/ delivery trade</small></div>
+        <ul>
+          <li>Free equity delivery</li>
+          <li>₹20 flat on intraday &amp; F&amp;O</li>
+          <li>Web + mobile app</li>
+          <li>Basic charts</li>
+          <li>Email support</li>
+        </ul>
+        <a href="contact.html" class="btn btn-ghost btn-lg" style="width:100%;">Get started</a>
+      </div>
+
+      <div class="plan featured">
+        <h3>Active</h3>
+        <p style="color:var(--muted);margin:0;">For active traders</p>
+        <div class="p">₹15 <small>/ order</small></div>
+        <ul>
+          <li>₹15 flat on intraday &amp; F&amp;O</li>
+          <li>Pro charts &amp; strategy builder</li>
+          <li>Desktop pro terminal</li>
+          <li>Priority chat + phone support</li>
+          <li>API access (sandbox)</li>
+        </ul>
+        <a href="contact.html" class="btn btn-primary btn-lg" style="width:100%;">Upgrade</a>
+      </div>
+
+      <div class="plan">
+        <h3>Pro</h3>
+        <p style="color:var(--muted);margin:0;">For pros &amp; algos</p>
+        <div class="p">Custom <small>pricing</small></div>
+        <ul>
+          <li>Volume-based pricing</li>
+          <li>Co-located order routing</li>
+          <li>Dedicated account manager</li>
+          <li>Full REST + WebSocket APIs</li>
+          <li>Institutional reports</li>
+        </ul>
+        <a href="contact.html" class="btn btn-ghost btn-lg" style="width:100%;">Talk to sales</a>
+      </div>
+    </div>
+    <p style="text-align:center;color:var(--muted);font-size:13px;margin-top:18px;">
+      Statutory charges (STT, GST, exchange fees, SEBI turnover) are additional and shown on every contract note.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="cta-band">
+      <div>
+        <h2>Experience it yourself</h2>
+        <p>Create a free demo account and explore the full platform — no funding required.</p>
+      </div>
+      <div class="btn-row">
+        <a href="contact.html" class="btn btn-primary btn-lg">Start Free Demo</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="brand"><img src="../assets/logo.svg" alt="" class="logo" /><span class="brand-name">Trade<span>X</span></span></a>
+        <p>India's modern trading platform for stocks, derivatives, commodities and global markets.</p>
+        <div class="socials"><a href="#">𝕏</a><a href="#">f</a><a href="#">◎</a><a href="#">▶</a><a href="#">✈</a></div>
+      </div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+      <div class="footer-col"><h4>Products</h4><ul><li><a href="products.html">Stocks</a></li><li><a href="products.html">F&amp;O</a></li><li><a href="products.html">Commodities</a></li></ul></div>
+      <div class="footer-col"><h4>Resources</h4><ul><li><a href="features.html">Platform</a></li><li><a href="features.html#pricing">Pricing</a></li></ul></div>
+      <div class="footer-col"><h4>Legal</h4><ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Use</a></li><li><a href="#">Risk Disclosure</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><div>© 2026 TradeX.</div><div>Template for demo purposes only.</div></div>
+  </div>
+</footer>
+<script src="../js/main.js"></script>
+</body>
+</html>

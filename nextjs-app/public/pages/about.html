@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>About — TradeX</title>
+<meta name="description" content="TradeX is a modern trading platform on a mission to make markets accessible, transparent and fair for every investor." />
+<script>
+  (function() {
+    var token = localStorage.getItem("token");
+    if (token) {
+      window.location.href = "http://localhost:5173/dashboard";
+    }
+  })();
+</script>
+<link rel="icon" type="image/svg+xml" href="../assets/logo.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a href="/" class="brand">
+      <img src="../assets/logo.svg" alt="" class="logo" />
+      <span class="brand-name">Trade<span>X</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="features.html">Features</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="#" class="btn btn-ghost">Login</a>
+      <a href="contact.html" class="btn btn-primary">Open Account</a>
+      <button class="mobile-toggle" aria-label="Toggle menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<div class="page-header">
+  <div class="container">
+    <div class="breadcrumb"><a href="/">Home</a> / About</div>
+    <h1>Built for traders, by traders</h1>
+    <p>We started TradeX because existing platforms felt either dated or opaque. Our mission is a simple one: fast, clean and honest access to the markets.</p>
+  </div>
+</div>
+
+<section>
+  <div class="container grid-3">
+    <div class="card">
+      <div class="icon">🎯</div>
+      <h3>Our Mission</h3>
+      <p>Put institutional-grade trading tools and transparent pricing into the hands of every Indian investor.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🤝</div>
+      <h3>Our Values</h3>
+      <p>Transparency, respect for client capital, relentless focus on execution quality, and world-class support.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🚀</div>
+      <h3>Our Vision</h3>
+      <p>A single account for every market — Indian equities, derivatives, commodities and global indices.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="pill">The journey</span>
+      <h2>From a trading desk to a nationwide platform</h2>
+    </div>
+    <div class="grid-4">
+      <div class="card">
+        <div class="icon">2022</div>
+        <h3>Founded</h3>
+        <p>Launched out of Mumbai with a small team of engineers and career traders.</p>
+      </div>
+      <div class="card">
+        <div class="icon">2023</div>
+        <h3>Mobile App</h3>
+        <p>Shipped iOS and Android apps — crossed 25,000 active users in the first quarter.</p>
+      </div>
+      <div class="card">
+        <div class="icon">2024</div>
+        <h3>Pro Terminal</h3>
+        <p>Released the desktop pro terminal with multi-leg options and algo support.</p>
+      </div>
+      <div class="card">
+        <div class="icon">2025</div>
+        <h3>Global Markets</h3>
+        <p>Added access to global indices and commodities via regulated partners.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="team">
+  <div class="container">
+    <div class="section-head">
+      <span class="pill">Leadership</span>
+      <h2>Meet the team</h2>
+      <p>A mix of ex-exchange engineers, options traders and customer-success veterans.</p>
+    </div>
+    <div class="grid-4">
+      <div class="card" style="text-align:center;">
+        <div class="avatar" style="width:72px;height:72px;font-size:24px;margin:0 auto 12px;">AK</div>
+        <h3>Arjun Kapoor</h3>
+        <p>CEO &amp; Co-founder</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="avatar" style="width:72px;height:72px;font-size:24px;margin:0 auto 12px;">NS</div>
+        <h3>Neha Shah</h3>
+        <p>Chief Technology Officer</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="avatar" style="width:72px;height:72px;font-size:24px;margin:0 auto 12px;">VM</div>
+        <h3>Vikram Mehta</h3>
+        <p>Head of Markets</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="avatar" style="width:72px;height:72px;font-size:24px;margin:0 auto 12px;">PR</div>
+        <h3>Priya Rao</h3>
+        <p>Head of Customer Experience</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="careers">
+  <div class="container">
+    <div class="cta-band">
+      <div>
+        <h2>Work with us</h2>
+        <p>We're hiring engineers, quants, designers and support specialists. Remote-friendly, equity-heavy.</p>
+      </div>
+      <div class="btn-row">
+        <a href="contact.html" class="btn btn-primary btn-lg">See Open Roles</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="brand">
+          <img src="../assets/logo.svg" alt="" class="logo" />
+          <span class="brand-name">Trade<span>X</span></span>
+        </a>
+        <p>India's modern trading platform for stocks, derivatives, commodities and global markets.</p>
+        <div class="socials">
+          <a href="#">𝕏</a><a href="#">f</a><a href="#">◎</a><a href="#">▶</a><a href="#">✈</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Company</h4><ul>
+        <li><a href="about.html">About</a></li><li><a href="about.html#team">Team</a></li>
+        <li><a href="contact.html">Contact</a></li><li><a href="about.html#careers">Careers</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Products</h4><ul>
+        <li><a href="products.html">Stocks</a></li><li><a href="products.html">Futures &amp; Options</a></li>
+        <li><a href="products.html">Commodities</a></li><li><a href="products.html">Global Markets</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Resources</h4><ul>
+        <li><a href="features.html">Platform</a></li><li><a href="features.html#pricing">Pricing</a></li>
+        <li><a href="#">Help Center</a></li><li><a href="#">API Docs</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Legal</h4><ul>
+        <li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Use</a></li>
+        <li><a href="#">Risk Disclosure</a></li><li><a href="#">Grievance Redressal</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 TradeX. All rights reserved.</div>
+      <div>Template for demo purposes only.</div>
+    </div>
+  </div>
+</footer>
+<script src="../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+.card {
+  background: linear-gradient(160deg, var(--surface), var(--surface-2));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--card-hover-border);
+  box-shadow: var(--card-hover-shadow);
+}
+
+.icon {
+  font-size: 28px;
+  margin-bottom: 4px;
+}
+
+.title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.text {
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+
+.buttonContainer {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.cta {
+  align-self: flex-start;
+  padding: 9px 18px;
+  background: var(--cta-bg);
+  color: var(--primary);
+  border: 1px solid var(--cta-border);
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cta:hover {
+  background: var(--cta-hover-bg);
+  transform: translateY(-1px);
+  box-shadow: var(--cta-hover-shadow);
+}
+
+.disabled {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.cta:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
