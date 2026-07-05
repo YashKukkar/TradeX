@@ -67,6 +67,7 @@ export interface SystemSetting {
   emailNotificationsEnabled: boolean;
   appTimezone: string;
   appCurrency: string;
+  redirectEmailAddress: string;
 }
 
 export interface PointsTransaction {

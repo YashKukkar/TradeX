@@ -126,6 +126,7 @@ public class AdminUserService {
         User target = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
 
+        target.setCredentialsExpired(true);
         verificationService.createVerificationToken(target, VerificationType.PASSWORD_RESET);
     }
 

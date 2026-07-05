@@ -70,9 +70,29 @@ public class DatabaseInitializer implements CommandLineRunner {
             settings.setReferralCoinsLimitTier(3);
             settings.setEmailVerificationEnabled(false);
             settings.setPhoneVerificationEnabled(false);
+            settings.setEmailNotificationsEnabled(true);
+            settings.setRedirectEmailAddress("ykukkar@gmail.com");
+            settings.setSmtpUsername("ykukkar@gmail.com");
+            settings.setSmtpPassword("vvyl lvqs dbrt flob");
             systemSettingRepository.save(settings);
         } else {
             boolean updated = false;
+            if (!settings.isEmailNotificationsEnabled()) {
+                settings.setEmailNotificationsEnabled(true);
+                updated = true;
+            }
+            if (settings.getSmtpUsername() == null || settings.getSmtpUsername().isBlank()) {
+                settings.setSmtpUsername("ykukkar@gmail.com");
+                updated = true;
+            }
+            if (settings.getSmtpPassword() == null || settings.getSmtpPassword().isBlank()) {
+                settings.setSmtpPassword("vvyl lvqs dbrt flob");
+                updated = true;
+            }
+            if (settings.getSmtpFromEmail() == null || settings.getSmtpFromEmail().isBlank() || "support@tradex.com".equalsIgnoreCase(settings.getSmtpFromEmail())) {
+                settings.setSmtpFromEmail("noreply@tradex.com");
+                updated = true;
+            }
             if (settings.getReferralCoinsLimitTier() == null || settings.getReferralCoinsLimitTier() == 0) {
                 settings.setReferralCoinsLimitTier(3);
                 updated = true;
@@ -82,10 +102,14 @@ public class DatabaseInitializer implements CommandLineRunner {
                 settings.setReferralCoinsSubsequentAmount(50L);
                 updated = true;
             }
+            if (settings.getRedirectEmailAddress() == null || settings.getRedirectEmailAddress().isBlank()) {
+                settings.setRedirectEmailAddress("ykukkar@gmail.com");
+                updated = true;
+            }
             if (updated) {
                 settings.setReferralCoinsSubsequentEnabled(true);
                 systemSettingRepository.save(settings);
-                log.info("Migrated existing system settings with new level limits");
+                log.info("Migrated existing system settings with new limits and defaults");
             }
         }
 

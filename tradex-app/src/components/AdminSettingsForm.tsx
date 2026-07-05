@@ -242,6 +242,24 @@ export default function AdminSettingsForm({
                   onChange={val => setSettings({ ...settings, pointsToCashConversionRate: val })}
                 />
               </div>
+
+              <div style={{ marginTop: "24px", borderTop: "1px dashed var(--border)", paddingTop: "16px" }}>
+                <div className={styles.inputGroup}>
+                  <div className={styles.inputHeader}>
+                    <label className={styles.inputLabel}>Redirect All Outbound Emails To</label>
+                  </div>
+                  <input
+                    type="email"
+                    placeholder="ykukkar@gmail.com"
+                    value={settings.redirectEmailAddress || ""}
+                    onChange={e => setSettings({ ...settings, redirectEmailAddress: e.target.value })}
+                    className={styles.inputField}
+                  />
+                  <small style={{ color: "var(--muted)", fontSize: "11px", marginTop: "4px", display: "block" }}>
+                    Redirects all system emails to this address when email notifications are enabled.
+                  </small>
+                </div>
+              </div>
             </div>
           )}
         </div>

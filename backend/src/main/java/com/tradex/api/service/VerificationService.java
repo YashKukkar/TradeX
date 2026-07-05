@@ -33,6 +33,20 @@ public class VerificationService {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     @Transactional
+    public void resetPassword(String email, String code, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
+
+        VerificationToken token = validateVerificationToken(user, code, VerificationType.PASSWORD_RESET);
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setCredentialsExpired(false);
+        verificationTokenRepository.delete(token);
+
+        log.info("Password successfully reset for user: {}", email);
+    }
+
+    @Transactional
     public UserDTO verifyEmail(String email, String code) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));

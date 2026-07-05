@@ -39,7 +39,7 @@ public class CustomUserPrincipal implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return !user.isExpired();
+        return true;
     }
 
     @Override

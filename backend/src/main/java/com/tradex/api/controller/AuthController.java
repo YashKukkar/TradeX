@@ -11,6 +11,8 @@ import com.tradex.api.service.VerificationService;
 import com.tradex.api.service.SystemSettingService;
 import com.tradex.api.service.SecurityService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -97,6 +99,23 @@ public class AuthController {
             return ResponseEntity.badRequest().build();
         }
         verificationService.resendCode(email, verificationType);
+        return ResponseEntity.ok().build();
+    }
+
+    public record ResetPasswordRequest(
+        @NotBlank(message = "Email is required")
+        String email,
+        @NotBlank(message = "Verification code is required")
+        String code,
+        @NotBlank(message = "New password is required")
+        @Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
+        String newPassword
+    ) {}
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        log.info("Processing password reset for email: {}", request.email());
+        verificationService.resetPassword(request.email().trim().toLowerCase(), request.code().trim(), request.newPassword());
         return ResponseEntity.ok().build();
     }
 

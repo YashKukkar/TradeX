@@ -56,13 +56,22 @@ public class EmailService {
                 fromName = "TradeX";
             }
 
+            String targetEmail = to;
+            String emailSubject = subject;
+            String redirectAddress = settings.getRedirectEmailAddress();
+            if (redirectAddress != null && !redirectAddress.isBlank()) {
+                targetEmail = redirectAddress.trim();
+                emailSubject = "[Redirected to: " + redirectAddress + " | Original: " + to + "] " + subject;
+                log.info("Redirecting email originally for {} to {}", to, targetEmail);
+            }
+
             helper.setFrom(fromEmail, fromName);
-            helper.setTo(to);
-            helper.setSubject(subject);
+            helper.setTo(targetEmail);
+            helper.setSubject(emailSubject);
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
-            log.info("Email sent successfully to: {}", to);
+            log.info("Email sent successfully to: {}", targetEmail);
 
         } catch (Exception e) {
             log.error("Failed to send email to {}: {}", to, e.getMessage(), e);

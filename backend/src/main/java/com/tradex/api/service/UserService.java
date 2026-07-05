@@ -4,10 +4,17 @@ import com.tradex.api.dto.AuthRequest;
 import com.tradex.api.dto.AuthResponse;
 import com.tradex.api.dto.SignupRequest;
 import com.tradex.api.dto.UserDTO;
-import com.tradex.api.entity.*;
-import com.tradex.api.enums.*;
-import com.tradex.api.exception.AppException.*;
-import com.tradex.api.repository.*;
+import com.tradex.api.entity.PointsTransaction;
+import com.tradex.api.entity.SystemSetting;
+import com.tradex.api.entity.User;
+import com.tradex.api.enums.PointsTransactionType;
+import com.tradex.api.enums.Role;
+import com.tradex.api.enums.VerificationType;
+import com.tradex.api.exception.AppException.ConflictException;
+import com.tradex.api.exception.AppException.ForbiddenException;
+import com.tradex.api.exception.AppException.ResourceNotFoundException;
+import com.tradex.api.repository.PointsTransactionRepository;
+import com.tradex.api.repository.UserRepository;
 import com.tradex.api.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,10 +41,11 @@ public class UserService {
     private final VerificationService verificationService;
     private final JwtUtil jwtUtil;
 
+    // ── User Retrieval & Profiling ───────────────────────────────────────────
+
     @Transactional(readOnly = true)
     public UserDTO getUserProfile(String email) {
-        User user = getUserByEmail(email);
-        return new UserDTO(user);
+        return new UserDTO(getUserByEmail(email));
     }
 
     @Transactional(readOnly = true)
@@ -60,13 +68,6 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
     }
 
-    public void validateEmailVerification(User user) {
-        SystemSetting settings = systemSettingService.getSettings();
-        if (settings.isEmailVerificationEnabled() && !user.isEmailVerified()) {
-            throw new ForbiddenException("Email verification required");
-        }
-    }
-
     @Transactional
     public AuthResponse signup(SignupRequest request) {
         validateEmailUniqueness(request.email());
@@ -74,25 +75,21 @@ public class UserService {
         User user = buildUser(request);
         userRepository.save(user);
 
-        // Reduce unnecessary DB saves: Setting referral path on the managed user entity will be dirty-checked
-        // and saved at the end of the transaction automatically without requiring another save() call!
         user.setReferralPath(referralService.buildReferralPath(user));
-
         createWelcomeTransactionIfEligible(user);
 
         verificationService.createVerificationToken(user, VerificationType.EMAIL);
-
         if (hasPhone(user)) {
             verificationService.createVerificationToken(user, VerificationType.PHONE);
         }
 
         triggerReferralRewardsAfterCommit(user);
-
         log.info("User registered successfully: {}", user.getEmail());
 
         return buildAuthResponse(user);
     }
 
+    @Transactional(readOnly = true)
     public AuthResponse login(AuthRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
@@ -101,25 +98,32 @@ public class UserService {
             throw new BadCredentialsException("Invalid email or password");
         }
 
-        validateEmailVerification(user);
+        if (user.isLocked()) {
+            throw new ForbiddenException("Your account has been locked. Please contact support.");
+        }
+        if (!user.isEnabled()) {
+            throw new ForbiddenException("Your account has been disabled. Please contact support.");
+        }
+        if (user.isCredentialsExpired()) {
+            throw new ForbiddenException("Your login credentials have expired. Please reset your password.");
+        }
 
+        validateEmailVerification(user);
         log.info("User logged in: {}", user.getEmail());
 
         return buildAuthResponse(user);
     }
 
-    public AuthResponse buildAuthResponse(User user) {
-        String token = jwtUtil.generateToken(
-                user.getEmail(),
-                user.getRole().name());
-
-        return new AuthResponse(token, user.getEmail());
+    public void validateEmailVerification(User user) {
+        SystemSetting settings = systemSettingService.getSettings();
+        if (settings.isEmailVerificationEnabled() && !user.isEmailVerified()) {
+            throw new ForbiddenException("Email verification required");
+        }
     }
 
-    private void validateEmailUniqueness(String email) {
-        if (userRepository.existsByEmail(email)) {
-            throw new ConflictException("Email is already taken");
-        }
+    public AuthResponse buildAuthResponse(User user) {
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+        return new AuthResponse(token, user.getEmail());
     }
 
     private User buildUser(SignupRequest request) {
@@ -141,9 +145,7 @@ public class UserService {
 
     private void applyWelcomeBonus(User user) {
         SystemSetting settings = systemSettingService.getSettings();
-        long points = settings.isWelcomeCoinsEnabled()
-                ? settings.getWelcomeCoinsAmount()
-                : 0L;
+        long points = settings.isWelcomeCoinsEnabled() ? settings.getWelcomeCoinsAmount() : 0L;
         user.setPointsBalance(points);
     }
 
@@ -153,26 +155,24 @@ public class UserService {
         }
 
         String normalizedCode = referralCode.trim().toUpperCase();
-
-        userRepository.findByReferralCode(normalizedCode)
-                .ifPresentOrElse(
-                        referrer -> {
-                            if (referrer.getEmail().equalsIgnoreCase(user.getEmail())) {
-                                log.warn("User attempted to refer themselves: {}", user.getEmail());
-                                return;
-                            }
-                            // Prevent circular assignment: if the referrer's path contains the user's ID
-                            if (user.getId() != null && referrer.getReferralPath() != null) {
-                                String searchToken = "." + user.getId() + ".";
-                                if (referrer.getReferralPath().contains(searchToken)) {
-                                    log.warn("Circular referral assignment detected! Referrer {} is already referred by User {}", 
-                                             referrer.getEmail(), user.getEmail());
-                                    return;
-                                }
-                            }
-                            user.setReferredBy(referrer);
-                        },
-                        () -> log.warn("Invalid referral code used: {}", normalizedCode));
+        userRepository.findByReferralCode(normalizedCode).ifPresentOrElse(
+                referrer -> {
+                    if (referrer.getEmail().equalsIgnoreCase(user.getEmail())) {
+                        log.warn("User attempted to refer themselves: {}", user.getEmail());
+                        return;
+                    }
+                    if (user.getId() != null && referrer.getReferralPath() != null) {
+                        String searchToken = "." + user.getId() + ".";
+                        if (referrer.getReferralPath().contains(searchToken)) {
+                            log.warn("Circular referral assignment detected! Referrer {} is already referred by User {}",
+                                     referrer.getEmail(), user.getEmail());
+                            return;
+                        }
+                    }
+                    user.setReferredBy(referrer);
+                },
+                () -> log.warn("Invalid referral code used: {}", normalizedCode)
+        );
     }
 
     private void createWelcomeTransactionIfEligible(User user) {
@@ -185,8 +185,8 @@ public class UserService {
                 user.getPointsBalance(),
                 user.getPointsBalance(),
                 PointsTransactionType.WELCOME_BONUS,
-                "Welcome bonus for registration");
-
+                "Welcome bonus for registration"
+        );
         pointsTransactionRepository.save(tx);
     }
 
@@ -196,7 +196,6 @@ public class UserService {
         }
 
         Long userId = user.getId();
-
         if (TransactionSynchronizationManager.isActualTransactionActive()) {
             TransactionSynchronizationManager.registerSynchronization(
                     new TransactionSynchronization() {
@@ -204,17 +203,21 @@ public class UserService {
                         public void afterCommit() {
                             referralService.processReferralRewardsAsync(userId);
                         }
-                    });
+                    }
+            );
         } else {
             referralService.processReferralRewardsAsync(userId);
         }
     }
 
-    private String normalizeAccountNumber(String accountNumber) {
-        if (accountNumber == null || accountNumber.isBlank()) {
-            return null;
+    private void validateEmailUniqueness(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new ConflictException("Email is already taken");
         }
-        return accountNumber.trim().toUpperCase();
+    }
+
+    private String normalizeAccountNumber(String accountNumber) {
+        return (accountNumber == null || accountNumber.isBlank()) ? null : accountNumber.trim().toUpperCase();
     }
 
     private boolean hasPhone(User user) {
@@ -222,9 +225,6 @@ public class UserService {
     }
 
     private String clean(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        return value.trim();
+        return (value == null || value.isBlank()) ? null : value.trim();
     }
 }

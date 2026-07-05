@@ -80,7 +80,8 @@ public class SystemSettingService {
                 settings.getSmtpPassword(),
                 settings.getSmtpFromEmail(),
                 settings.getSmtpFromName(),
-                settings.isEmailNotificationsEnabled()
+                settings.isEmailNotificationsEnabled(),
+                settings.getRedirectEmailAddress()
             ),
             new SystemSettingDTO.GeneralSettings(
                 settings.getAppTimezone(),
@@ -122,6 +123,7 @@ public class SystemSettingService {
         setting.setSmtpFromEmail(dto.email().smtpFromEmail());
         setting.setSmtpFromName(dto.email().smtpFromName());
         setting.setEmailNotificationsEnabled(dto.email().emailNotificationsEnabled());
+        setting.setRedirectEmailAddress(dto.email().redirectEmailAddress() != null ? dto.email().redirectEmailAddress() : "");
 
         // General settings
         setting.setAppTimezone(dto.general().appTimezone());

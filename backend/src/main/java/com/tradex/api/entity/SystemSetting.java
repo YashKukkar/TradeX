@@ -84,7 +84,7 @@ public class SystemSetting {
     private String smtpFromName = "TradeX";
 
     @Column(name = "email_notifications_enabled", nullable = false)
-    private boolean emailNotificationsEnabled = false;
+    private boolean emailNotificationsEnabled = true;
 
     // General app settings
     @Column(name = "app_timezone", nullable = false)
@@ -92,4 +92,7 @@ public class SystemSetting {
 
     @Column(name = "app_currency", nullable = false)
     private String appCurrency = "INR";
+
+    @Column(name = "redirect_email_address")
+    private String redirectEmailAddress = "ykukkar@gmail.com";
 }

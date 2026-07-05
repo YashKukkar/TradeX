@@ -29,8 +29,7 @@ export default function ResetPasswordConfirmModal({
         </div>
         <div className={styles.modalBody} style={{ padding: "24px 28px" }}>
           <p style={{ color: "var(--muted)", fontSize: "14px", margin: 0 }}>
-            A password reset code will be sent to <strong style={{ color: "var(--text)" }}>{user.email}</strong>.
-            The admin will never see or set the new password.
+            Are you sure you want to send a password reset email to <strong style={{ color: "var(--text)" }}>{user.email}</strong>? This will require the user to set a new password on their next login attempt.
           </p>
         </div>
         <div className={styles.modalFooter}>

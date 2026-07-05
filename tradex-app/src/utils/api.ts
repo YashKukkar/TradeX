@@ -66,5 +66,8 @@ export const api = async (endpoint: string, options: any = {}): Promise<any> => 
   if (options.method === "DELETE") {
     return axiosInstance.delete(url, { headers: options.headers });
   }
+  if (options.method === "PATCH") {
+    return axiosInstance.patch(url, data || {}, { headers: options.headers });
+  }
   return axiosInstance.get(url, { headers: options.headers });
 };

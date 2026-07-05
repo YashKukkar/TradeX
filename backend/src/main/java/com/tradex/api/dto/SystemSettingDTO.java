@@ -44,6 +44,7 @@ public record SystemSettingDTO(
         @JsonProperty("smtpFromEmail") String smtpFromEmail,
         @JsonProperty("smtpFromName") String smtpFromName,
         @JsonProperty("emailNotificationsEnabled") boolean emailNotificationsEnabled,
+        @JsonProperty("redirectEmailAddress") String redirectEmailAddress,
         @JsonProperty("appTimezone") String appTimezone,
         @JsonProperty("appCurrency") String appCurrency
     ) {
@@ -60,7 +61,8 @@ public record SystemSettingDTO(
                 smtpPassword,
                 smtpFromEmail != null ? smtpFromEmail : "noreply@tradex.com",
                 smtpFromName != null ? smtpFromName : "TradeX",
-                emailNotificationsEnabled
+                emailNotificationsEnabled,
+                redirectEmailAddress != null ? redirectEmailAddress : ""
             ),
             new GeneralSettings(
                 appTimezone != null ? appTimezone : "Asia/Kolkata",
@@ -147,8 +149,22 @@ public record SystemSettingDTO(
         @NotNull(message = "From name cannot be null")
         String smtpFromName,
 
-        boolean emailNotificationsEnabled
-    ) {}
+        boolean emailNotificationsEnabled,
+
+        String redirectEmailAddress
+    ) {
+        public EmailSettings(
+            String smtpHost,
+            Integer smtpPort,
+            String smtpUsername,
+            String smtpPassword,
+            String smtpFromEmail,
+            String smtpFromName,
+            boolean emailNotificationsEnabled
+        ) {
+            this(smtpHost, smtpPort, smtpUsername, smtpPassword, smtpFromEmail, smtpFromName, emailNotificationsEnabled, "");
+        }
+    }
 
     public record GeneralSettings(
         @NotNull(message = "Timezone cannot be null")

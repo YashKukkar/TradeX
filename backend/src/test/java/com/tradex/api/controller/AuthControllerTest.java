@@ -288,4 +288,31 @@ class AuthControllerTest {
                                 .andExpect(jsonPath("$.firstDepositRewardAmount").value(120.0))
                                 .andExpect(jsonPath("$.firstDepositRewardThreshold").value(600.0));
         }
+
+        @Test
+        void testResetPasswordSuccess() throws Exception {
+                User user = new User("reset@example.com", passwordEncoder.encode("oldpassword"));
+                user.setEmailVerified(true);
+                user.setCredentialsExpired(true);
+                userRepository.save(user);
+
+                java.time.LocalDateTime expiry = java.time.LocalDateTime.now().plusMinutes(10);
+                VerificationToken token = new VerificationToken(user, passwordEncoder.encode("123456"), VerificationType.PASSWORD_RESET, expiry);
+                verificationTokenRepository.save(token);
+
+                AuthController.ResetPasswordRequest request = new AuthController.ResetPasswordRequest(
+                        "reset@example.com",
+                        "123456",
+                        "newsecurepassword"
+                );
+
+                mockMvc.perform(post("/api/auth/reset-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isOk());
+
+                User updatedUser = userRepository.findByEmail("reset@example.com").orElseThrow();
+                org.junit.jupiter.api.Assertions.assertFalse(updatedUser.isCredentialsExpired());
+                org.junit.jupiter.api.Assertions.assertTrue(passwordEncoder.matches("newsecurepassword", updatedUser.getPassword()));
+        }
 }
