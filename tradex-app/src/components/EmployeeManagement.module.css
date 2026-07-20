@@ -1,0 +1,195 @@
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.subTitle {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(181, 95, 230, 0.25);
+  transition: all 0.2s ease;
+}
+
+.addBtn:hover {
+  background: var(--primary-hover, #9c3cd6);
+  transform: translateY(-1px);
+}
+
+.emptyState {
+  padding: 48px;
+  text-align: center;
+  background: linear-gradient(160deg, var(--surface), var(--surface-2));
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  color: var(--muted);
+}
+
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  color: var(--border);
+}
+
+.emptyTitle {
+  font-weight: 600;
+  font-size: 15px;
+  margin: 0;
+}
+
+.emptySub {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.employeeMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.employeeEmail {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.employeeSubtext {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.permissionsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 450px;
+}
+
+.permissionTag {
+  font-size: 10.5px;
+  font-weight: 600;
+  background: rgba(181, 95, 230, 0.08);
+  color: var(--primary);
+  border: 1px solid rgba(181, 95, 230, 0.2);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.statusPill {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.statusActive {
+  color: #00e0a4;
+  background: rgba(0, 224, 164, 0.1);
+  border: 1px solid rgba(0, 224, 164, 0.2);
+}
+
+.statusDisabled {
+  color: var(--danger);
+  background: rgba(255, 90, 106, 0.1);
+  border: 1px solid rgba(255, 90, 106, 0.2);
+}
+
+.actionRow {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.input {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 13.5px;
+}
+
+.checkboxContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.submitBtn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.2s ease;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: var(--primary-hover, #9c3cd6);
+  transform: translateY(-1px);
+}

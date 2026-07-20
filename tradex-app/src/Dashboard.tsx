@@ -8,6 +8,7 @@ import VerificationModal from "./components/VerificationModal";
 import AdminDashboard from "./components/AdminDashboard";
 import UserDashboard from "./components/UserDashboard";
 import { getDisplayName, formatDate } from "./utils/dashboardHelpers";
+import { isAdminRole } from "./utils/permissions";
 import {
   useCurrentUser,
   useVerification,
@@ -40,7 +41,7 @@ export default function Dashboard() {
 
   const { data: user, isLoading: userLoading, error: userError } = useCurrentUser();
 
-  const isAdmin = user?.role === "ADMIN";
+  const isAdmin = isAdminRole(user);
 
   const verifyMutation = useVerification(
     () => {
@@ -105,7 +106,7 @@ export default function Dashboard() {
   }, [userError, navigate]);
 
   useEffect(() => {
-    if (user?.role === "ADMIN") {
+    if (isAdminRole(user)) {
       document.documentElement.setAttribute("data-theme", "admin");
     }
     return () => {
@@ -187,12 +188,6 @@ export default function Dashboard() {
                   <div className={styles.dropdownMeta}>Member since {memberSince}</div>
                 )}
                 <div className={styles.dropdownDivider} />
-                {isAdmin && (
-                  <button className={styles.dropdownAdmin} onClick={() => navigate("/dashboard?tab=users")}>
-                    <Icon name="admin_panel_settings" style={{ fontSize: "16px", marginRight: "6px" }} />
-                    Admin Panel
-                  </button>
-                )}
                 <button className={styles.dropdownLogout} onClick={handleLogout}>
                   Sign out
                 </button>
@@ -206,7 +201,8 @@ export default function Dashboard() {
         {isAdmin ? (
           <AdminDashboard
             displayName={displayName}
-            adminLoading={userLoading}
+            userLoading={userLoading}
+            user={user!}
           />
         ) : (
           <UserDashboard

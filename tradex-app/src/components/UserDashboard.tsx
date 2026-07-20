@@ -208,7 +208,28 @@ export default function UserDashboard({
             )}
           </Card.Body>
         </Card>
+
+        <Card>
+          <Card.Icon name="support_agent" />
+          <Card.Title>Help & Support</Card.Title>
+          <Card.Body>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div>
+                Need assistance with your wallet, transactions, or account?
+              </div>
+              <span className={styles.metaLabel} style={{ marginTop: "4px" }}>
+                Our ticket resolution system tracks your requests in real-time. Open a support ticket, upload evidence, and chat directly with our admins.
+              </span>
+            </div>
+          </Card.Body>
+          <Card.Actions>
+            <Card.ActionBtn onClick={() => navigate("/support")}>
+              Contact Support
+            </Card.ActionBtn>
+          </Card.Actions>
+        </Card>
       </div>
+
 
       <WalletActivityLog transactions={transactions} />
     </>

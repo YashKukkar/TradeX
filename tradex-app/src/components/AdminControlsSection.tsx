@@ -1,8 +1,10 @@
 import Icon from "./Icon";
-import type { UserInfo } from "../utils/dashboardHelpers";
+import type { UserInfo, UserProfile } from "../utils/dashboardHelpers";
+import { hasPermission } from "../utils/permissions";
 
 interface AdminControlsSectionProps {
   user: UserInfo;
+  currentUser: UserProfile;
   hasNetwork: boolean;
   onLock: () => void;
   onUnlock: () => void;
@@ -16,6 +18,7 @@ interface AdminControlsSectionProps {
 
 export default function AdminControlsSection({
   user,
+  currentUser,
   hasNetwork,
   onLock,
   onUnlock,
@@ -26,12 +29,18 @@ export default function AdminControlsSection({
   onAdjustPoints,
   viewNetwork,
 }: AdminControlsSectionProps) {
+  const hasManageUsers = hasPermission(currentUser, "MANAGE_USERS");
+  const hasManagePoints = hasPermission(currentUser, "MANAGE_POINTS");
+  const hasViewReferrals = hasPermission(currentUser, "MANAGE_USERS");
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "12px" }}>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
         {user.locked ? (
           <button
             onClick={onUnlock}
+            disabled={!hasManageUsers}
+            title={!hasManageUsers ? "Requires User Management authority" : ""}
             style={{
               display: "flex",
               alignItems: "center",
@@ -44,7 +53,8 @@ export default function AdminControlsSection({
               borderRadius: "8px",
               fontSize: "13px",
               fontWeight: 700,
-              cursor: "pointer",
+              cursor: hasManageUsers ? "pointer" : "not-allowed",
+              opacity: hasManageUsers ? 1 : 0.5,
               transition: "all 0.2s ease",
             }}
           >
@@ -53,6 +63,8 @@ export default function AdminControlsSection({
         ) : (
           <button
             onClick={onLock}
+            disabled={!hasManageUsers}
+            title={!hasManageUsers ? "Requires User Management authority" : ""}
             style={{
               display: "flex",
               alignItems: "center",
@@ -65,7 +77,8 @@ export default function AdminControlsSection({
               borderRadius: "8px",
               fontSize: "13px",
               fontWeight: 700,
-              cursor: "pointer",
+              cursor: hasManageUsers ? "pointer" : "not-allowed",
+              opacity: hasManageUsers ? 1 : 0.5,
               transition: "all 0.2s ease",
             }}
           >
@@ -76,6 +89,8 @@ export default function AdminControlsSection({
         {user.enabled === false ? (
           <button
             onClick={onEnable}
+            disabled={!hasManageUsers}
+            title={!hasManageUsers ? "Requires User Management authority" : ""}
             style={{
               display: "flex",
               alignItems: "center",
@@ -88,7 +103,8 @@ export default function AdminControlsSection({
               borderRadius: "8px",
               fontSize: "13px",
               fontWeight: 700,
-              cursor: "pointer",
+              cursor: hasManageUsers ? "pointer" : "not-allowed",
+              opacity: hasManageUsers ? 1 : 0.5,
               transition: "all 0.2s ease",
             }}
           >
@@ -97,6 +113,8 @@ export default function AdminControlsSection({
         ) : (
           <button
             onClick={onDisable}
+            disabled={!hasManageUsers}
+            title={!hasManageUsers ? "Requires User Management authority" : ""}
             style={{
               display: "flex",
               alignItems: "center",
@@ -109,7 +127,8 @@ export default function AdminControlsSection({
               borderRadius: "8px",
               fontSize: "13px",
               fontWeight: 700,
-              cursor: "pointer",
+              cursor: hasManageUsers ? "pointer" : "not-allowed",
+              opacity: hasManageUsers ? 1 : 0.5,
               transition: "all 0.2s ease",
             }}
           >
@@ -121,6 +140,8 @@ export default function AdminControlsSection({
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
         <button
           onClick={onAdjustPoints}
+          disabled={!hasManagePoints}
+          title={!hasManagePoints ? "Requires Points Management authority" : ""}
           style={{
             display: "flex",
             alignItems: "center",
@@ -133,7 +154,8 @@ export default function AdminControlsSection({
             borderRadius: "8px",
             fontSize: "13px",
             fontWeight: 700,
-            cursor: "pointer",
+            cursor: hasManagePoints ? "pointer" : "not-allowed",
+            opacity: hasManagePoints ? 1 : 0.5,
             transition: "all 0.2s ease",
           }}
         >
@@ -142,6 +164,8 @@ export default function AdminControlsSection({
 
         <button
           onClick={onSendResetEmail}
+          disabled={!hasManageUsers}
+          title={!hasManageUsers ? "Requires User Management authority" : ""}
           style={{
             display: "flex",
             alignItems: "center",
@@ -154,7 +178,8 @@ export default function AdminControlsSection({
             borderRadius: "8px",
             fontSize: "13px",
             fontWeight: 700,
-            cursor: "pointer",
+            cursor: hasManageUsers ? "pointer" : "not-allowed",
+            opacity: hasManageUsers ? 1 : 0.5,
             transition: "all 0.2s ease",
           }}
         >
@@ -166,6 +191,8 @@ export default function AdminControlsSection({
         {!user.emailVerified && (
           <button
             onClick={onVerifyEmail}
+            disabled={!hasManageUsers}
+            title={!hasManageUsers ? "Requires User Management authority" : ""}
             style={{
               flex: 1,
               display: "flex",
@@ -179,7 +206,8 @@ export default function AdminControlsSection({
               borderRadius: "8px",
               fontSize: "13px",
               fontWeight: 700,
-              cursor: "pointer",
+              cursor: hasManageUsers ? "pointer" : "not-allowed",
+              opacity: hasManageUsers ? 1 : 0.5,
               transition: "all 0.2s ease",
             }}
           >
@@ -190,6 +218,8 @@ export default function AdminControlsSection({
         {hasNetwork && (
           <button
             onClick={viewNetwork}
+            disabled={!hasViewReferrals}
+            title={!hasViewReferrals ? "Requires View Referral Tree authority" : ""}
             style={{
               flex: 1,
               display: "flex",
@@ -203,7 +233,8 @@ export default function AdminControlsSection({
               borderRadius: "8px",
               fontSize: "13px",
               fontWeight: 700,
-              cursor: "pointer",
+              cursor: hasViewReferrals ? "pointer" : "not-allowed",
+              opacity: hasViewReferrals ? 1 : 0.5,
               transition: "all 0.2s ease",
             }}
           >

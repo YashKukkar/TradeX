@@ -2,6 +2,7 @@ package com.tradex.api.security;
 
 import com.tradex.api.entity.User;
 import com.tradex.api.entity.SystemSetting;
+import com.tradex.api.enums.Permission;
 import com.tradex.api.enums.Role;
 import com.tradex.api.repository.UserRepository;
 import com.tradex.api.service.SystemSettingService;
@@ -22,6 +23,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+
 import jakarta.servlet.http.Cookie;
 
 @Component
@@ -71,12 +76,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             userEmail = jwtUtil.extractUsername(jwt);
             String role = jwtUtil.extractRole(jwt);
-            
+
             if (userEmail == null || SecurityContextHolder.getContext().getAuthentication() != null) {
                 filterChain.doFilter(request, response);
                 return;
             }
-            
+
             if (!jwtUtil.validateToken(jwt, userEmail)) {
                 filterChain.doFilter(request, response);
                 return;
@@ -91,19 +96,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                    path.endsWith("/verify-phone") ||
                                    path.endsWith("/logout") ||
                                    path.endsWith("/me");
-                
+
                 if (!isBypass) {
                     user = userRepository.findByEmail(userEmail).orElse(null);
                     if (user == null) {
                         filterChain.doFilter(request, response);
                         return;
                     }
-                    
+
                     if (settings.isEmailVerificationEnabled() && !user.isEmailVerified()) {
                         writeErrorResponse(request, response, HttpServletResponse.SC_FORBIDDEN, "Forbidden", "Email verification is required.");
                         return;
                     }
-                    
+
                     if (settings.isPhoneVerificationEnabled() && user.getPhoneNumber() != null && !user.isPhoneVerified()) {
                         writeErrorResponse(request, response, HttpServletResponse.SC_FORBIDDEN, "Forbidden", "Phone verification is required.");
                         return;
@@ -115,6 +120,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 user = new User();
                 user.setEmail(userEmail);
                 user.setRole(Role.valueOf(role != null ? role.toUpperCase() : "USER"));
+                // JWT for EMPLOYEE role
+                List<String> permStrings = jwtUtil.extractPermissions(jwt);
+                if (!permStrings.isEmpty()) {
+                    Set<Permission> perms = EnumSet.noneOf(Permission.class);
+                    for (String p : permStrings) {
+                        try {
+                            perms.add(Permission.valueOf(p));
+                        } catch (IllegalArgumentException ignored) {}
+                    }
+                    user.setPermissions(perms);
+                }
             }
 
             CustomUserPrincipal principal = new CustomUserPrincipal(user);
@@ -125,11 +141,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             );
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
-            
+
         } catch (Exception e) {
             log.warn("JWT Authentication failed: {}", e.getMessage());
         }
-        
+
         filterChain.doFilter(request, response);
     }
 
@@ -137,9 +153,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setStatus(status);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        
+
         ErrorResponse errorResponse = new ErrorResponse(status, error, message, request.getRequestURI());
-        
+
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         response.getWriter().write(mapper.writeValueAsString(errorResponse));

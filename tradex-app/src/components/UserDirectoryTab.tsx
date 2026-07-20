@@ -5,7 +5,7 @@ import AdjustPointsModal from "./AdjustPointsModal";
 import ResetPasswordConfirmModal from "./ResetPasswordConfirmModal";
 import ReferralTreeModal from "./ReferralTreeModal";
 import Toast from "./Toast";
-import { useAdminTelemetry } from "../hooks/useDashboard";
+
 import {
   useReferralTree,
   useUpdateUserStatus,
@@ -13,7 +13,7 @@ import {
   useAdjustUserPoints,
   type AdminAction,
 } from "../hooks/useAdmin";
-import type { UserInfo } from "../utils/dashboardHelpers";
+import type { UserInfo, UserProfile } from "../utils/dashboardHelpers";
 
 type ModalState =
   | { type: "controlPanel"; user: UserInfo }
@@ -27,7 +27,13 @@ interface ToastState {
   type: "success" | "error" | "warning" | "info";
 }
 
-export default function UserDirectoryTab() {
+interface UserDirectoryTabProps {
+  user: UserProfile;
+  users: UserInfo[];
+  adminLoading: boolean;
+}
+
+export default function UserDirectoryTab({ user, users, adminLoading }: UserDirectoryTabProps) {
   const [modal, setModal] = useState<ModalState>(null);
   const [toast, setToast] = useState<ToastState | null>(null);
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
@@ -40,10 +46,6 @@ export default function UserDirectoryTab() {
     const msg = (err as { message?: string })?.message ?? "Something went wrong";
     showToast(msg, "error");
   }
-
-  // ── Queries & Mutations ──────────────────────────────────────────
-  const { data: adminData, isLoading: adminLoading } = useAdminTelemetry(true);
-  const users = (adminData?.usersList || []).filter((u) => u.role !== "ADMIN");
 
   const selectedUser = modal && "user" in modal
     ? users.find((u) => u.id === modal.user.id) || modal.user
@@ -114,6 +116,7 @@ export default function UserDirectoryTab() {
       {modal?.type === "controlPanel" && selectedUser && (
         <AdminUserControlModal
           user={selectedUser}
+          currentUser={user}
           onClose={() => setModal(null)}
           hasNetwork={users.some((other) => other.referredByEmail === selectedUser.email)}
           onLock={() => act("LOCK", selectedUser)}

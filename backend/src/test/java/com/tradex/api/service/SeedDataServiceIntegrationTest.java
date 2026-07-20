@@ -1,7 +1,6 @@
 package com.tradex.api.service;
 
 import com.tradex.api.entity.*;
-import com.tradex.api.enums.*;
 import com.tradex.api.repository.UserRepository;
 import com.tradex.api.repository.PointsTransactionRepository;
 import com.tradex.api.repository.ReferralRewardRepository;
@@ -11,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import com.tradex.api.service.seed.SeedDataService;
 
 import static org.junit.jupiter.api.Assertions.*;
 

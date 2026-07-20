@@ -2,6 +2,7 @@ package com.tradex.api.controller;
 
 import com.tradex.api.dto.WalletTransactionDTO;
 import com.tradex.api.dto.UserDTO;
+import com.tradex.api.mapper.UserMapper;
 import com.tradex.api.service.WalletService;
 import com.tradex.api.entity.User;
 import jakarta.validation.Valid;
@@ -18,13 +19,17 @@ import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequestMapping("/api/wallet")
 @RequiredArgsConstructor
 @Slf4j
+@PreAuthorize("hasAuthority('ROLE_USER')")
 public class WalletController {
 
     private final WalletService walletService;
+    private final UserMapper userMapper;
 
     public record WalletAmountRequest(
         @NotNull(message = "Amount cannot be null")
@@ -87,6 +92,6 @@ public class WalletController {
     ) {
         log.info("Updating bank details for user {}", principal.getName());
         User user = walletService.updateBankDetails(principal.getName(), request.accountNumber());
-        return ResponseEntity.ok(new UserDTO(user));
+        return ResponseEntity.ok(userMapper.toDTO(user));
     }
 }

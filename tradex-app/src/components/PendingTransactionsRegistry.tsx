@@ -10,6 +10,8 @@ import {
   useApproveTransaction,
   useRejectTransaction,
 } from "../hooks/useAdmin";
+import type { UserProfile } from "../utils/dashboardHelpers";
+import { hasPermission } from "../utils/permissions";
 
 export interface PendingTransaction {
   id: number;
@@ -24,7 +26,11 @@ export interface PendingTransaction {
   userAccountNumber?: string;
 }
 
-export default function PendingTransactionsRegistry() {
+interface PendingTransactionsRegistryProps {
+  user: UserProfile;
+}
+
+export default function PendingTransactionsRegistry({ user }: PendingTransactionsRegistryProps) {
   const [activeTab, setActiveTab] = useState<"pending" | "all">("pending");
   const [rejectingId, setRejectingId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState("");
@@ -252,24 +258,30 @@ export default function PendingTransactionsRegistry() {
                           </button>
                         </div>
                       ) : (
-                        <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
-                          <button
-                            className={styles.approveBtn}
-                            onClick={() => handleApprove(t.id)}
-                            disabled={approveMutation.isPending}
-                          >
-                            <Icon name="check_circle" style={{ fontSize: "16px" }} />
-                            Approve
-                          </button>
-                          <button
-                            className={styles.rejectBtn}
-                            onClick={() => handleRejectClick(t.id)}
-                            disabled={approveMutation.isPending}
-                          >
-                            <Icon name="cancel" style={{ fontSize: "16px" }} />
-                            Reject
-                          </button>
-                        </div>
+                        t.type === "DEPOSIT" && !hasPermission(user, "MANAGE_DEPOSITS") ? (
+                          <span style={{ fontSize: "12.5px", color: "var(--muted)", fontStyle: "italic" }}>No Deposit Permission</span>
+                        ) : t.type === "WITHDRAWAL" && !hasPermission(user, "MANAGE_WITHDRAWALS") ? (
+                          <span style={{ fontSize: "12.5px", color: "var(--muted)", fontStyle: "italic" }}>No Withdrawal Permission</span>
+                        ) : (
+                          <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                            <button
+                              className={styles.approveBtn}
+                              onClick={() => handleApprove(t.id)}
+                              disabled={approveMutation.isPending}
+                            >
+                              <Icon name="check_circle" style={{ fontSize: "16px" }} />
+                              Approve
+                            </button>
+                            <button
+                              className={styles.rejectBtn}
+                              onClick={() => handleRejectClick(t.id)}
+                              disabled={approveMutation.isPending}
+                            >
+                              <Icon name="cancel" style={{ fontSize: "16px" }} />
+                              Reject
+                            </button>
+                          </div>
+                        )
                       )}
                     </td>
                   )}

@@ -23,10 +23,13 @@ export function useReferralTree(userId: number | null) {
   });
 }
 
-export function useAdminAuditLogs(page: number, enabled: boolean) {
+export function useAdminAuditLogs(page: number, enabled: boolean, targetEmail?: string) {
   return useQuery<PageResponse<AuditLogItem>>({
-    queryKey: ["adminAuditLogs", page],
-    queryFn: () => api(`/admin/audit-logs?page=${page}&size=50&sort=createdAt,desc`),
+    queryKey: ["adminAuditLogs", page, targetEmail],
+    queryFn: () => {
+      const emailParam = targetEmail ? `&targetEmail=${encodeURIComponent(targetEmail)}` : "";
+      return api(`/admin/audit-logs?page=${page}&size=50&sort=createdAt,desc${emailParam}`);
+    },
     enabled,
   });
 }
@@ -106,6 +109,31 @@ export function useAdjustUserPoints(options?: {
   });
 }
 
+export function useAdjustUserWallet(options?: {
+  onSuccess?: () => void;
+  onError?: (err: Error) => void;
+}) {
+  const queryClient = useQueryClient();
+  return useMutation<
+    UserInfo,
+    Error,
+    { userId: number; delta: number; walletType: "CASH" | "BONUS"; reason: string }
+  >({
+    mutationFn: ({ userId, delta, walletType, reason }) =>
+      api(`/admin/users/${userId}/wallet`, {
+        method: "POST",
+        body: JSON.stringify({ delta, walletType, reason }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminTelemetry"] });
+      options?.onSuccess?.();
+    },
+    onError: (err) => {
+      options?.onError?.(err);
+    },
+  });
+}
+
 export function useSaveSystemSettings(options?: {
   onSuccess?: (data: SystemSetting) => void;
   onError?: (err: Error) => void;
@@ -155,6 +183,75 @@ export function useRejectTransaction(options?: {
       queryClient.invalidateQueries({ queryKey: ["allTransactions"] });
       queryClient.invalidateQueries({ queryKey: ["adminTelemetry"] });
       options?.onSuccess?.();
+    },
+  });
+}
+
+export function useEmployees() {
+  return useQuery<UserInfo[]>({
+    queryKey: ["employeesList"],
+    queryFn: () => api("/admin/employees"),
+  });
+}
+
+export function useCreateEmployee(options?: {
+  onSuccess?: (employee: UserInfo) => void;
+  onError?: (err: Error) => void;
+}) {
+  const queryClient = useQueryClient();
+  return useMutation<UserInfo, Error, { email: string; password: string; permissions: string[] }>({
+    mutationFn: (body) =>
+      api("/admin/employees", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["employeesList"] });
+      options?.onSuccess?.(data);
+    },
+    onError: (err) => {
+      options?.onError?.(err);
+    },
+  });
+}
+
+export function useUpdateEmployeePermissions(options?: {
+  onSuccess?: (employee: UserInfo) => void;
+  onError?: (err: Error) => void;
+}) {
+  const queryClient = useQueryClient();
+  return useMutation<UserInfo, Error, { employeeId: number; permissions: string[] }>({
+    mutationFn: ({ employeeId, permissions }) =>
+      api(`/admin/employees/${employeeId}/permissions`, {
+        method: "PUT",
+        body: JSON.stringify({ permissions }),
+      }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["employeesList"] });
+      options?.onSuccess?.(data);
+    },
+    onError: (err) => {
+      options?.onError?.(err);
+    },
+  });
+}
+
+export function useDeleteEmployee(options?: {
+  onSuccess?: () => void;
+  onError?: (err: Error) => void;
+}) {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, number>({
+    mutationFn: (employeeId) =>
+      api(`/admin/employees/${employeeId}`, {
+        method: "DELETE",
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employeesList"] });
+      options?.onSuccess?.();
+    },
+    onError: (err) => {
+      options?.onError?.(err);
     },
   });
 }

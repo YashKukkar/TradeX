@@ -4,6 +4,7 @@ import com.tradex.api.entity.AdminAuditLog;
 import com.tradex.api.entity.User;
 import com.tradex.api.repository.AdminAuditLogRepository;
 import com.tradex.api.repository.UserRepository;
+import com.tradex.api.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -16,8 +17,6 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-
-import java.lang.reflect.Method;
 
 @Aspect
 @Component
@@ -36,7 +35,7 @@ public class AdminAuditAspect {
         Object[] args = joinPoint.getArgs();
 
         String adminEmail = null;
-        Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
             adminEmail = auth.getName();
         }
@@ -44,15 +43,19 @@ public class AdminAuditAspect {
         Long targetUserId = null;
 
         for (int i = 0; i < parameterNames.length; i++) {
-            if ("userId".equals(parameterNames[i])) {
+            if ("userId".equals(parameterNames[i]) || "id".equals(parameterNames[i]) || "employeeId".equals(parameterNames[i])) {
                 targetUserId = (Long) args[i];
             } else if (adminEmail == null && "adminEmail".equals(parameterNames[i])) {
                 adminEmail = (String) args[i];
             }
         }
 
+        if (targetUserId == null && result instanceof UserDTO) {
+            targetUserId = ((UserDTO) result).id();
+        }
+
         if (adminEmail == null || targetUserId == null) {
-            log.warn("AOP Auditing bypassed: adminEmail or target userId not found.");
+            log.warn("AOP Auditing bypassed: adminEmail ({}) or target userId ({}) not found.", adminEmail, targetUserId);
             return;
         }
 

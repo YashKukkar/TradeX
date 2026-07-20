@@ -1,6 +1,7 @@
 package com.tradex.api.controller;
 
 import com.tradex.api.dto.AdminAdjustPointsRequest;
+import com.tradex.api.dto.AdminAdjustWalletRequest;
 import com.tradex.api.dto.AdminAuditLogDTO;
 import com.tradex.api.dto.PointsTransactionDTO;
 import com.tradex.api.dto.UserDTO;
@@ -14,7 +15,7 @@ import com.tradex.api.service.AdminUserService;
 import com.tradex.api.service.UserService;
 import com.tradex.api.service.SystemSettingService;
 import com.tradex.api.service.ReferralService;
-import com.tradex.api.service.SeedDataService;
+import com.tradex.api.service.seed.SeedDataService;
 import com.tradex.api.service.WalletService;
 import com.tradex.api.exception.AppException.BadRequestException;
 import jakarta.validation.Valid;
@@ -45,22 +46,22 @@ public class AdminController {
         return auth.getName();
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_USERS')")
     @GetMapping("/users")
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers();
+    public ResponseEntity<List<UserDTO>> getAllUsers(Authentication auth) {
+        List<UserDTO> users = userService.getAllUsers(auth.getName());
         return ResponseEntity.ok(users);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_USERS')")
     @GetMapping("/users/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id, Authentication auth) {
+        return ResponseEntity.ok(userService.getUserById(id, auth.getName()));
     }
 
     public record StatusActionRequest(AdminAction action) {}
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_USERS')")
     @PatchMapping("/users/{id}/status")
     public ResponseEntity<UserDTO> updateUserStatus(
             @PathVariable Long id,
@@ -78,7 +79,7 @@ public class AdminController {
         return ResponseEntity.ok(result);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_USERS')")
     @PostMapping("/users/{id}/reset-password")
     public ResponseEntity<Void> sendPasswordResetEmail(
             @PathVariable Long id,
@@ -87,7 +88,7 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_POINTS')")
     @PostMapping("/users/{id}/points")
     public ResponseEntity<UserDTO> adjustPoints(
             @PathVariable Long id,
@@ -96,39 +97,49 @@ public class AdminController {
         return ResponseEntity.ok(adminUserService.adjustPoints(currentAdminEmail(auth), id, request));
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping("/audit-logs")
-    public ResponseEntity<Page<AdminAuditLogDTO>> getAuditLogs(
-            @PageableDefault(size = 50, sort = "createdAt") Pageable pageable) {
-        return ResponseEntity.ok(adminUserService.getAuditLogs(pageable));
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_DEPOSITS', 'PERM_MANAGE_WITHDRAWALS')")
+    @PostMapping("/users/{id}/wallet")
+    public ResponseEntity<UserDTO> adjustWallet(
+            @PathVariable Long id,
+            @Valid @RequestBody AdminAdjustWalletRequest request,
+            Authentication auth) {
+        return ResponseEntity.ok(adminUserService.adjustWallet(currentAdminEmail(auth), id, request));
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EMPLOYEE')")
+    @GetMapping("/audit-logs")
+    public ResponseEntity<Page<AdminAuditLogDTO>> getAuditLogs(
+            @RequestParam(required = false) String targetEmail,
+            @PageableDefault(size = 50, sort = "createdAt") Pageable pageable) {
+        return ResponseEntity.ok(adminUserService.getAuditLogs(targetEmail, pageable));
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_POINTS')")
     @GetMapping("/users/{id}/points-history")
     public ResponseEntity<List<PointsTransactionDTO>> getUserPointsHistory(@PathVariable Long id) {
         return ResponseEntity.ok(adminUserService.getUserPointsHistory(id));
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_USERS', 'PERM_MANAGE_DEPOSITS', 'PERM_MANAGE_WITHDRAWALS')")
     @GetMapping("/users/{id}/wallet-history")
     public ResponseEntity<List<WalletTransactionDTO>> getUserWalletHistory(@PathVariable Long id) {
         return ResponseEntity.ok(adminUserService.getUserWalletHistory(id));
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_USERS')")
     @GetMapping("/users/{id}/referral-tree")
     public ResponseEntity<List<UserDTO>> getReferralTree(@PathVariable Long id) {
         List<UserDTO> network = referralService.getReferralTree(id);
         return ResponseEntity.ok(network);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'ROLE_EMPLOYEE')")
     @GetMapping("/settings")
     public ResponseEntity<SystemSettingDTO> getSettings() {
         return ResponseEntity.ok(systemSettingService.getSettingsDTO());
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_SETTINGS')")
     @PutMapping("/settings")
     public ResponseEntity<SystemSettingDTO> updateSettings(@Valid @RequestBody SystemSettingDTO dto) {
         log.info("Admin updated system settings");
@@ -136,7 +147,7 @@ public class AdminController {
         return ResponseEntity.ok(updatedDto);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
     @PostMapping("/seed-test-data")
     public ResponseEntity<Void> seedTestData() {
         log.info("Admin triggered database seeding for test users");
@@ -149,32 +160,32 @@ public class AdminController {
         String reason
     ) {}
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_DEPOSITS', 'PERM_MANAGE_WITHDRAWALS')")
     @GetMapping("/transactions")
     public ResponseEntity<List<WalletTransactionDTO>> getAllTransactions() {
         return ResponseEntity.ok(walletService.getAllTransactions());
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_DEPOSITS', 'PERM_MANAGE_WITHDRAWALS')")
     @GetMapping("/transactions/pending")
     public ResponseEntity<List<WalletTransactionDTO>> getPendingTransactions() {
         return ResponseEntity.ok(walletService.getPendingTransactions());
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_DEPOSITS', 'PERM_MANAGE_WITHDRAWALS')")
     @PostMapping("/transactions/{id}/approve")
-    public ResponseEntity<WalletTransactionDTO> approveTransaction(@PathVariable Long id) {
+    public ResponseEntity<WalletTransactionDTO> approveTransaction(@PathVariable Long id, Authentication auth) {
         log.info("Admin approved transaction ID: {}", id);
-        return ResponseEntity.ok(walletService.approveTransaction(id));
+        return ResponseEntity.ok(walletService.approveTransaction(id, auth));
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_DEPOSITS', 'PERM_MANAGE_WITHDRAWALS')")
     @PostMapping("/transactions/{id}/reject")
     public ResponseEntity<WalletTransactionDTO> rejectTransaction(
             @PathVariable Long id,
-            @Valid @RequestBody RejectTransactionRequest request) {
+            @Valid @RequestBody RejectTransactionRequest request,
+            Authentication auth) {
         log.info("Admin rejected transaction ID: {} with reason: {}", id, request.reason());
-        return ResponseEntity.ok(walletService.rejectTransaction(id, request.reason()));
+        return ResponseEntity.ok(walletService.rejectTransaction(id, request.reason(), auth));
     }
 }
-

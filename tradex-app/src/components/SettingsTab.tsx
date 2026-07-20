@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import AdminSettingsForm from "./AdminSettingsForm";
-import { useAdminTelemetry } from "../hooks/useDashboard";
 import { useSaveSystemSettings } from "../hooks/useAdmin";
 import { validateSystemSettings } from "../utils/validation";
 import type { SystemSetting } from "../utils/dashboardHelpers";
 
-export default function SettingsTab() {
+export default function SettingsTab({ settingsConfig }: { settingsConfig?: SystemSetting }) {
   const [settings, setSettings] = useState<SystemSetting>({
     welcomeCoinsEnabled: true,
     welcomeCoinsAmount: 1000,
@@ -32,20 +31,20 @@ export default function SettingsTab() {
     emailNotificationsEnabled: false,
     appTimezone: "Asia/Kolkata",
     appCurrency: "INR",
+    redirectEmailAddress: "",
   });
+
 
   const [settingsSuccess, setSettingsSuccess] = useState(false);
   const [settingsError, setSettingsError] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { data: adminData } = useAdminTelemetry(true);
-
   useEffect(() => {
-    if (adminData?.settingsConfig) {
-      setSettings(adminData.settingsConfig);
+    if (settingsConfig) {
+      setSettings(settingsConfig);
     }
-  }, [adminData]);
+  }, [settingsConfig]);
 
   useEffect(() => {
     setErrors(validateSystemSettings(settings));

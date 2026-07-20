@@ -1,7 +1,9 @@
 package com.tradex.api.service;
+import com.tradex.api.mapper.UserMapper;
 
 import com.tradex.api.entity.ReferralReward;
 import com.tradex.api.enums.ReferralRewardStatus;
+import com.tradex.api.enums.Role;
 import com.tradex.api.entity.User;
 import com.tradex.api.entity.SystemSetting;
 import com.tradex.api.entity.PointsTransaction;
@@ -25,6 +27,7 @@ import java.security.SecureRandom;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.function.Function;
@@ -39,6 +42,7 @@ public class ReferralService {
     private final ReferralRewardRepository rewardRepository;
     private final SystemSettingService systemSettingService;
     private final PointsTransactionRepository pointsTransactionRepository;
+    private final UserMapper userMapper;
 
     private static final String REFERRAL_CODE_CHARS = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
     private static final int REFERRAL_CODE_LENGTH = 8;
@@ -174,7 +178,25 @@ public class ReferralService {
     @Async
     @Transactional
     public void processReferralRewardsAsync(Long newUserId) {
-        processReferralRewards(newUserId);
+        int maxRetries = 3;
+        for (int i = 0; i < maxRetries; i++) {
+            try {
+                processReferralRewards(newUserId);
+                return;
+            } catch (ResourceNotFoundException e) {
+                if (i == maxRetries - 1) {
+                    throw e;
+                }
+                log.info("User {} not found in async thread yet. Retrying in 100ms... (Attempt {}/{})", newUserId,
+                        i + 1, maxRetries);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(ie);
+                }
+            }
+        }
     }
 
     @Transactional(readOnly = true)
@@ -182,10 +204,14 @@ public class ReferralService {
         User currentUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
+        if (currentUser.getRole() != Role.USER) {
+            return Collections.emptyList();
+        }
+
         return rewardRepository.findByReferrerOrderByCreatedAtDesc(currentUser).stream()
                 .map(reward -> {
-                    String referredEmail = reward.getReferredUser() != null 
-                            ? reward.getReferredUser().getEmail() 
+                    String referredEmail = reward.getReferredUser() != null
+                            ? reward.getReferredUser().getEmail()
                             : "Unknown";
                     return new ReferralRewardDTO(
                             reward.getId(),
@@ -202,6 +228,10 @@ public class ReferralService {
     public List<PointsTransactionDTO> getMyTransactions(String email) {
         User currentUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
+
+        if (currentUser.getRole() != Role.USER) {
+            return Collections.emptyList();
+        }
 
         return pointsTransactionRepository.findByUserOrderByCreatedAtDesc(currentUser).stream()
                 .map(tx -> new PointsTransactionDTO(
@@ -225,7 +255,7 @@ public class ReferralService {
         return userRepository.findByReferralPathStartingWith(path)
                 .stream()
                 .filter(u -> !u.getId().equals(userId))
-                .map(UserDTO::new)
+                .map(userMapper::toDTO)
                 .toList();
     }
 

@@ -2,7 +2,6 @@ package com.tradex.api.service;
 
 import com.tradex.api.config.AppProperties;
 import com.tradex.api.entity.SystemSetting;
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +17,7 @@ import java.util.Properties;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@SuppressWarnings("null")
 public class EmailService {
 
     private final SystemSettingService systemSettingService;
@@ -128,7 +128,7 @@ public class EmailService {
                 otpEmailTemplate = new String(inputStream.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             } catch (java.io.IOException e) {
                 log.error("Failed to read email template", e);
-                throw new RuntimeException(e);
+                throw new IllegalStateException("Failed to read email template", e);
             }
         }
         return otpEmailTemplate;

@@ -29,17 +29,21 @@ export function useCurrentUser() {
   });
 }
 
-export function useAdminTelemetry(isAdmin: boolean) {
-  return useQuery<{ usersList: UserInfo[], settingsConfig: SystemSetting }>({
-    queryKey: ["adminTelemetry"],
+export function useAdminTelemetry(isAdmin: boolean, currentUser?: UserProfile | null) {
+  return useQuery<{ usersList: UserInfo[], settingsConfig: SystemSetting | undefined }>({
+    queryKey: ["adminTelemetry", currentUser?.email],
     queryFn: async () => {
+      const isSuperAdmin = currentUser?.role === "SUPER_ADMIN";
+      const canManageUsers = isSuperAdmin || currentUser?.permissions?.includes("MANAGE_USERS") === true;
+
       const [usersList, settingsConfig] = await Promise.all([
-        api("/admin/users"),
-        api("/admin/settings")
+        canManageUsers ? api("/admin/users") : [],
+        api("/admin/settings")  // readable by all admins — drives overview status cards
       ]);
       return { usersList, settingsConfig };
     },
-    enabled: isAdmin
+    enabled: isAdmin && !!currentUser,
+    staleTime: 60000
   });
 }
 

@@ -1,12 +1,16 @@
 import { useState } from "react";
 import Icon from "./Icon";
-import type { UserInfo } from "../utils/dashboardHelpers";
+import type { UserInfo, UserProfile } from "../utils/dashboardHelpers";
+import { hasPermission } from "../utils/permissions";
 import styles from "../AdminUsers.module.css";
 import AdminControlsSection from "./AdminControlsSection";
 import UserLedgerTab from "./UserLedgerTab";
+import UserAuditTab from "./UserAuditTab";
+import { useUserActiveTickets } from "../hooks/useTickets";
 
 interface AdminUserControlModalProps {
   user: UserInfo;
+  currentUser: UserProfile;
   onClose: () => void;
   hasNetwork: boolean;
   onLock: () => void;
@@ -42,6 +46,7 @@ function VerifiedBadge({ verified }: { verified?: boolean }) {
 
 export default function AdminUserControlModal({
   user,
+  currentUser,
   onClose,
   hasNetwork,
   onLock,
@@ -53,7 +58,9 @@ export default function AdminUserControlModal({
   onAdjustPoints,
   viewNetwork,
 }: AdminUserControlModalProps) {
-  const [activeTab, setActiveTab] = useState<"profile" | "cash" | "points">("profile");
+  const [activeTab, setActiveTab] = useState<"profile" | "cash" | "points" | "audit">("profile");
+
+  const { data: activeTickets = [] } = useUserActiveTickets(user.email);
 
   const joinedDate = user.createdAt
     ? new Date(user.createdAt * 1000).toLocaleDateString("en-IN", {
@@ -77,30 +84,68 @@ export default function AdminUserControlModal({
 
         {/* Inner Tab Switches */}
         <div style={{ display: "flex", borderBottom: "1px solid var(--border)", background: "rgba(0,0,0,0.08)", padding: "0 12px" }}>
-          {(["profile", "cash", "points"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              style={{
-                background: "none",
-                border: "none",
-                borderBottom: activeTab === tab ? "2px solid var(--primary)" : "2px solid transparent",
-                color: activeTab === tab ? "var(--text)" : "var(--muted)",
-                padding: "12px 16px",
-                fontSize: "13px",
-                fontWeight: 700,
-                cursor: "pointer",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                transition: "all 0.2s ease"
-              }}
-            >
-              {tab === "profile" ? "Profile & Actions" : tab === "cash" ? "Cash Ledger" : "Points Ledger"}
-            </button>
-          ))}
+          {([
+            { id: "profile", label: "Profile & Actions", show: true },
+            { id: "cash", label: "Cash Ledger", show: hasPermission(currentUser, "MANAGE_USERS") },
+            { id: "points", label: "Points Ledger", show: hasPermission(currentUser, "MANAGE_POINTS") },
+            { id: "audit", label: "Audit History", show: hasPermission(currentUser, "MANAGE_USERS") }
+          ] as const)
+            .filter(t => t.show)
+            .map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  borderBottom: activeTab === tab.id ? "2px solid var(--primary)" : "2px solid transparent",
+                  color: activeTab === tab.id ? "var(--text)" : "var(--muted)",
+                  padding: "12px 16px",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                {tab.label}
+              </button>
+            ))}
         </div>
 
         <div className={styles.drawerBody} style={{ padding: "20px 24px", overflowY: "auto", height: "calc(100vh - 120px)" }}>
+          {activeTickets.length > 0 && (
+            <div style={{
+              background: "rgba(255, 176, 32, 0.1)",
+              border: "1px solid var(--accent)",
+              borderRadius: "8px",
+              padding: "12px 16px",
+              marginBottom: "16px",
+              display: "flex",
+              gap: "10px",
+              alignItems: "flex-start"
+            }}>
+              <Icon name="warning" style={{ color: "var(--accent)", fontSize: "20px", marginTop: "2px" }} />
+              <div style={{ fontSize: "12px", lineHeight: "1.5" }}>
+                <strong style={{ color: "var(--accent)" }}>Active Ticket Collision Warning</strong>
+                <p style={{ margin: "4px 0 0 0", color: "var(--text)" }}>
+                  This user has active support tickets:
+                </p>
+                <ul style={{ margin: "6px 0 0 0", paddingLeft: "20px", color: "var(--text)" }}>
+                  {activeTickets.map(t => (
+                    <li key={t.id}>
+                      <strong>{t.ticketNumber}</strong> ({t.category.replace("_", " ")}) 
+                      {t.assignedToUserEmail ? ` assigned to ${t.assignedToUserEmail}` : t.assignedToPermission ? ` assigned to group ${t.assignedToPermission.replace("MANAGE_", "")}` : " (Unassigned)"}
+                    </li>
+                  ))}
+                </ul>
+                <p style={{ margin: "6px 0 0 0", fontSize: "11px", color: "var(--muted)" }}>
+                  Please coordinate with the assigned employee/team before making changes.
+                </p>
+              </div>
+            </div>
+          )}
           {activeTab === "profile" && (
             <>
               {/* Account Status */}
@@ -118,6 +163,7 @@ export default function AdminUserControlModal({
                 <p className={styles.drawerSectionTitle}>Administrative Controls</p>
                 <AdminControlsSection
                   user={user}
+                  currentUser={currentUser}
                   hasNetwork={hasNetwork}
                   onLock={onLock}
                   onUnlock={onUnlock}
@@ -161,6 +207,10 @@ export default function AdminUserControlModal({
 
           {activeTab === "points" && (
             <UserLedgerTab userId={user.id} type="points" />
+          )}
+
+          {activeTab === "audit" && (
+            <UserAuditTab email={user.email} />
           )}
         </div>
       </aside>

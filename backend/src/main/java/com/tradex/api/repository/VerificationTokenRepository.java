@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import jakarta.persistence.LockModeType;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -24,6 +25,6 @@ public interface VerificationTokenRepository extends JpaRepository<VerificationT
 
     @Modifying
     @Query("DELETE FROM VerificationToken vt WHERE vt.user IN :users")
-    void deleteByUserIn(@Param("users") java.util.List<User> users);
+    void deleteByUserIn(@Param("users") List<User> users);
 }
 

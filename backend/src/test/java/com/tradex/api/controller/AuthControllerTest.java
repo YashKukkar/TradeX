@@ -55,6 +55,16 @@ class AuthControllerTest {
         @Autowired
         private SystemSettingService systemSettingService;
 
+        private String hashOtp(String otp) {
+                try {
+                        java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+                        byte[] hash = digest.digest(otp.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                        return java.util.HexFormat.of().formatHex(hash);
+                } catch (Exception e) {
+                        throw new RuntimeException(e);
+                }
+        }
+
         @BeforeEach
         void setup() {
                 verificationTokenRepository.deleteAll();
@@ -174,7 +184,7 @@ class AuthControllerTest {
                 existingUser = userRepository.save(existingUser);
 
                 verificationTokenRepository.save(
-                                new VerificationToken(existingUser, passwordEncoder.encode("123456"),
+                                new VerificationToken(existingUser, hashOtp("123456"),
                                                 VerificationType.EMAIL,
                                                 java.time.LocalDateTime.now().plusMinutes(10)));
 
@@ -192,7 +202,7 @@ class AuthControllerTest {
                 existingUser = userRepository.save(existingUser);
 
                 verificationTokenRepository.save(
-                                new VerificationToken(existingUser, passwordEncoder.encode("123456"),
+                                new VerificationToken(existingUser, hashOtp("123456"),
                                                 VerificationType.EMAIL,
                                                 java.time.LocalDateTime.now().plusMinutes(10)));
 
@@ -211,7 +221,7 @@ class AuthControllerTest {
                 existingUser = userRepository.save(existingUser);
 
                 verificationTokenRepository.save(
-                                new VerificationToken(existingUser, passwordEncoder.encode("123456"),
+                                new VerificationToken(existingUser, hashOtp("123456"),
                                                 VerificationType.PHONE,
                                                 java.time.LocalDateTime.now().plusMinutes(10)));
 
@@ -297,7 +307,7 @@ class AuthControllerTest {
                 userRepository.save(user);
 
                 java.time.LocalDateTime expiry = java.time.LocalDateTime.now().plusMinutes(10);
-                VerificationToken token = new VerificationToken(user, passwordEncoder.encode("123456"), VerificationType.PASSWORD_RESET, expiry);
+                VerificationToken token = new VerificationToken(user, hashOtp("123456"), VerificationType.PASSWORD_RESET, expiry);
                 verificationTokenRepository.save(token);
 
                 AuthController.ResetPasswordRequest request = new AuthController.ResetPasswordRequest(

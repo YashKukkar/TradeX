@@ -8,7 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
@@ -31,6 +35,14 @@ public class JwtUtil {
         return extractAllClaims(token).get("role", String.class);
     }
 
+    public List<String> extractPermissions(String token) {
+        String perms = extractAllClaims(token).get("permissions", String.class);
+        if (perms == null || perms.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(perms.split(","));
+    }
+
     public Date extractExpiration(String token) {
         return extractAllClaims(token).getExpiration();
     }
@@ -48,14 +60,22 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String username, String role) {
-        return Jwts.builder()
+    public String generateToken(String username, String role, List<String> permissions) {
+        var builder = Jwts.builder()
                 .setSubject(username)
                 .claim("role", role)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMs));
+
+        if (permissions != null && !permissions.isEmpty()) {
+            builder.claim("permissions", permissions.stream().collect(Collectors.joining(",")));
+        }
+
+        return builder.signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
+    }
+
+    public String generateToken(String username, String role) {
+        return generateToken(username, role, Collections.emptyList());
     }
 
     public Boolean validateToken(String token, String username) {

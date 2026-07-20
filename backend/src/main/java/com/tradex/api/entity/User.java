@@ -2,9 +2,13 @@ package com.tradex.api.entity;
 
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.util.EnumSet;
+import java.util.Set;
 import jakarta.persistence.*;
+import com.tradex.api.enums.Permission;
 import com.tradex.api.enums.Role;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -53,6 +57,14 @@ public class User {
     @Column(nullable = false, columnDefinition = "varchar(50)")
     @Builder.Default
     private Role role = Role.USER;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_permissions", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "permission")
+    @BatchSize(size = 50)
+    @Builder.Default
+    private Set<Permission> permissions = EnumSet.noneOf(Permission.class);
 
     @Column(name = "phone_number", length = 15)
     private String phoneNumber;
@@ -104,6 +116,16 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
+    public Long getPointsBalance() {
+        return this.pointsBalance == null ? 0L : this.pointsBalance;
+    }
 
+    public BigDecimal getWithdrawableBalance() {
+        return this.withdrawableBalance == null ? BigDecimal.ZERO : this.withdrawableBalance;
+    }
+
+    public BigDecimal getBonusBalance() {
+        return this.bonusBalance == null ? BigDecimal.ZERO : this.bonusBalance;
+    }
 }
 

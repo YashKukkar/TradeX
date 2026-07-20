@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import com.tradex.api.mapper.UserMapper;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,6 +52,9 @@ class AdminUserServiceTest {
     @Mock
     private VerificationService verificationService;
 
+    @Mock
+    private UserMapper userMapper;
+
     @InjectMocks
     private AdminUserService adminUserService;
 
@@ -59,6 +63,29 @@ class AdminUserServiceTest {
 
     @BeforeEach
     void setUp() {
+        lenient().when(userMapper.toDTO(any())).thenAnswer(invocation -> {
+            User u = invocation.getArgument(0);
+            if (u == null) return null;
+            return new UserDTO(
+                u.getId(),
+                u.getEmail(),
+                null,
+                u.getPointsBalance(),
+                null,
+                null,
+                null,
+                null,
+                u.getRole() != null ? u.getRole().name() : "USER",
+                0L,
+                u.isEmailVerified(),
+                u.isPhoneVerified(),
+                u.getWithdrawableBalance(),
+                u.getBonusBalance(),
+                u.isEnabled(),
+                u.isLocked(),
+                java.util.Collections.emptyList()
+            );
+        });
         targetUser = new User();
         targetUser.setId(2L);
         targetUser.setEmail("user@example.com");
@@ -275,7 +302,7 @@ class AdminUserServiceTest {
         Page<AdminAuditLog> page = new PageImpl<>(List.of(logEntry), pageable, 1);
         when(auditLogRepository.findAll(pageable)).thenReturn(page);
 
-        Page<AdminAuditLogDTO> result = adminUserService.getAuditLogs(pageable);
+        Page<AdminAuditLogDTO> result = adminUserService.getAuditLogs(null, pageable);
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());

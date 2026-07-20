@@ -15,11 +15,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.tradex.api.mapper.UserMapper;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 class ReferralServiceTest {
@@ -36,6 +38,9 @@ class ReferralServiceTest {
     @Mock
     private PointsTransactionRepository pointsTransactionRepository;
 
+    @Mock
+    private UserMapper userMapper;
+
     @InjectMocks
     private ReferralService referralService;
 
@@ -43,6 +48,29 @@ class ReferralServiceTest {
 
     @BeforeEach
     void setUp() {
+        lenient().when(userMapper.toDTO(any())).thenAnswer(invocation -> {
+            User u = invocation.getArgument(0);
+            if (u == null) return null;
+            return new UserDTO(
+                u.getId(),
+                u.getEmail(),
+                null,
+                u.getPointsBalance(),
+                null,
+                null,
+                null,
+                null,
+                u.getRole() != null ? u.getRole().name() : "USER",
+                0L,
+                u.isEmailVerified(),
+                u.isPhoneVerified(),
+                u.getWithdrawableBalance(),
+                u.getBonusBalance(),
+                u.isEnabled(),
+                u.isLocked(),
+                java.util.Collections.emptyList()
+            );
+        });
         user = new User("test@example.com", "encoded");
         user.setId(1L);
         user.setRole(Role.USER);
@@ -124,5 +152,33 @@ class ReferralServiceTest {
         referralService.processReferralRewardsAsync(1L);
 
         verify(userRepository, times(1)).findByIdForUpdate(1L);
+    }
+
+    @Test
+    void testProcessReferralRewardsAsyncWithRetries() {
+        User newUser = new User();
+        newUser.setId(1L);
+        newUser.setEmail("new@example.com");
+
+        when(userRepository.findByIdForUpdate(1L))
+                .thenReturn(Optional.empty())
+                .thenReturn(Optional.empty())
+                .thenReturn(Optional.of(newUser));
+        when(rewardRepository.existsByReferredUserId(1L)).thenReturn(false);
+
+        referralService.processReferralRewardsAsync(1L);
+
+        verify(userRepository, times(3)).findByIdForUpdate(1L);
+    }
+
+    @Test
+    void testProcessReferralRewardsAsyncExhaustedRetries() {
+        when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () ->
+            referralService.processReferralRewardsAsync(1L)
+        );
+
+        verify(userRepository, times(3)).findByIdForUpdate(1L);
     }
 }

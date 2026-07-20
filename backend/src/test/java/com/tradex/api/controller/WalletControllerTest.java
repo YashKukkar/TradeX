@@ -1,8 +1,8 @@
 package com.tradex.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tradex.api.dto.WalletTransactionDTO;
 import com.tradex.api.dto.UserDTO;
+import com.tradex.api.dto.WalletTransactionDTO;
 import com.tradex.api.entity.User;
 import com.tradex.api.enums.WalletTransactionStatus;
 import com.tradex.api.enums.WalletTransactionType;
@@ -12,6 +12,7 @@ import com.tradex.api.security.SecurityConfig;
 import com.tradex.api.service.WalletService;
 import com.tradex.api.service.SystemSettingService;
 import com.tradex.api.repository.UserRepository;
+import com.tradex.api.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -35,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(WalletController.class)
-@Import({SecurityConfig.class, JwtAuthenticationFilter.class})
+@Import({ SecurityConfig.class, JwtAuthenticationFilter.class })
 @AutoConfigureMockMvc
 @SuppressWarnings("null")
 class WalletControllerTest {
@@ -56,6 +57,9 @@ class WalletControllerTest {
     private UserRepository userRepository;
 
     @MockBean
+    private UserMapper userMapper;
+
+    @MockBean
     private com.tradex.api.security.TokenBlacklistCache tokenBlacklistCache;
 
     @Autowired
@@ -65,19 +69,18 @@ class WalletControllerTest {
     @WithMockUser(username = "user@example.com", authorities = "ROLE_USER")
     void testDepositSuccess() throws Exception {
         WalletController.WalletAmountRequest request = new WalletController.WalletAmountRequest(BigDecimal.TEN);
-        
+
         WalletTransactionDTO mockTx = new WalletTransactionDTO(
-            1L,
-            BigDecimal.TEN,
-            BigDecimal.TEN,
-            WalletTransactionType.DEPOSIT.name(),
-            WalletTransactionStatus.PENDING.name(),
-            "Notes",
-            System.currentTimeMillis() / 1000,
-            "user@example.com",
-            "+1234567890",
-            "ACC12345"
-        );
+                1L,
+                BigDecimal.TEN,
+                BigDecimal.TEN,
+                WalletTransactionType.DEPOSIT.name(),
+                WalletTransactionStatus.PENDING.name(),
+                "Notes",
+                System.currentTimeMillis() / 1000,
+                "user@example.com",
+                "+1234567890",
+                "ACC12345");
 
         when(walletService.deposit(eq("user@example.com"), any(BigDecimal.class))).thenReturn(mockTx);
 
@@ -96,17 +99,16 @@ class WalletControllerTest {
         WalletController.WalletAmountRequest request = new WalletController.WalletAmountRequest(BigDecimal.TEN);
 
         WalletTransactionDTO mockTx = new WalletTransactionDTO(
-            2L,
-            BigDecimal.TEN,
-            BigDecimal.TEN,
-            WalletTransactionType.WITHDRAWAL.name(),
-            WalletTransactionStatus.PENDING.name(),
-            "Notes",
-            System.currentTimeMillis() / 1000,
-            "user@example.com",
-            "+1234567890",
-            "ACC12345"
-        );
+                2L,
+                BigDecimal.TEN,
+                BigDecimal.TEN,
+                WalletTransactionType.WITHDRAWAL.name(),
+                WalletTransactionStatus.PENDING.name(),
+                "Notes",
+                System.currentTimeMillis() / 1000,
+                "user@example.com",
+                "+1234567890",
+                "ACC12345");
 
         when(walletService.withdraw(eq("user@example.com"), any(BigDecimal.class))).thenReturn(mockTx);
 
@@ -124,17 +126,16 @@ class WalletControllerTest {
         WalletController.ConvertPointsRequest request = new WalletController.ConvertPointsRequest(100L);
 
         WalletTransactionDTO mockTx = new WalletTransactionDTO(
-            3L,
-            BigDecimal.TEN,
-            BigDecimal.TEN,
-            WalletTransactionType.POINTS_CONVERSION.name(),
-            WalletTransactionStatus.SUCCESS.name(),
-            "Notes",
-            System.currentTimeMillis() / 1000,
-            "user@example.com",
-            "+1234567890",
-            "ACC12345"
-        );
+                3L,
+                BigDecimal.TEN,
+                BigDecimal.TEN,
+                WalletTransactionType.POINTS_CONVERSION.name(),
+                WalletTransactionStatus.SUCCESS.name(),
+                "Notes",
+                System.currentTimeMillis() / 1000,
+                "user@example.com",
+                "+1234567890",
+                "ACC12345");
 
         when(walletService.convertPoints(eq("user@example.com"), eq(100L))).thenReturn(mockTx);
 
@@ -150,17 +151,16 @@ class WalletControllerTest {
     @WithMockUser(username = "user@example.com", authorities = "ROLE_USER")
     void testGetMyTransactions() throws Exception {
         WalletTransactionDTO mockTx = new WalletTransactionDTO(
-            1L,
-            BigDecimal.TEN,
-            BigDecimal.TEN,
-            WalletTransactionType.DEPOSIT.name(),
-            WalletTransactionStatus.SUCCESS.name(),
-            "Notes",
-            System.currentTimeMillis() / 1000,
-            "user@example.com",
-            "+1234567890",
-            "ACC12345"
-        );
+                1L,
+                BigDecimal.TEN,
+                BigDecimal.TEN,
+                WalletTransactionType.DEPOSIT.name(),
+                WalletTransactionStatus.SUCCESS.name(),
+                "Notes",
+                System.currentTimeMillis() / 1000,
+                "user@example.com",
+                "+1234567890",
+                "ACC12345");
 
         when(walletService.getMyWalletTransactions("user@example.com")).thenReturn(List.of(mockTx));
 
@@ -182,6 +182,17 @@ class WalletControllerTest {
         mockUser.setAccountNumber("ACC12345");
 
         when(walletService.updateBankDetails("user@example.com", "ACC12345")).thenReturn(mockUser);
+
+        UserDTO mockUserDTO = new UserDTO(
+                1L,
+                "user@example.com",
+                null,
+                100L,
+                null,
+                null,
+                null,
+                "ACC12345");
+        when(userMapper.toDTO(any())).thenReturn(mockUserDTO);
 
         mockMvc.perform(put("/api/wallet/bank-details")
                 .contentType(MediaType.APPLICATION_JSON)

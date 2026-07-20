@@ -10,6 +10,7 @@ export interface UserProfile {
   createdAt?: number;
   withdrawableBalance: number;
   bonusBalance: number;
+  permissions?: string[];
 }
 
 export interface WalletTransaction {
@@ -39,6 +40,7 @@ export interface UserInfo {
   enabled?: boolean;
   locked?: boolean;
   createdAt?: number;
+  permissions?: string[];
 }
 
 export interface SystemSetting {

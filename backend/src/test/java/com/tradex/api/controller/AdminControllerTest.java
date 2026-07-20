@@ -15,7 +15,7 @@ import com.tradex.api.security.SecurityConfig;
 import com.tradex.api.security.TokenBlacklistCache;
 import com.tradex.api.service.AdminUserService;
 import com.tradex.api.service.ReferralService;
-import com.tradex.api.service.SeedDataService;
+import com.tradex.api.service.seed.SeedDataService;
 import com.tradex.api.service.SystemSettingService;
 import com.tradex.api.service.UserService;
 import com.tradex.api.service.WalletService;
@@ -27,7 +27,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -85,10 +84,10 @@ class AdminControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = "ROLE_ADMIN")
+    @WithMockUser(username = "admin@example.com", authorities = "ROLE_SUPER_ADMIN")
     void testGetAllUsers() throws Exception {
         UserDTO user = new UserDTO(1L, "test@example.com", "CODE", 100L, ".1.", null, "+1234567890", "ACC12345");
-        when(userService.getAllUsers()).thenReturn(List.of(user));
+        when(userService.getAllUsers(any())).thenReturn(List.of(user));
 
         mockMvc.perform(get("/api/admin/users"))
                 .andExpect(status().isOk())
@@ -103,10 +102,10 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = "ROLE_ADMIN")
+    @WithMockUser(username = "admin@example.com", authorities = "ROLE_SUPER_ADMIN")
     void testGetUserById() throws Exception {
         UserDTO user = new UserDTO(2L, "test@example.com", "CODE", 100L, ".1.2.", null, "+1234567890", "ACC12345");
-        when(userService.getUserById(2L)).thenReturn(user);
+        when(userService.getUserById(eq(2L), any())).thenReturn(user);
 
         mockMvc.perform(get("/api/admin/users/2"))
                 .andExpect(status().isOk())
@@ -114,7 +113,7 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = "ROLE_ADMIN")
+    @WithMockUser(username = "admin@example.com", authorities = "ROLE_SUPER_ADMIN")
     void testUpdateUserStatus() throws Exception {
         UserDTO user = new UserDTO(2L, "test@example.com", "CODE", 100L, ".1.2.", null, "+1234567890", "ACC12345");
         when(adminUserService.lockUser("admin@example.com", 2L)).thenReturn(user);
@@ -131,7 +130,7 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = "ROLE_ADMIN")
+    @WithMockUser(username = "admin@example.com", authorities = "ROLE_SUPER_ADMIN")
     void testSendPasswordResetEmail() throws Exception {
         mockMvc.perform(post("/api/admin/users/2/reset-password"))
                 .andExpect(status().isOk());
@@ -140,7 +139,7 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = "ROLE_ADMIN")
+    @WithMockUser(username = "admin@example.com", authorities = "ROLE_SUPER_ADMIN")
     void testAdjustPoints() throws Exception {
         UserDTO user = new UserDTO(2L, "test@example.com", "CODE", 150L, ".1.2.", null, "+1234567890", "ACC12345");
         AdminAdjustPointsRequest request = new AdminAdjustPointsRequest(50L, "Bonus");
@@ -155,12 +154,12 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = "ROLE_ADMIN")
+    @WithMockUser(username = "admin@example.com", authorities = "ROLE_SUPER_ADMIN")
     void testGetAuditLogs() throws Exception {
         AdminAuditLogDTO logDTO = new AdminAuditLogDTO(1L, "admin@example.com", "user@example.com", "LOCK", "Details", System.currentTimeMillis() / 1000);
         Page<AdminAuditLogDTO> page = new PageImpl<>(List.of(logDTO));
 
-        when(adminUserService.getAuditLogs(any(Pageable.class))).thenReturn(page);
+        when(adminUserService.getAuditLogs(any(), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/admin/audit-logs"))
                 .andExpect(status().isOk())
@@ -168,7 +167,7 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = "ROLE_ADMIN")
+    @WithMockUser(username = "admin@example.com", authorities = "ROLE_SUPER_ADMIN")
     void testGetUserPointsHistory() throws Exception {
         PointsTransactionDTO tx = new PointsTransactionDTO(1L, 100L, 200L, "ADMIN_ADJUSTMENT", "Notes", 1783200000L);
         when(adminUserService.getUserPointsHistory(2L)).thenReturn(List.of(tx));
@@ -179,7 +178,7 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = "ROLE_ADMIN")
+    @WithMockUser(username = "admin@example.com", authorities = "ROLE_SUPER_ADMIN")
     void testGetUserWalletHistory() throws Exception {
         WalletTransactionDTO tx = new WalletTransactionDTO(
             1L,
@@ -201,7 +200,7 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = "ROLE_ADMIN")
+    @WithMockUser(username = "admin@example.com", authorities = "ROLE_SUPER_ADMIN")
     void testGetReferralTree() throws Exception {
         UserDTO user = new UserDTO(2L, "tree@example.com", "CODE", 100L, ".1.2.", "test@example.com", "+1234567890", "ACC12345");
         when(referralService.getReferralTree(1L)).thenReturn(List.of(user));
@@ -212,7 +211,7 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = "ROLE_ADMIN")
+    @WithMockUser(username = "admin@example.com", authorities = "ROLE_SUPER_ADMIN")
     void testGetSettings() throws Exception {
         SystemSettingDTO dto = new SystemSettingDTO(
             new SystemSettingDTO.WelcomeSettings(true, 1000L),
@@ -231,7 +230,7 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = "ROLE_ADMIN")
+    @WithMockUser(username = "admin@example.com", authorities = "ROLE_SUPER_ADMIN")
     void testUpdateSettings() throws Exception {
         SystemSettingDTO dto = new SystemSettingDTO(
             new SystemSettingDTO.WelcomeSettings(true, 2000L),
@@ -252,7 +251,7 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = "ROLE_ADMIN")
+    @WithMockUser(username = "admin@example.com", authorities = "ROLE_SUPER_ADMIN")
     void testSeedTestData() throws Exception {
         mockMvc.perform(post("/api/admin/seed-test-data"))
                 .andExpect(status().isOk());
@@ -261,7 +260,7 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = "ROLE_ADMIN")
+    @WithMockUser(username = "admin@example.com", authorities = "ROLE_SUPER_ADMIN")
     void testGetAllTransactions() throws Exception {
         WalletTransactionDTO tx = new WalletTransactionDTO(
             1L,
@@ -283,7 +282,7 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = "ROLE_ADMIN")
+    @WithMockUser(username = "admin@example.com", authorities = "ROLE_SUPER_ADMIN")
     void testGetPendingTransactions() throws Exception {
         WalletTransactionDTO tx = new WalletTransactionDTO(
             1L,
@@ -305,7 +304,7 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = "ROLE_ADMIN")
+    @WithMockUser(username = "admin@example.com", authorities = "ROLE_SUPER_ADMIN")
     void testApproveTransaction() throws Exception {
         WalletTransactionDTO tx = new WalletTransactionDTO(
             1L,
@@ -319,7 +318,7 @@ class AdminControllerTest {
             "+1234567890",
             "ACC12345"
         );
-        when(walletService.approveTransaction(1L)).thenReturn(tx);
+        when(walletService.approveTransaction(eq(1L), any())).thenReturn(tx);
 
         mockMvc.perform(post("/api/admin/transactions/1/approve"))
                 .andExpect(status().isOk())
@@ -327,7 +326,7 @@ class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = "ROLE_ADMIN")
+    @WithMockUser(username = "admin@example.com", authorities = "ROLE_SUPER_ADMIN")
     void testRejectTransaction() throws Exception {
         WalletTransactionDTO tx = new WalletTransactionDTO(
             1L,
@@ -343,7 +342,7 @@ class AdminControllerTest {
         );
         AdminController.RejectTransactionRequest request = new AdminController.RejectTransactionRequest("Invalid receipt");
 
-        when(walletService.rejectTransaction(eq(1L), eq("Invalid receipt"))).thenReturn(tx);
+        when(walletService.rejectTransaction(eq(1L), eq("Invalid receipt"), any())).thenReturn(tx);
 
         mockMvc.perform(post("/api/admin/transactions/1/reject")
                 .contentType(MediaType.APPLICATION_JSON)

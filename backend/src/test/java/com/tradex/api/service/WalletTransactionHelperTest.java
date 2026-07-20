@@ -6,6 +6,8 @@ import com.tradex.api.enums.WalletTransactionStatus;
 import com.tradex.api.enums.WalletTransactionType;
 import com.tradex.api.repository.UserRepository;
 import com.tradex.api.repository.WalletTransactionRepository;
+import com.tradex.api.util.WalletTransactionHelper;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -5,7 +5,9 @@ import com.tradex.api.entity.*;
 import com.tradex.api.enums.*;
 import com.tradex.api.repository.UserRepository;
 import com.tradex.api.repository.WalletTransactionRepository;
+import com.tradex.api.util.WalletTransactionHelper;
 import com.tradex.api.repository.PointsTransactionRepository;
+import com.tradex.api.repository.AdminAuditLogRepository;
 import com.tradex.api.exception.AppException.BadRequestException;
 import com.tradex.api.exception.AppException.ForbiddenException;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,6 +42,9 @@ class WalletServiceTest {
 
     @Mock
     private WalletTransactionHelper walletTransactionHelper;
+    
+    @Mock
+    private AdminAuditLogRepository adminAuditLogRepository;
 
     private WalletService walletService;
     private com.tradex.api.config.AppProperties appProperties;
@@ -63,6 +69,10 @@ class WalletServiceTest {
         settings.setPointsToCashConversionRate(new BigDecimal("10.00"));
 
         appProperties = new com.tradex.api.config.AppProperties();
+        appProperties.getWallet().setMinWithdrawalAmount(new BigDecimal("100.00"));
+        appProperties.getWallet().setMaxWithdrawalAmount(new BigDecimal("50000.00"));
+
+        lenient().when(systemSettingService.getSettings()).thenReturn(settings);
 
         walletService = new WalletService(
             userRepository,
@@ -70,7 +80,8 @@ class WalletServiceTest {
             pointsTransactionRepository,
             systemSettingService,
             walletTransactionHelper,
-            appProperties
+            appProperties,
+            adminAuditLogRepository
         );
     }
 
@@ -248,7 +259,7 @@ class WalletServiceTest {
         settings.setPointsConversionEnabled(false);
         when(systemSettingService.getSettings()).thenReturn(settings);
 
-        assertThrows(ForbiddenException.class, () -> 
+        assertThrows(ForbiddenException.class, () ->
             walletService.convertPoints("user@example.com", 100L)
         );
     }
@@ -260,8 +271,84 @@ class WalletServiceTest {
         when(systemSettingService.getSettings()).thenReturn(settings);
         when(userRepository.findByEmailForUpdate("user@example.com")).thenReturn(Optional.of(user));
 
-        assertThrows(BadRequestException.class, () -> 
+        assertThrows(BadRequestException.class, () ->
             walletService.convertPoints("user@example.com", 100L)
         );
+    }
+
+    @Test
+    @DisplayName("Should approve transaction with auth permission checks")
+    void testApproveTransactionWithAuth() {
+        org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
+        org.springframework.security.core.authority.SimpleGrantedAuthority adminAuth =
+                new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_SUPER_ADMIN");
+        doReturn(Collections.singletonList(adminAuth)).when(auth).getAuthorities();
+
+        WalletTransaction pendingTx = new WalletTransaction(user, new BigDecimal("100.00"), BigDecimal.ZERO, WalletTransactionType.DEPOSIT, WalletTransactionStatus.PENDING, "Pending");
+        pendingTx.setId(10L);
+
+        when(walletTransactionRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(pendingTx));
+        when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(user));
+
+        WalletTransactionDTO result = walletService.approveTransaction(10L, auth);
+
+        assertNotNull(result);
+        assertEquals(WalletTransactionStatus.SUCCESS.name(), result.status());
+    }
+
+    @Test
+    @DisplayName("Should fail approve transaction when auth lacks permission")
+    void testApproveTransactionWithAuthForbidden() {
+        org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
+        doReturn(Collections.emptyList()).when(auth).getAuthorities();
+
+        WalletTransaction pendingTx = new WalletTransaction(user, new BigDecimal("100.00"), BigDecimal.ZERO, WalletTransactionType.DEPOSIT, WalletTransactionStatus.PENDING, "Pending");
+        pendingTx.setId(10L);
+
+        when(walletTransactionRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(pendingTx));
+
+        assertThrows(org.springframework.security.access.AccessDeniedException.class, () ->
+            walletService.approveTransaction(10L, auth)
+        );
+    }
+
+    @Test
+    @DisplayName("Should approve deposit with employee manage deposits permission")
+    void testApproveDepositWithEmployeePermission() {
+        org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
+        org.springframework.security.core.authority.SimpleGrantedAuthority empAuth =
+                new org.springframework.security.core.authority.SimpleGrantedAuthority("PERM_MANAGE_DEPOSITS");
+        doReturn(Collections.singletonList(empAuth)).when(auth).getAuthorities();
+
+        WalletTransaction pendingTx = new WalletTransaction(user, new BigDecimal("100.00"), BigDecimal.ZERO, WalletTransactionType.DEPOSIT, WalletTransactionStatus.PENDING, "Pending");
+        pendingTx.setId(10L);
+
+        when(walletTransactionRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(pendingTx));
+        when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(user));
+
+        WalletTransactionDTO result = walletService.approveTransaction(10L, auth);
+
+        assertNotNull(result);
+        assertEquals(WalletTransactionStatus.SUCCESS.name(), result.status());
+    }
+
+    @Test
+    @DisplayName("Should reject withdrawal with employee manage withdrawals permission")
+    void testRejectWithdrawalWithEmployeePermission() {
+        org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
+        org.springframework.security.core.authority.SimpleGrantedAuthority empAuth =
+                new org.springframework.security.core.authority.SimpleGrantedAuthority("PERM_MANAGE_WITHDRAWALS");
+        doReturn(Collections.singletonList(empAuth)).when(auth).getAuthorities();
+
+        WalletTransaction pendingTx = new WalletTransaction(user, new BigDecimal("100.00"), BigDecimal.ZERO, WalletTransactionType.WITHDRAWAL, WalletTransactionStatus.PENDING, "Pending");
+        pendingTx.setId(10L);
+
+        when(walletTransactionRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(pendingTx));
+        when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(user));
+
+        WalletTransactionDTO result = walletService.rejectTransaction(10L, "Incorrect info", auth);
+
+        assertNotNull(result);
+        assertEquals(WalletTransactionStatus.FAILED.name(), result.status());
     }
 }

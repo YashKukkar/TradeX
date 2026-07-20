@@ -1,4 +1,4 @@
-package com.tradex.api.service;
+package com.tradex.api.util;
 
 import com.tradex.api.entity.User;
 import com.tradex.api.entity.WalletTransaction;

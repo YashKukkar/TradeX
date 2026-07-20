@@ -1,4 +1,5 @@
 package com.tradex.api.service;
+import com.tradex.api.mapper.UserMapper;
 
 import com.tradex.api.dto.AuthRequest;
 import com.tradex.api.dto.AuthResponse;
@@ -9,13 +10,16 @@ import com.tradex.api.entity.SystemSetting;
 import com.tradex.api.entity.User;
 import com.tradex.api.enums.PointsTransactionType;
 import com.tradex.api.enums.Role;
+import com.tradex.api.enums.Permission;
 import com.tradex.api.enums.VerificationType;
+import com.tradex.api.exception.AppException;
 import com.tradex.api.exception.AppException.ConflictException;
 import com.tradex.api.exception.AppException.ForbiddenException;
 import com.tradex.api.exception.AppException.ResourceNotFoundException;
 import com.tradex.api.repository.PointsTransactionRepository;
 import com.tradex.api.repository.UserRepository;
 import com.tradex.api.security.JwtUtil;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -26,6 +30,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,26 +45,44 @@ public class UserService {
     private final PointsTransactionRepository pointsTransactionRepository;
     private final VerificationService verificationService;
     private final JwtUtil jwtUtil;
+    private final UserMapper userMapper;
 
     // ── User Retrieval & Profiling ───────────────────────────────────────────
 
     @Transactional(readOnly = true)
     public UserDTO getUserProfile(String email) {
-        return new UserDTO(getUserByEmail(email));
+        return userMapper.toDTO(getUserByEmail(email));
     }
 
     @Transactional(readOnly = true)
-    public UserDTO getUserById(Long id) {
+    public UserDTO getUserById(Long id, String requesterEmail) {
+        User requester = userRepository.findByEmail(requesterEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Requester not found"));
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
-        return new UserDTO(user);
+
+        if (requester.getRole() == Role.EMPLOYEE && user.getRole() != Role.USER) {
+            throw new AppException.ForbiddenException("Employees are only permitted to view regular customers");
+        }
+
+        return userMapper.toDTO(user);
     }
 
     @Transactional(readOnly = true)
-    public List<UserDTO> getAllUsers() {
-        return userRepository.findAllWithReferredBy()
-                .stream()
-                .map(UserDTO::new)
+    public List<UserDTO> getAllUsers(String requesterEmail) {
+        User requester = userRepository.findByEmail(requesterEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Requester not found"));
+
+        List<User> users = userRepository.findAllWithReferredBy();
+        if (requester.getRole() == Role.EMPLOYEE) {
+            users = users.stream()
+                    .filter(u -> u.getRole() == Role.USER)
+                    .toList();
+        }
+
+        return users.stream()
+                .map(userMapper::toDTO)
                 .toList();
     }
 
@@ -109,7 +132,22 @@ public class UserService {
         }
 
         validateEmailVerification(user);
-        log.info("User logged in: {}", user.getEmail());
+        List<String> authorities = new ArrayList<>();
+        authorities.add("ROLE_" + user.getRole().name());
+        if (user.getRole() == Role.SUPER_ADMIN) {
+            for (Permission perm : Permission.values()) {
+                authorities.add(perm.getAuthority());
+            }
+        } else if (user.getRole() == Role.EMPLOYEE && user.getPermissions() != null) {
+            for (Permission perm : user.getPermissions()) {
+                authorities.add(perm.getAuthority());
+            }
+        }
+        List<String> logPermissions = authorities.stream()
+                .filter(a -> !a.startsWith("ROLE_"))
+                .map(a -> a.startsWith("PERM_") ? a.substring(5) : a)
+                .toList();
+        log.info("User logged in: {} | Role: {} | Permissions: {}", user.getEmail(), user.getRole(), logPermissions);
 
         return buildAuthResponse(user);
     }
@@ -122,7 +160,13 @@ public class UserService {
     }
 
     public AuthResponse buildAuthResponse(User user) {
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+        List<String> permissionNames = Collections.emptyList();
+        if (user.getPermissions() != null && !user.getPermissions().isEmpty()) {
+            permissionNames = user.getPermissions().stream()
+                    .map(Enum::name)
+                    .collect(Collectors.toList());
+        }
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name(), permissionNames);
         return new AuthResponse(token, user.getEmail());
     }
 

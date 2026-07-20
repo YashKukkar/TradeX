@@ -1,7 +1,9 @@
 package com.tradex.api.service;
+import com.tradex.api.mapper.UserMapper;
 
 import com.tradex.api.config.audit.AdminAudited;
 import com.tradex.api.dto.AdminAdjustPointsRequest;
+import com.tradex.api.dto.AdminAdjustWalletRequest;
 import com.tradex.api.dto.AdminAuditLogDTO;
 import com.tradex.api.dto.PointsTransactionDTO;
 import com.tradex.api.dto.UserDTO;
@@ -21,10 +23,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.math.BigDecimal;
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@SuppressWarnings("null")
 public class AdminUserService {
 
     private final UserRepository userRepository;
@@ -32,6 +38,8 @@ public class AdminUserService {
     private final PointsTransactionRepository pointsTransactionRepository;
     private final WalletTransactionRepository walletTransactionRepository;
     private final VerificationService verificationService;
+    private final UserMapper userMapper;
+    private final ConcurrentHashMap<Long, Instant> passwordResetCooldowns = new ConcurrentHashMap<>();
 
 
     private User loadTargetForUpdate(Long userId) {
@@ -58,7 +66,7 @@ public class AdminUserService {
         }
 
         target.setLocked(true);
-        return new UserDTO(target);
+        return userMapper.toDTO(target);
     }
 
     @Transactional
@@ -71,7 +79,7 @@ public class AdminUserService {
         }
 
         target.setLocked(false);
-        return new UserDTO(target);
+        return userMapper.toDTO(target);
     }
 
     // ── Enable / Disable ─────────────────────────────────────────────────────
@@ -87,7 +95,7 @@ public class AdminUserService {
         }
 
         target.setEnabled(false);
-        return new UserDTO(target);
+        return userMapper.toDTO(target);
     }
 
     @Transactional
@@ -100,7 +108,7 @@ public class AdminUserService {
         }
 
         target.setEnabled(true);
-        return new UserDTO(target);
+        return userMapper.toDTO(target);
     }
 
     // ── Force Email Verification ──────────────────────────────────────────────
@@ -115,7 +123,7 @@ public class AdminUserService {
         }
 
         target.setEmailVerified(true);
-        return new UserDTO(target);
+        return userMapper.toDTO(target);
     }
 
     // ── Password Reset Email ──────────────────────────────────────────────────
@@ -123,11 +131,19 @@ public class AdminUserService {
     @Transactional
     @AdminAudited(action = AdminAction.PASSWORD_RESET_EMAIL_SENT, details = "'Password reset email triggered by admin'")
     public void sendPasswordResetEmail(String adminEmail, Long userId) {
+        Instant now = Instant.now();
+        Instant lastReset = passwordResetCooldowns.get(userId);
+        if (lastReset != null && now.isBefore(lastReset.plusSeconds(60))) {
+            throw new BadRequestException("Please wait at least 60 seconds between password reset requests for this user.");
+        }
+
         User target = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
 
         target.setCredentialsExpired(true);
         verificationService.createVerificationToken(target, VerificationType.PASSWORD_RESET);
+
+        passwordResetCooldowns.put(userId, now);
     }
 
     // ── Adjust Points ─────────────────────────────────────────────────────────
@@ -160,14 +176,62 @@ public class AdminUserService {
                 "Admin adjustment: " + request.reason());
         pointsTransactionRepository.save(tx);
 
-        return new UserDTO(target);
+        return userMapper.toDTO(target);
+    }
+
+    @Transactional
+    @AdminAudited(
+        action = AdminAction.WALLET_ADJUSTMENT,
+        details = "'Wallet adjusted: type=' + #request.walletType + ', delta=' + #request.delta + '. Reason: ' + #request.reason"
+    )
+    public UserDTO adjustWallet(String adminEmail, Long userId, AdminAdjustWalletRequest request) {
+        User target = loadTargetForUpdate(userId);
+
+        BigDecimal delta = request.delta();
+        BigDecimal currentBalance;
+        BigDecimal newBalance;
+
+        if ("BONUS".equalsIgnoreCase(request.walletType())) {
+            currentBalance = target.getBonusBalance() != null ? target.getBonusBalance() : BigDecimal.ZERO;
+            newBalance = currentBalance.add(delta);
+            if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
+                throw new BadRequestException(
+                        "Adjustment would result in a negative bonus balance (current: " + currentBalance +
+                        ", delta: " + delta + ")");
+            }
+            target.setBonusBalance(newBalance);
+        } else if ("CASH".equalsIgnoreCase(request.walletType())) {
+            currentBalance = target.getWithdrawableBalance() != null ? target.getWithdrawableBalance() : BigDecimal.ZERO;
+            newBalance = currentBalance.add(delta);
+            if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
+                throw new BadRequestException(
+                        "Adjustment would result in a negative withdrawable balance (current: " + currentBalance +
+                        ", delta: " + delta + ")");
+            }
+            target.setWithdrawableBalance(newBalance);
+        } else {
+            throw new BadRequestException("Invalid wallet type: " + request.walletType());
+        }
+
+        WalletTransaction tx = new WalletTransaction(
+                target,
+                delta,
+                newBalance,
+                WalletTransactionType.ADMIN_ADJUSTMENT,
+                WalletTransactionStatus.SUCCESS,
+                "Admin adjustment: " + request.reason());
+        walletTransactionRepository.save(tx);
+
+        return userMapper.toDTO(target);
     }
 
     // ── Audit Logs & User Transactions Queries ────────────────────────────────
 
     @Transactional(readOnly = true)
-    public Page<AdminAuditLogDTO> getAuditLogs(Pageable pageable) {
-        // Find all logs with actor and target fetched eagerly in a clean Page representation
+    public Page<AdminAuditLogDTO> getAuditLogs(String targetEmail, Pageable pageable) {
+        if (targetEmail != null && !targetEmail.isBlank()) {
+            return auditLogRepository.findByTargetEmail(targetEmail, pageable).map(AdminAuditLogDTO::new);
+        }
         return auditLogRepository.findAll(pageable).map(AdminAuditLogDTO::new);
     }
 

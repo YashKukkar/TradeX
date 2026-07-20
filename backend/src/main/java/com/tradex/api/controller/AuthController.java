@@ -9,7 +9,7 @@ import com.tradex.api.enums.VerificationType;
 import com.tradex.api.service.UserService;
 import com.tradex.api.service.VerificationService;
 import com.tradex.api.service.SystemSettingService;
-import com.tradex.api.service.SecurityService;
+import com.tradex.api.security.SecurityService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

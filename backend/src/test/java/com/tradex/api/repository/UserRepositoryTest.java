@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -55,17 +56,18 @@ class UserRepositoryTest {
         u3 = userRepository.save(u3);
 
         // Find by referral path starting with u2's path
-        java.util.List<User> downlineOfU2 = userRepository.findByReferralPathStartingWith(u2.getReferralPath());
+        List<User> downlineOfU2 = userRepository.findByReferralPathStartingWith(u2.getReferralPath());
         assertEquals(2, downlineOfU2.size());
-        
+
         boolean foundU2 = false;
         boolean foundU3 = false;
         for (User u : downlineOfU2) {
-            if (u.getEmail().equals("u2@example.com")) foundU2 = true;
-            if (u.getEmail().equals("u3@example.com")) foundU3 = true;
+            if (u.getEmail().equals("u2@example.com"))
+                foundU2 = true;
+            if (u.getEmail().equals("u3@example.com"))
+                foundU3 = true;
         }
         assertTrue(foundU2);
         assertTrue(foundU3);
     }
 }
-

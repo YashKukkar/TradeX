@@ -1,11 +1,13 @@
 package com.tradex.api.security;
 
+import com.tradex.api.enums.Permission;
 import com.tradex.api.enums.Role;
 import com.tradex.api.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,7 +26,21 @@ public class CustomUserPrincipal implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Role role = user.getRole() != null ? user.getRole() : Role.USER;
-        return List.of(new SimpleGrantedAuthority(role.getAuthority()));
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(role.getAuthority()));
+
+        if (role == Role.SUPER_ADMIN) {
+            // SUPER_ADMIN gets all permissions implicitly
+            for (Permission perm : Permission.values()) {
+                authorities.add(new SimpleGrantedAuthority(perm.getAuthority()));
+            }
+        } else if (role == Role.EMPLOYEE && user.getPermissions() != null) {
+            for (Permission perm : user.getPermissions()) {
+                authorities.add(new SimpleGrantedAuthority(perm.getAuthority()));
+            }
+        }
+
+        return authorities;
     }
 
     @Override

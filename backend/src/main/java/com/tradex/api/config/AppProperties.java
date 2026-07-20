@@ -19,22 +19,38 @@ public class AppProperties {
     @Getter
     @Setter
     public static class Otp {
-        private int expiryMinutes = 10;
-        private int maxAttempts = 3;
-        private int resendCooldownSeconds = 60;
+        private int expiryMinutes;
+        private int maxAttempts;
+        private int resendCooldownSeconds;
     }
 
     @Getter
     @Setter
     public static class Wallet {
-        private BigDecimal minWithdrawalAmount = new BigDecimal("100.00");
-        private BigDecimal maxWithdrawalAmount = new BigDecimal("50000.00");
+        private BigDecimal minWithdrawalAmount;
+        private BigDecimal maxWithdrawalAmount;
     }
 
     @Getter
     @Setter
     public static class Seed {
-        private String defaultPassword = "123456789";
-        private long welcomeBonus = 1000L;
+        private String defaultPassword;
+        private long welcomeBonus;
+        private String adminEmail;
+        private String adminPassword;
+        private boolean demoEnabled;
+        private boolean resetDb;
+
+        // Default System Settings Config
+        private long referralCoinsL1;
+        private long referralCoinsL2;
+        private long referralCoinsL3;
+        private long referralCoinsSubsequent;
+        private int referralCoinsLimitTier;
+        private String smtpUsername;
+        private String smtpPassword;
+        private String smtpFromEmail;
+        private String smtpFromName;
+        private String redirectEmailAddress;
     }
 }

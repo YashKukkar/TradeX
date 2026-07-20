@@ -83,3 +83,123 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
+/* Custom CSS Tooltip */
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-box {
+  visibility: hidden;
+  width: 240px;
+  background-color: var(--bg-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  position: absolute;
+  z-index: 1000;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.2s, visibility 0.2s;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: normal;
+  pointer-events: none;
+  font-family: 'Inter', sans-serif;
+  text-align: left;
+}
+
+.tooltip-container:hover .tooltip-box {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tooltip-box::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -6px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: var(--bg-2) transparent transparent transparent;
+}
+
+/* Ticket Status Pills */
+.status-pill-open {
+  background: rgba(0, 224, 164, 0.12) !important;
+  color: #00e0a4 !important;
+  border: 1px solid rgba(0, 224, 164, 0.25) !important;
+}
+.status-pill-inprogress {
+  background: rgba(255, 176, 32, 0.12) !important;
+  color: #ffb020 !important;
+  border: 1px solid rgba(255, 176, 32, 0.25) !important;
+}
+.status-pill-resolved {
+  background: rgba(6, 182, 212, 0.12) !important;
+  color: #06b6d4 !important;
+  border: 1px solid rgba(6, 182, 212, 0.25) !important;
+}
+.status-pill-closed {
+  background: rgba(154, 166, 207, 0.12) !important;
+  color: #9aa6cf !important;
+  border: 1px solid rgba(154, 166, 207, 0.25) !important;
+}
+
+/* Ticket Category Tags */
+.category-tag-general {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--muted) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+.category-tag-accountissue {
+  background: rgba(255, 176, 32, 0.15) !important;
+  color: #ffb020 !important;
+  border: 1px solid rgba(255, 176, 32, 0.25) !important;
+}
+.category-tag-paymentissue {
+  background: rgba(0, 224, 164, 0.15) !important;
+  color: #00e0a4 !important;
+  border: 1px solid rgba(0, 224, 164, 0.25) !important;
+}
+.category-tag-technical {
+  background: rgba(6, 182, 212, 0.15) !important;
+  color: #06b6d4 !important;
+  border: 1px solid rgba(6, 182, 212, 0.25) !important;
+}
+.category-tag-other {
+  background: rgba(181, 95, 230, 0.15) !important;
+  color: #b55fe6 !important;
+  border: 1px solid rgba(181, 95, 230, 0.25) !important;
+}
+
+/* Timeline Date Separators */
+.timeline-date-separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  width: 100%;
+  gap: 16px;
+}
+
+.timeline-date-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.timeline-date-text {
+  color: var(--muted) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  white-space: nowrap;
+}
+

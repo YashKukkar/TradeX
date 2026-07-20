@@ -4,5 +4,6 @@ public enum WalletTransactionType {
     DEPOSIT,
     WITHDRAWAL,
     FIRST_DEPOSIT_BONUS,
-    POINTS_CONVERSION
+    POINTS_CONVERSION,
+    ADMIN_ADJUSTMENT
 }

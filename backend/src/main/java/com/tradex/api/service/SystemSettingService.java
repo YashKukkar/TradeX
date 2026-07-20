@@ -46,6 +46,7 @@ public class SystemSettingService {
     }
 
     public SystemSettingDTO toDTO(SystemSetting settings) {
+        String maskedPassword = (settings.getSmtpPassword() != null && !settings.getSmtpPassword().isEmpty()) ? "********" : "";
         return new SystemSettingDTO(
             new SystemSettingDTO.WelcomeSettings(
                 settings.isWelcomeCoinsEnabled(),
@@ -77,7 +78,7 @@ public class SystemSettingService {
                 settings.getSmtpHost(),
                 settings.getSmtpPort(),
                 settings.getSmtpUsername(),
-                settings.getSmtpPassword(),
+                maskedPassword,
                 settings.getSmtpFromEmail(),
                 settings.getSmtpFromName(),
                 settings.isEmailNotificationsEnabled(),
@@ -119,7 +120,12 @@ public class SystemSettingService {
         setting.setSmtpHost(dto.email().smtpHost());
         setting.setSmtpPort(dto.email().smtpPort());
         setting.setSmtpUsername(dto.email().smtpUsername());
-        setting.setSmtpPassword(dto.email().smtpPassword());
+        
+        String newPassword = dto.email().smtpPassword();
+        if (newPassword != null && !newPassword.equals("********")) {
+            setting.setSmtpPassword(newPassword);
+        }
+
         setting.setSmtpFromEmail(dto.email().smtpFromEmail());
         setting.setSmtpFromName(dto.email().smtpFromName());
         setting.setEmailNotificationsEnabled(dto.email().emailNotificationsEnabled());

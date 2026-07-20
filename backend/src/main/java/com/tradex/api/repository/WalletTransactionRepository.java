@@ -15,6 +15,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface WalletTransactionRepository extends JpaRepository<WalletTransaction, Long> {
@@ -26,7 +27,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT wt FROM WalletTransaction wt WHERE wt.id = :id")
-    java.util.Optional<WalletTransaction> findByIdForUpdate(@Param("id") Long id);
+    Optional<WalletTransaction> findByIdForUpdate(@Param("id") Long id);
 
     @Modifying
     @Query("DELETE FROM WalletTransaction wt WHERE wt.user IN :users")

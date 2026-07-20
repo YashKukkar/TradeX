@@ -18,11 +18,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.tradex.api.mapper.UserMapper;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,6 +53,9 @@ class UserServiceTest {
     @Mock
     private JwtUtil jwtUtil;
 
+    @Mock
+    private UserMapper userMapper;
+
     @InjectMocks
     private UserService userService;
 
@@ -58,14 +64,36 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = new User("test@example.com", "encoded");
-        user.setId(1L);
+        lenient().when(userMapper.toDTO(any())).thenAnswer(invocation -> {
+            User u = invocation.getArgument(0);
+            if (u == null) return null;
+            return new UserDTO(
+                u.getId(),
+                u.getEmail(),
+                u.getReferralCode(),
+                u.getPointsBalance(),
+                u.getReferralPath(),
+                u.getReferredBy() != null ? u.getReferredBy().getEmail() : null,
+                u.getPhoneNumber(),
+                u.getAccountNumber(),
+                u.getRole() != null ? u.getRole().name() : "USER",
+                0L,
+                u.isEmailVerified(),
+                u.isPhoneVerified(),
+                u.getWithdrawableBalance(),
+                u.getBonusBalance(),
+                u.isEnabled(),
+                u.isLocked(),
+                java.util.Collections.emptyList()
+            );
+        });
+        user = new User("test@example.com", "password");
+        settings = new SystemSetting();
         user.setRole(Role.USER);
         user.setPointsBalance(100L);
         user.setReferralCode("CODE");
         user.setReferralPath(".1.");
 
-        settings = new SystemSetting();
         settings.setWelcomeCoinsEnabled(true);
         settings.setWelcomeCoinsAmount(1000L);
         settings.setEmailVerificationEnabled(false);
@@ -82,9 +110,12 @@ class UserServiceTest {
 
     @Test
     void testGetAllUsers() {
+        User admin = new User("admin@example.com", "encoded");
+        admin.setRole(Role.SUPER_ADMIN);
+        when(userRepository.findByEmail("admin@example.com")).thenReturn(Optional.of(admin));
         when(userRepository.findAllWithReferredBy()).thenReturn(List.of(user));
 
-        List<UserDTO> list = userService.getAllUsers();
+        List<UserDTO> list = userService.getAllUsers("admin@example.com");
         assertEquals(1, list.size());
         assertEquals("test@example.com", list.get(0).email());
     }
@@ -98,7 +129,7 @@ class UserServiceTest {
         when(referralService.generateUniqueReferralCode()).thenReturn("CODE");
         when(systemSettingService.getSettings()).thenReturn(settings);
         when(referralService.buildReferralPath(any(User.class))).thenReturn(".2.");
-        when(jwtUtil.generateToken("new@example.com", "USER")).thenReturn("token");
+        when(jwtUtil.generateToken(eq("new@example.com"), eq("USER"), anyList())).thenReturn("token");
 
         AuthResponse resp = userService.signup(req);
 
@@ -112,9 +143,9 @@ class UserServiceTest {
         AuthRequest req = new AuthRequest("test@example.com", "pass");
 
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches("pass", "encoded")).thenReturn(true);
+        when(passwordEncoder.matches("pass", "password")).thenReturn(true);
         when(systemSettingService.getSettings()).thenReturn(settings);
-        when(jwtUtil.generateToken("test@example.com", "USER")).thenReturn("token");
+        when(jwtUtil.generateToken(eq("test@example.com"), eq("USER"), anyList())).thenReturn("token");
 
         AuthResponse resp = userService.login(req);
 
@@ -127,7 +158,7 @@ class UserServiceTest {
         AuthRequest req = new AuthRequest("test@example.com", "wrong");
 
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches("wrong", "encoded")).thenReturn(false);
+        when(passwordEncoder.matches("wrong", "password")).thenReturn(false);
 
         assertThrows(BadCredentialsException.class, () -> userService.login(req));
     }

@@ -5,11 +5,16 @@ import com.tradex.api.entity.*;
 import com.tradex.api.enums.*;
 import com.tradex.api.repository.UserRepository;
 import com.tradex.api.repository.WalletTransactionRepository;
+import com.tradex.api.util.WalletTransactionHelper;
 import com.tradex.api.repository.PointsTransactionRepository;
+import com.tradex.api.repository.AdminAuditLogRepository;
 import com.tradex.api.exception.AppException.*;
 import com.tradex.api.config.AppProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +25,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@SuppressWarnings("null")
 public class WalletService {
 
     private final UserRepository userRepository;
@@ -28,6 +34,7 @@ public class WalletService {
     private final SystemSettingService systemSettingService;
     private final WalletTransactionHelper walletTransactionHelper;
     private final AppProperties appProperties;
+    private final AdminAuditLogRepository adminAuditLogRepository;
 
     @Transactional
     public WalletTransactionDTO deposit(String email, BigDecimal amount) {
@@ -39,6 +46,10 @@ public class WalletService {
 
         User user = userRepository.findByEmailForUpdate(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
+
+        if (user.getRole() == Role.EMPLOYEE || user.getRole() == Role.SUPER_ADMIN) {
+            throw new ForbiddenException("This operation is only available to customers");
+        }
 
         WalletTransaction depositTx = new WalletTransaction(
                 user,
@@ -89,10 +100,13 @@ public class WalletService {
     }
 
     @Transactional
-    @SuppressWarnings("null")
     public WalletTransactionDTO withdraw(String email, BigDecimal amount) {
         User user = userRepository.findByEmailForUpdate(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
+
+        if (user.getRole() == Role.EMPLOYEE || user.getRole() == Role.SUPER_ADMIN) {
+            throw new ForbiddenException("This operation is only available to customers");
+        }
 
         validateWithdrawal(user, amount);
 
@@ -128,6 +142,10 @@ public class WalletService {
         User user = userRepository.findByEmailForUpdate(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
+        if (user.getRole() == Role.EMPLOYEE || user.getRole() == Role.SUPER_ADMIN) {
+            throw new ForbiddenException("This operation is only available to customers");
+        }
+
         Long currentPoints = user.getPointsBalance();
         if (currentPoints < points) {
             throw new BadRequestException("Insufficient TradeX Points balance");
@@ -150,7 +168,7 @@ public class WalletService {
 
         PointsTransaction pointsTx = new PointsTransaction(
                 user,
-                points,
+                -points,
                 newPoints,
                 PointsTransactionType.CONVERT_TO_CASH,
                 "Converted " + points + " points to bonus cash");
@@ -164,6 +182,14 @@ public class WalletService {
                 WalletTransactionStatus.SUCCESS,
                 "Converted " + points + " TradeX Points into bonus cash");
         walletTransactionRepository.save(walletTx);
+
+        AdminAuditLog auditLog = new AdminAuditLog(
+                user,
+                user,
+                AdminAction.POINTS_CONVERSION,
+                "Converted " + points + " points to ₹" + cashAwarded.setScale(2, RoundingMode.HALF_UP) + " bonus cash"
+        );
+        adminAuditLogRepository.save(auditLog);
 
         log.info("Converted {} points to {} bonus cash for user {}", points, cashAwarded, email);
 
@@ -232,6 +258,14 @@ public class WalletService {
     }
 
     @Transactional
+    public WalletTransactionDTO approveTransaction(Long transactionId, Authentication auth) {
+        WalletTransaction tx = walletTransactionRepository.findByIdForUpdate(transactionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));
+        enforceTransactionPermission(auth, tx.getType());
+        return approveTransaction(transactionId);
+    }
+
+    @Transactional
     public WalletTransactionDTO rejectTransaction(Long transactionId, String reason) {
         WalletTransaction tx = walletTransactionRepository.findByIdForUpdate(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));
@@ -255,6 +289,35 @@ public class WalletService {
         }
 
         return new WalletTransactionDTO(tx);
+    }
+
+    @Transactional
+    public WalletTransactionDTO rejectTransaction(Long transactionId, String reason, Authentication auth) {
+        WalletTransaction tx = walletTransactionRepository.findByIdForUpdate(transactionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));
+        enforceTransactionPermission(auth, tx.getType());
+        return rejectTransaction(transactionId, reason);
+    }
+
+    private void enforceTransactionPermission(Authentication auth, WalletTransactionType type) {
+        boolean isSuperAdmin = auth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(a -> a.equals("ROLE_SUPER_ADMIN"));
+        if (isSuperAdmin) return;
+
+        String requiredPerm = switch (type) {
+            case DEPOSIT -> "PERM_MANAGE_DEPOSITS";
+            case WITHDRAWAL -> "PERM_MANAGE_WITHDRAWALS";
+            default -> throw new BadRequestException("Unsupported transaction type: " + type);
+        };
+
+        boolean hasPermission = auth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(a -> a.equals(requiredPerm));
+
+        if (!hasPermission) {
+            throw new AccessDeniedException("You do not have permission to manage " + type.name().toLowerCase() + " transactions.");
+        }
     }
 
     private void approveDeposit(User user, WalletTransaction tx) {

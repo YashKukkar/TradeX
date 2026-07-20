@@ -1,4 +1,5 @@
 package com.tradex.api.service;
+import com.tradex.api.mapper.UserMapper;
 
 import com.tradex.api.dto.UserDTO;
 import com.tradex.api.entity.User;
@@ -15,8 +16,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.HexFormat;
 import java.util.Optional;
 
 @Service
@@ -30,6 +34,7 @@ public class VerificationService {
     private final PasswordEncoder passwordEncoder;
     private final AppProperties appProperties;
     private final EmailService emailService;
+    private final UserMapper userMapper;
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     @Transactional
@@ -51,7 +56,6 @@ public class VerificationService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
-        // Lock token row during verification to prevent race conditions
         VerificationToken token = validateVerificationToken(user, code, VerificationType.EMAIL);
 
         user.setEmailVerified(true);
@@ -59,7 +63,7 @@ public class VerificationService {
 
         log.info("Email verified for user: {}", email);
 
-        return new UserDTO(user);
+        return userMapper.toDTO(user);
     }
 
     @Transactional
@@ -79,7 +83,7 @@ public class VerificationService {
 
         log.info("Phone verified for user: {}", email);
 
-        return new UserDTO(user);
+        return userMapper.toDTO(user);
     }
 
     @Transactional
@@ -92,7 +96,7 @@ public class VerificationService {
     @Transactional
     public void createVerificationToken(User user, VerificationType type) {
         String otp = generateOtp();
-        String hashedOtp = passwordEncoder.encode(otp);
+        String hashedOtp = hashOtp(otp);
         LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(appProperties.getOtp().getExpiryMinutes());
 
         Optional<VerificationToken> existingTokenOpt = verificationTokenRepository.findByUserAndTypeForUpdate(user,
@@ -145,7 +149,7 @@ public class VerificationService {
             throw new BadRequestException("Verification token blocked");
         }
 
-        if (!passwordEncoder.matches(code, token.getToken())) {
+        if (!hashOtp(code).equals(token.getToken())) {
             // Increment attempts atomically inside pessimistic lock
             token.setAttempts(token.getAttempts() + 1);
             verificationTokenRepository.save(token);
@@ -167,5 +171,16 @@ public class VerificationService {
 
     private String generateOtp() {
         return String.format("%06d", SECURE_RANDOM.nextInt(1_000_000));
+    }
+
+    private String hashOtp(String otp) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(otp.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(hash);
+        } catch (Exception e) {
+            log.error("Failed to hash OTP: {}", e.getMessage(), e);
+            throw new IllegalStateException("Failed to hash OTP", e);
+        }
     }
 }

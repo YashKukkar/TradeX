@@ -3,6 +3,7 @@ import Icon from "./Icon";
 import type { UserInfo } from "../utils/dashboardHelpers";
 import styles from "../AdminUsers.module.css";
 import { fuzzyMatch } from "../utils/fuzzyMatch";
+import PermissionsTooltip from "./PermissionsTooltip";
 
 interface UserAuditRegistryProps {
   users: UserInfo[];
@@ -111,6 +112,7 @@ export default function UserAuditRegistry({
               <tr>
                 <th>ID</th>
                 <th>Email</th>
+                <th>Role</th>
                 <th>Status</th>
                 <th>Phone</th>
                 <th>Bank Account</th>
@@ -135,6 +137,50 @@ export default function UserAuditRegistry({
                     <span className={styles.userEmail}>
                       <HighlightText text={u.email} indices={emailIndices} />
                     </span>
+                  </td>
+                  <td>
+                    {u.role === "SUPER_ADMIN" || u.role === "EMPLOYEE" ? (
+                      <PermissionsTooltip
+                        email={u.email}
+                        permissions={u.permissions || undefined}
+                        isAdmin={true}
+                        align="flex-start"
+                      >
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            padding: "4px 8px",
+                            borderRadius: "6px",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.03em",
+                            display: "inline-block",
+                            background: u.role === "SUPER_ADMIN" ? "rgba(181, 95, 230, 0.15)" : "rgba(0, 224, 164, 0.15)",
+                            color: u.role === "SUPER_ADMIN" ? "#b55fe6" : "var(--primary)",
+                            border: u.role === "SUPER_ADMIN" ? "1px dashed rgba(181, 95, 230, 0.4)" : "1px dashed rgba(0, 224, 164, 0.4)",
+                            cursor: "pointer"
+                          }}
+                        >
+                          {u.role === "SUPER_ADMIN" ? "Admin" : "Employee"}
+                        </span>
+                      </PermissionsTooltip>
+                    ) : (
+                      <span
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          padding: "4px 8px",
+                          borderRadius: "6px",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.03em",
+                          display: "inline-block",
+                          background: "rgba(255, 255, 255, 0.05)",
+                          color: "var(--muted)"
+                        }}
+                      >
+                        User
+                      </span>
+                    )}
                   </td>
                   <td>
                     <StatusPill user={u} />

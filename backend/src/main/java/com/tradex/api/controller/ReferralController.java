@@ -11,9 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequestMapping("/api/referrals")
 @RequiredArgsConstructor
+@PreAuthorize("hasAuthority('ROLE_USER')")
 public class ReferralController {
 
     private final ReferralService referralService;
