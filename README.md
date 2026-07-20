@@ -11,7 +11,6 @@ A full-stack trading platform with a marketing site, a user-facing web app, and 
   - [Manual Launch](#manual-launch)
 - [Default Accounts](#default-accounts)
   - [Admin Account](#admin-account)
-  - [Employee Accounts](#employee-accounts)
   - [Test Users](#test-users)
 - [Project Structure](#project-structure)
 
@@ -82,13 +81,6 @@ For development and testing purposes, the application is pre-seeded with the fol
 ### Admin Account
 - **Email:** `admin@tradex.com`
 - **Password:** `123456789`
-
-### Employee Accounts
-All employee accounts share the default password: `123456789`.
-
-- `e1@tradex.com` (Permissions: `MANAGE_USERS`, `MANAGE_POINTS`)
-- `e2@tradex.com` (Permissions: `MANAGE_DEPOSITS`, `MANAGE_WITHDRAWALS`)
-- `e3@tradex.com` (Permissions: `MANAGE_SETTINGS`)
 
 ### Test Users
 All test users share the same default password: `123456789`.
