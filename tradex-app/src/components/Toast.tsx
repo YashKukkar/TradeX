@@ -3,18 +3,19 @@ import styles from "./Toast.module.css";
 
 interface ToastProps {
   message: string;
-  type?: "success" | "error" | "warning" | "info";
+  type?: "success" | "error" | "warning" | "info" | "loading";
   onClose: () => void;
   duration?: number;
 }
 
 export default function Toast({ message, type = "success", onClose, duration = 3000 }: ToastProps) {
   useEffect(() => {
+    if (type === "loading") return;
     const timer = setTimeout(() => {
       onClose();
     }, duration);
     return () => clearTimeout(timer);
-  }, [onClose, duration]);
+  }, [onClose, duration, type]);
 
   const getIcon = () => {
     switch (type) {
@@ -22,6 +23,7 @@ export default function Toast({ message, type = "success", onClose, duration = 3
       case "error": return "error";
       case "warning": return "warning";
       case "info": return "info";
+      case "loading": return "sync";
       default: return "info";
     }
   };

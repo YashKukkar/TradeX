@@ -8,7 +8,7 @@ import TicketDetailModal from "./components/TicketDetailModal";
 import StatCard from "./components/StatCard";
 import Card from "./components/Card";
 import { formatDateTime } from "./utils/dashboardHelpers";
-import Toast from "./components/Toast";
+import { useToast } from "./context/ToastContext";
 
 
 
@@ -20,7 +20,7 @@ export default function SupportTickets() {
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
-  const [toast, setToast] = useState<{ message: string; type: "success" | "warning" } | null>(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (error) {
@@ -126,7 +126,7 @@ export default function SupportTickets() {
       {/* Stats Cards Row */}
       <div className={styles.statsGrid}>
         <StatCard
-          icon="confirmation_number"
+          icon="support_agent"
           label="Total Raised"
           value={totalCount}
           isLoading={isLoading}
@@ -293,9 +293,9 @@ export default function SupportTickets() {
         onClose={() => setCreateModalOpen(false)} 
         onSuccess={(warning) => {
           if (warning) {
-            setToast({ message: warning, type: "warning" });
+            showToast(warning, "warning");
           } else {
-            setToast({ message: "Support ticket created successfully.", type: "success" });
+            showToast("Support ticket created successfully.", "success");
           }
         }}
       />
@@ -307,13 +307,6 @@ export default function SupportTickets() {
         ticketId={selectedTicketId}
         isAdmin={false}
       />
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
     </div>
   );
 }

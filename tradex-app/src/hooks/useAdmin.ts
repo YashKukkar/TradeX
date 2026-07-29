@@ -1,6 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../utils/api";
 import type { UserInfo, SystemSetting } from "../utils/dashboardHelpers";
+import { useCurrentUser } from "./useDashboard";
+
+const updateTelemetryCache = (queryClient: any, email: string | undefined, updatedUser: UserInfo) => {
+  queryClient.setQueryData(["adminTelemetry", email], (old: any) => {
+    if (!old) return old;
+    return {
+      ...old,
+      usersList: old.usersList.map((u: any) => u.id === updatedUser.id ? updatedUser : u),
+    };
+  });
+};
 import type { AuditLogItem } from "../components/AdminAuditLogsRegistry";
 import type { PendingTransaction } from "../components/PendingTransactionsRegistry";
 
@@ -38,6 +49,7 @@ export function usePendingTransactions() {
   return useQuery<PendingTransaction[]>({
     queryKey: ["pendingTransactions"],
     queryFn: () => api("/admin/transactions/pending"),
+    refetchInterval: 5000,
   });
 }
 
@@ -46,6 +58,7 @@ export function useAllTransactions(enabled: boolean) {
     queryKey: ["allTransactions"],
     queryFn: () => api("/admin/transactions"),
     enabled,
+    refetchInterval: 5000,
   });
 }
 
@@ -56,10 +69,12 @@ export function useUpdateUserStatus(options?: {
   onError?: (err: Error) => void;
 }) {
   const queryClient = useQueryClient();
+  const { data: currentUser } = useCurrentUser();
   return useMutation<UserInfo, Error, { userId: number; action: AdminAction }>({
     mutationFn: ({ userId, action }) =>
       api(`/admin/users/${userId}/status`, { method: "PATCH", body: JSON.stringify({ action }) }),
     onSuccess: (data, vars) => {
+      updateTelemetryCache(queryClient, currentUser?.email, data);
       queryClient.invalidateQueries({ queryKey: ["adminTelemetry"] });
       options?.onSuccess?.(data, vars.action);
     },
@@ -89,6 +104,7 @@ export function useAdjustUserPoints(options?: {
   onError?: (err: Error) => void;
 }) {
   const queryClient = useQueryClient();
+  const { data: currentUser } = useCurrentUser();
   return useMutation<
     UserInfo,
     Error,
@@ -99,7 +115,8 @@ export function useAdjustUserPoints(options?: {
         method: "POST",
         body: JSON.stringify({ delta, reason }),
       }),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      updateTelemetryCache(queryClient, currentUser?.email, data);
       queryClient.invalidateQueries({ queryKey: ["adminTelemetry"] });
       options?.onSuccess?.();
     },
@@ -114,6 +131,7 @@ export function useAdjustUserWallet(options?: {
   onError?: (err: Error) => void;
 }) {
   const queryClient = useQueryClient();
+  const { data: currentUser } = useCurrentUser();
   return useMutation<
     UserInfo,
     Error,
@@ -124,7 +142,8 @@ export function useAdjustUserWallet(options?: {
         method: "POST",
         body: JSON.stringify({ delta, walletType, reason }),
       }),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      updateTelemetryCache(queryClient, currentUser?.email, data);
       queryClient.invalidateQueries({ queryKey: ["adminTelemetry"] });
       options?.onSuccess?.();
     },
@@ -194,12 +213,26 @@ export function useEmployees() {
   });
 }
 
+export interface PermissionRegistryData {
+  key: string;
+  displayName: string;
+  description: string;
+  category: string;
+}
+
+export function useSystemPermissions() {
+  return useQuery<PermissionRegistryData[]>({
+    queryKey: ["systemPermissions"],
+    queryFn: () => api("/admin/permissions"),
+  });
+}
+
 export function useCreateEmployee(options?: {
   onSuccess?: (employee: UserInfo) => void;
   onError?: (err: Error) => void;
 }) {
   const queryClient = useQueryClient();
-  return useMutation<UserInfo, Error, { email: string; password: string; permissions: string[] }>({
+  return useMutation<UserInfo, Error, { email: string; password: string; permissions: string[]; teams: string[] }>({
     mutationFn: (body) =>
       api("/admin/employees", {
         method: "POST",
@@ -245,6 +278,92 @@ export function useDeleteEmployee(options?: {
     mutationFn: (employeeId) =>
       api(`/admin/employees/${employeeId}`, {
         method: "DELETE",
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employeesList"] });
+      options?.onSuccess?.();
+    },
+    onError: (err) => {
+      options?.onError?.(err);
+    },
+  });
+}
+
+export interface TeamData {
+  id: number;
+  name: string;
+  description: string;
+  permissions: string[];
+}
+
+export function useTeams() {
+  return useQuery<TeamData[]>({
+    queryKey: ["teamsList"],
+    queryFn: () => api("/admin/teams"),
+  });
+}
+
+export function useCreateTeam(options?: { onSuccess?: () => void; onError?: (err: Error) => void }) {
+  const queryClient = useQueryClient();
+  return useMutation<TeamData, Error, { name: string; description: string; permissions: string[] }>({
+    mutationFn: (body) =>
+      api("/admin/teams", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teamsList"] });
+      options?.onSuccess?.();
+    },
+    onError: (err) => {
+      options?.onError?.(err);
+    },
+  });
+}
+
+export function useUpdateTeam(options?: { onSuccess?: () => void; onError?: (err: Error) => void }) {
+  const queryClient = useQueryClient();
+  return useMutation<TeamData, Error, { id: number; name: string; description: string; permissions: string[] }>({
+    mutationFn: ({ id, ...body }) =>
+      api(`/admin/teams/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(body),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teamsList"] });
+      queryClient.invalidateQueries({ queryKey: ["employeesList"] });
+      options?.onSuccess?.();
+    },
+    onError: (err) => {
+      options?.onError?.(err);
+    },
+  });
+}
+
+export function useDeleteTeam(options?: { onSuccess?: () => void; onError?: (err: Error) => void }) {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, number>({
+    mutationFn: (id) =>
+      api(`/admin/teams/${id}`, {
+        method: "DELETE",
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teamsList"] });
+      options?.onSuccess?.();
+    },
+    onError: (err) => {
+      options?.onError?.(err);
+    },
+  });
+}
+
+export function useUpdateEmployeeTeams(options?: { onSuccess?: () => void; onError?: (err: Error) => void }) {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, { employeeId: number; teams: string[] }>({
+    mutationFn: ({ employeeId, teams }) =>
+      api(`/admin/teams/employee/${employeeId}`, {
+        method: "PUT",
+        body: JSON.stringify({ teams }),
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["employeesList"] });

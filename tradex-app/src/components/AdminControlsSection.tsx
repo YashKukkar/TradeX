@@ -1,4 +1,5 @@
 import Icon from "./Icon";
+import ActionButton from "./ActionButton";
 import type { UserInfo, UserProfile } from "../utils/dashboardHelpers";
 import { hasPermission } from "../utils/permissions";
 
@@ -14,6 +15,12 @@ interface AdminControlsSectionProps {
   onSendResetEmail: () => void;
   onAdjustPoints: () => void;
   viewNetwork: () => void;
+  isLockPending?: boolean;
+  isUnlockPending?: boolean;
+  isEnablePending?: boolean;
+  isDisablePending?: boolean;
+  isVerifyEmailPending?: boolean;
+  isResetPending?: boolean;
 }
 
 export default function AdminControlsSection({
@@ -28,6 +35,12 @@ export default function AdminControlsSection({
   onSendResetEmail,
   onAdjustPoints,
   viewNetwork,
+  isLockPending = false,
+  isUnlockPending = false,
+  isEnablePending = false,
+  isDisablePending = false,
+  isVerifyEmailPending = false,
+  isResetPending = false,
 }: AdminControlsSectionProps) {
   const hasManageUsers = hasPermission(currentUser, "MANAGE_USERS");
   const hasManagePoints = hasPermission(currentUser, "MANAGE_POINTS");
@@ -37,15 +50,14 @@ export default function AdminControlsSection({
     <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "12px" }}>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
         {user.locked ? (
-          <button
+          <ActionButton
             onClick={onUnlock}
             disabled={!hasManageUsers}
+            loading={isUnlockPending}
+            loadingText="Unlocking..."
+            iconName="lock_open"
             title={!hasManageUsers ? "Requires User Management authority" : ""}
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
               background: "rgba(0, 224, 164, 0.1)",
               border: "1px solid #00e0a4",
               color: "#00e0a4",
@@ -53,23 +65,19 @@ export default function AdminControlsSection({
               borderRadius: "8px",
               fontSize: "13px",
               fontWeight: 700,
-              cursor: hasManageUsers ? "pointer" : "not-allowed",
-              opacity: hasManageUsers ? 1 : 0.5,
-              transition: "all 0.2s ease",
             }}
           >
-            <Icon name="lock_open" style={{ fontSize: "16px" }} /> Unlock Account
-          </button>
+            Unlock Account
+          </ActionButton>
         ) : (
-          <button
+          <ActionButton
             onClick={onLock}
             disabled={!hasManageUsers}
+            loading={isLockPending}
+            loadingText="Locking..."
+            iconName="lock"
             title={!hasManageUsers ? "Requires User Management authority" : ""}
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
               background: "rgba(255, 90, 106, 0.1)",
               border: "1px solid #ff5a6a",
               color: "#ff5a6a",
@@ -77,25 +85,21 @@ export default function AdminControlsSection({
               borderRadius: "8px",
               fontSize: "13px",
               fontWeight: 700,
-              cursor: hasManageUsers ? "pointer" : "not-allowed",
-              opacity: hasManageUsers ? 1 : 0.5,
-              transition: "all 0.2s ease",
             }}
           >
-            <Icon name="lock" style={{ fontSize: "16px" }} /> Lock Account
-          </button>
+            Lock Account
+          </ActionButton>
         )}
 
         {user.enabled === false ? (
-          <button
+          <ActionButton
             onClick={onEnable}
             disabled={!hasManageUsers}
+            loading={isEnablePending}
+            loadingText="Enabling..."
+            iconName="person"
             title={!hasManageUsers ? "Requires User Management authority" : ""}
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
               background: "rgba(0, 224, 164, 0.1)",
               border: "1px solid #00e0a4",
               color: "#00e0a4",
@@ -103,23 +107,19 @@ export default function AdminControlsSection({
               borderRadius: "8px",
               fontSize: "13px",
               fontWeight: 700,
-              cursor: hasManageUsers ? "pointer" : "not-allowed",
-              opacity: hasManageUsers ? 1 : 0.5,
-              transition: "all 0.2s ease",
             }}
           >
-            <Icon name="toggle_on" style={{ fontSize: "16px" }} /> Enable Account
-          </button>
+            Enable Account
+          </ActionButton>
         ) : (
-          <button
+          <ActionButton
             onClick={onDisable}
             disabled={!hasManageUsers}
+            loading={isDisablePending}
+            loadingText="Disabling..."
+            iconName="person_off"
             title={!hasManageUsers ? "Requires User Management authority" : ""}
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
               background: "rgba(255, 90, 106, 0.1)",
               border: "1px solid #ff5a6a",
               color: "#ff5a6a",
@@ -127,13 +127,10 @@ export default function AdminControlsSection({
               borderRadius: "8px",
               fontSize: "13px",
               fontWeight: 700,
-              cursor: hasManageUsers ? "pointer" : "not-allowed",
-              opacity: hasManageUsers ? 1 : 0.5,
-              transition: "all 0.2s ease",
             }}
           >
-            <Icon name="toggle_off" style={{ fontSize: "16px" }} /> Disable Account
-          </button>
+            Disable Account
+          </ActionButton>
         )}
       </div>
 
@@ -159,18 +156,17 @@ export default function AdminControlsSection({
             transition: "all 0.2s ease",
           }}
         >
-          <Icon name="toll" style={{ fontSize: "16px" }} /> Adjust Points
+          <Icon name="stars" style={{ fontSize: "16px" }} /> Adjust Points
         </button>
 
-        <button
+        <ActionButton
           onClick={onSendResetEmail}
           disabled={!hasManageUsers}
+          loading={isResetPending}
+          loadingText="Sending..."
+          iconName="key"
           title={!hasManageUsers ? "Requires User Management authority" : ""}
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "8px",
             background: "rgba(181, 95, 230, 0.08)",
             border: "1px solid var(--primary)",
             color: "var(--primary)",
@@ -178,27 +174,23 @@ export default function AdminControlsSection({
             borderRadius: "8px",
             fontSize: "13px",
             fontWeight: 700,
-            cursor: hasManageUsers ? "pointer" : "not-allowed",
-            opacity: hasManageUsers ? 1 : 0.5,
-            transition: "all 0.2s ease",
           }}
         >
-          <Icon name="key" style={{ fontSize: "16px" }} /> Send Reset PW
-        </button>
+          Send Reset PW
+        </ActionButton>
       </div>
 
       <div style={{ display: "flex", gap: "10px" }}>
         {!user.emailVerified && (
-          <button
+          <ActionButton
             onClick={onVerifyEmail}
             disabled={!hasManageUsers}
+            loading={isVerifyEmailPending}
+            loadingText="Verifying..."
+            iconName="mark_email_read"
             title={!hasManageUsers ? "Requires User Management authority" : ""}
             style={{
               flex: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
               background: "rgba(0, 150, 255, 0.08)",
               border: "1px solid #0096ff",
               color: "#0096ff",
@@ -206,13 +198,10 @@ export default function AdminControlsSection({
               borderRadius: "8px",
               fontSize: "13px",
               fontWeight: 700,
-              cursor: hasManageUsers ? "pointer" : "not-allowed",
-              opacity: hasManageUsers ? 1 : 0.5,
-              transition: "all 0.2s ease",
             }}
           >
-            <Icon name="mark_email_read" style={{ fontSize: "16px" }} /> Verify Email
-          </button>
+            Verify Email
+          </ActionButton>
         )}
 
         {hasNetwork && (

@@ -1,10 +1,12 @@
 package com.tradex.api.service;
 import com.tradex.api.mapper.UserMapper;
-
+import com.tradex.api.dto.AddBankAccountRequest;
 import com.tradex.api.dto.AuthRequest;
 import com.tradex.api.dto.AuthResponse;
 import com.tradex.api.dto.SignupRequest;
+import com.tradex.api.dto.UpdateProfileRequest;
 import com.tradex.api.dto.UserDTO;
+import com.tradex.api.entity.BankDetail;
 import com.tradex.api.entity.PointsTransaction;
 import com.tradex.api.entity.SystemSetting;
 import com.tradex.api.entity.User;
@@ -30,7 +32,6 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +47,7 @@ public class UserService {
     private final VerificationService verificationService;
     private final JwtUtil jwtUtil;
     private final UserMapper userMapper;
+    private final com.tradex.api.repository.TeamRepository teamRepository;
 
     // ── User Retrieval & Profiling ───────────────────────────────────────────
 
@@ -139,8 +141,8 @@ public class UserService {
                 authorities.add(perm.getAuthority());
             }
         } else if (user.getRole() == Role.EMPLOYEE && user.getPermissions() != null) {
-            for (Permission perm : user.getPermissions()) {
-                authorities.add(perm.getAuthority());
+            for (String perm : user.getPermissions()) {
+                authorities.add(perm.startsWith("PERM_") ? perm : "PERM_" + perm);
             }
         }
         List<String> logPermissions = authorities.stream()
@@ -160,12 +162,20 @@ public class UserService {
     }
 
     public AuthResponse buildAuthResponse(User user) {
-        List<String> permissionNames = Collections.emptyList();
-        if (user.getPermissions() != null && !user.getPermissions().isEmpty()) {
-            permissionNames = user.getPermissions().stream()
-                    .map(Enum::name)
-                    .collect(Collectors.toList());
+        Set<String> effective = new HashSet<>();
+        if (user.getPermissions() != null) {
+            effective.addAll(user.getPermissions());
         }
+        if (user.getTeams() != null && !user.getTeams().isEmpty()) {
+            for (String teamName : user.getTeams()) {
+                teamRepository.findByName(teamName).ifPresent(t -> {
+                    if (t.getPermissions() != null) {
+                        effective.addAll(t.getPermissions());
+                    }
+                });
+            }
+        }
+        List<String> permissionNames = new ArrayList<>(effective);
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name(), permissionNames);
         return new AuthResponse(token, user.getEmail());
     }
@@ -176,10 +186,22 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setReferralCode(referralService.generateUniqueReferralCode());
         user.setPhoneNumber(clean(request.phoneNumber()));
-        user.setAccountNumber(normalizeAccountNumber(request.accountNumber()));
         user.setEmailVerified(false);
         user.setPhoneVerified(false);
         user.setRole(Role.USER);
+
+        String acc = normalizeAccountNumber(request.accountNumber());
+        if (acc != null) {
+            BankDetail bank = BankDetail.builder()
+                    .user(user)
+                    .accountNumber(acc)
+                    .ifscCode("TEMP0123456")
+                    .holderName(clean(request.email()))
+                    .bankName("Default Partner Bank")
+                    .isPrimary(true)
+                    .build();
+            user.getBankDetails().add(bank);
+        }
 
         applyWelcomeBonus(user);
         attachReferrer(user, request.referralCode());
@@ -270,5 +292,117 @@ public class UserService {
 
     private String clean(String value) {
         return (value == null || value.isBlank()) ? null : value.trim();
+    }
+
+    @Transactional
+    public UserDTO updateProfile(String email, UpdateProfileRequest request) {
+        User user = userRepository.findByEmail(email.trim().toLowerCase())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
+
+        String newPhone = clean(request.phoneNumber());
+        if (newPhone != null && !newPhone.equals(user.getPhoneNumber())) {
+            user.setPhoneNumber(newPhone);
+            user.setPhoneVerified(false);
+        }
+
+        User saved = userRepository.save(user);
+        log.info("Updated profile for user: {}", email);
+        return userMapper.toDTO(saved);
+    }
+
+    @Transactional
+    public UserDTO addBankAccount(String email, AddBankAccountRequest request) {
+        User user = userRepository.findByEmail(email.trim().toLowerCase())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
+
+        BankDetail bank = BankDetail.builder()
+                .user(user)
+                .accountNumber(request.accountNumber().trim().toUpperCase())
+                .ifscCode(request.ifscCode().trim().toUpperCase())
+                .holderName(request.holderName().trim())
+                .bankName(request.bankName().trim())
+                .isPrimary(request.isPrimary() || user.getBankDetails().isEmpty())
+                .build();
+
+        if (bank.isPrimary()) {
+            for (BankDetail other : user.getBankDetails()) {
+                other.setPrimary(false);
+            }
+        }
+
+        user.getBankDetails().add(bank);
+        User saved = userRepository.save(user);
+        log.info("Added bank account {} for user {}", request.accountNumber(), email);
+        return userMapper.toDTO(saved);
+    }
+
+    @Transactional
+    public UserDTO setPrimaryBankAccount(String email, Long bankAccountId) {
+        User user = userRepository.findByEmail(email.trim().toLowerCase())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
+
+        boolean found = false;
+        for (BankDetail bank : user.getBankDetails()) {
+            if (bank.getId().equals(bankAccountId)) {
+                bank.setPrimary(true);
+                found = true;
+            } else {
+                bank.setPrimary(false);
+            }
+        }
+
+        if (!found) {
+            throw new ResourceNotFoundException("Bank account not found: " + bankAccountId);
+        }
+
+        User saved = userRepository.save(user);
+        log.info("Set primary bank account ID {} for user {}", bankAccountId, email);
+        return userMapper.toDTO(saved);
+    }
+
+    @Transactional
+    public UserDTO deleteBankAccount(String email, Long bankAccountId) {
+        User user = userRepository.findByEmail(email.trim().toLowerCase())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
+
+        BankDetail toDelete = null;
+        for (BankDetail bank : user.getBankDetails()) {
+            if (bank.getId().equals(bankAccountId)) {
+                toDelete = bank;
+                break;
+            }
+        }
+
+        if (toDelete == null) {
+            throw new ResourceNotFoundException("Bank account not found: " + bankAccountId);
+        }
+
+        if (toDelete.isPrimary() && user.getBankDetails().size() > 1) {
+            throw new AppException.BadRequestException("Cannot delete primary bank account. Please set another account as primary first.");
+        }
+
+        user.getBankDetails().remove(toDelete);
+
+        if (user.getBankDetails().size() == 1) {
+            user.getBankDetails().get(0).setPrimary(true);
+        }
+
+        User saved = userRepository.save(user);
+        log.info("Deleted bank account ID {} for user {}", bankAccountId, email);
+        return userMapper.toDTO(saved);
+    }
+
+    @Transactional
+    public void changePassword(String email, String currentPassword, String newPassword) {
+        User user = userRepository.findByEmail(email.trim().toLowerCase())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new AppException.BadRequestException("Incorrect current password");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        log.info("Password updated successfully for user: {}", email);
     }
 }

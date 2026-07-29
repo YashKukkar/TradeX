@@ -41,6 +41,17 @@ public class TicketStatusService {
         User admin = userRepository.findByEmail(adminEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Admin user not found: " + adminEmail));
 
+        if (admin.getRole() != Role.SUPER_ADMIN) {
+            // Cannot modify status of a ticket claimed by another agent
+            if (ticket.getAssignedToUser() != null && !ticket.getAssignedToUser().getId().equals(admin.getId())) {
+                throw new ForbiddenException("You cannot update status on a ticket claimed by another agent.");
+            }
+            // Must have the matching permission group to resolve or change status of the ticket (if group is assigned)
+            if (ticket.getAssignedToPermission() != null && !admin.getPermissions().contains(ticket.getAssignedToPermission())) {
+                throw new ForbiddenException("You do not have the required permission group to update status on this ticket.");
+            }
+        }
+
         TicketStatus oldStatus = ticket.getStatus();
         ticket.setStatus(status);
         ticket.setUpdatedAt(LocalDateTime.now());

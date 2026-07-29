@@ -2,53 +2,23 @@ import React from "react";
 import { useAdminAuditLogs } from "../hooks/useAdmin";
 import styles from "../AdminUsers.module.css";
 import TimelineDateSeparator, { getDayLabel } from "./TimelineDateSeparator";
+import ActionBadge from "./ActionBadge";
+import { formatEpochTime } from "../utils/dashboardHelpers";
+import LoadingState from "./LoadingState";
 
 interface UserAuditTabProps {
   email: string;
-}
-
-function ActionBadge({ action }: { action: string }) {
-  let badgeClass = styles.badgeLSub;
-  if (action === "LOCK" || action === "DISABLE") {
-    badgeClass = styles.badgeL1; // yellow/orange
-  } else if (action === "UNLOCK" || action === "ENABLE") {
-    badgeClass = styles.badgeLActive; // green
-  } else if (action === "FORCE_EMAIL_VERIFY" || action === "PASSWORD_RESET_EMAIL_SENT") {
-    badgeClass = styles.badgeL3; // cyan
-  } else if (action === "POINTS_ADJUSTMENT" || action === "POINTS_CONVERSION") {
-    badgeClass = styles.badgeL2; // violet/purple
-  }
-
-  const label = action.replace(/_/g, " ");
-
-  return (
-    <span className={`${styles.depthBadge} ${badgeClass}`} style={{ fontSize: "10px", padding: "2px 6px" }}>
-      {label}
-    </span>
-  );
 }
 
 export default function UserAuditTab({ email }: UserAuditTabProps) {
   const { data, isLoading } = useAdminAuditLogs(0, true, email);
   const logs = data?.content || [];
 
-  const formatTime = (epochSeconds: number) => {
-    return new Date(epochSeconds * 1000).toLocaleString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
       <p className={styles.drawerSectionTitle}>Audit Action Log Trail</p>
       {isLoading ? (
-        <div className={styles.loadingState} style={{ padding: "40px 0" }}>
-          <div className={styles.spinner}></div>
-          <p style={{ fontSize: "13px" }}>Querying ledger...</p>
-        </div>
+        <LoadingState message="Querying ledger..." padding="40px 0" />
       ) : logs.length === 0 ? (
         <div className={styles.emptyState} style={{ padding: "40px 0" }}>No audit log history for this user.</div>
       ) : (
@@ -67,7 +37,7 @@ export default function UserAuditTab({ email }: UserAuditTabProps) {
                 )}
                 <div
                   style={{
-                    background: "rgba(255, 255, 255, 0.02)",
+                    background: "linear-gradient(160deg, var(--surface), var(--surface-2))",
                     border: "1px solid var(--border)",
                     borderRadius: "10px",
                     padding: "12px 14px",
@@ -76,8 +46,8 @@ export default function UserAuditTab({ email }: UserAuditTabProps) {
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                    <span style={{ fontSize: "11px", color: "var(--muted)" }}>{formatTime(log.createdAt)}</span>
-                    <ActionBadge action={log.action} />
+                    <span style={{ fontSize: "11px", color: "var(--muted)" }}>{formatEpochTime(log.createdAt, { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                    <ActionBadge action={log.action} style={{ fontSize: "10px", padding: "2px 6px" }} />
                   </div>
                   <div style={{ fontSize: "13px", color: "var(--text)", fontWeight: "500" }}>
                     Actor: <span style={{ color: "var(--primary)" }}>{log.actorEmail}</span>

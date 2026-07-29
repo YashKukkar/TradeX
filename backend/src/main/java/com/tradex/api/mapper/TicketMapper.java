@@ -6,11 +6,12 @@ import com.tradex.api.entity.TicketComment;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@SuppressWarnings("null")
 public class TicketMapper {
 
     public TicketDTO mapToDTO(SupportTicket ticket) {
@@ -21,9 +22,9 @@ public class TicketMapper {
                 .category(ticket.getCategory())
                 .subject(ticket.getSubject())
                 .status(ticket.getStatus())
-                .assignedToPermission(ticket.getAssignedToPermission() != null ? ticket.getAssignedToPermission().name() : null)
+                .assignedToPermission(ticket.getAssignedToPermission())
                 .assignedToUserEmail(ticket.getAssignedToUser() != null ? ticket.getAssignedToUser().getEmail() : null)
-                .assignedToUserPermissions(ticket.getAssignedToUser() != null ? ticket.getAssignedToUser().getPermissions().stream().map(Enum::name).collect(Collectors.toSet()) : null)
+                .assignedToUserPermissions(ticket.getAssignedToUser() != null ? new HashSet<>(ticket.getAssignedToUser().getPermissions()) : null)
                 .claimedAt(ticket.getClaimedAt())
                 .createdAt(ticket.getCreatedAt())
                 .updatedAt(ticket.getUpdatedAt())
@@ -41,9 +42,9 @@ public class TicketMapper {
                         .build())
                 .collect(Collectors.toList());
 
-        List<TicketCommentDTO> commentDTOs = ticket.getComments().stream()
-                .map(this::mapToCommentDTO)
-                .collect(Collectors.toList());
+        List<TicketCommentDTO> commentDTOs = ticket.getComments() != null
+                ? ticket.getComments().stream().map(this::mapToCommentDTO).collect(Collectors.toList())
+                : Collections.emptyList();
 
         List<TicketHistoryDTO> historyDTOs = (!isEmployee || ticket.getHistory() == null) ? new ArrayList<>() : ticket.getHistory().stream()
                 .map(h -> TicketHistoryDTO.builder()
@@ -63,11 +64,11 @@ public class TicketMapper {
                 .subject(ticket.getSubject())
                 .description(ticket.getDescription())
                 .status(ticket.getStatus())
-                .adminNotes(isEmployee ? ticket.getAdminNotes() : null)
+
                 .resolvedByEmail(isEmployee && ticket.getResolvedBy() != null ? ticket.getResolvedBy().getEmail() : null)
-                .assignedToPermission(isEmployee && ticket.getAssignedToPermission() != null ? ticket.getAssignedToPermission().name() : null)
+                .assignedToPermission(isEmployee ? ticket.getAssignedToPermission() : null)
                 .assignedToUserEmail(ticket.getAssignedToUser() != null ? (isEmployee ? ticket.getAssignedToUser().getEmail() : "Support Agent") : null)
-                .assignedToUserPermissions(isEmployee && ticket.getAssignedToUser() != null ? ticket.getAssignedToUser().getPermissions().stream().map(Enum::name).collect(Collectors.toSet()) : null)
+                .assignedToUserPermissions(isEmployee && ticket.getAssignedToUser() != null ? new HashSet<>(ticket.getAssignedToUser().getPermissions()) : null)
                 .claimedAt(isEmployee ? ticket.getClaimedAt() : null)
                 .createdAt(ticket.getCreatedAt())
                 .updatedAt(ticket.getUpdatedAt())

@@ -1,15 +1,14 @@
 package com.tradex.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tradex.api.dto.UserDTO;
 import com.tradex.api.dto.WalletTransactionDTO;
-import com.tradex.api.entity.User;
 import com.tradex.api.enums.WalletTransactionStatus;
 import com.tradex.api.enums.WalletTransactionType;
 import com.tradex.api.security.JwtAuthenticationFilter;
 import com.tradex.api.security.JwtUtil;
 import com.tradex.api.security.SecurityConfig;
 import com.tradex.api.service.WalletService;
+import com.tradex.api.service.PointsService;
 import com.tradex.api.service.SystemSettingService;
 import com.tradex.api.repository.UserRepository;
 import com.tradex.api.mapper.UserMapper;
@@ -31,7 +30,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -46,6 +44,9 @@ class WalletControllerTest {
 
     @MockBean
     private WalletService walletService;
+
+    @MockBean
+    private PointsService pointsService;
 
     @MockBean
     private SystemSettingService systemSettingService;
@@ -137,7 +138,7 @@ class WalletControllerTest {
                 "+1234567890",
                 "ACC12345");
 
-        when(walletService.convertPoints(eq("user@example.com"), eq(100L))).thenReturn(mockTx);
+        when(pointsService.convertPoints(eq("user@example.com"), eq(100L))).thenReturn(mockTx);
 
         mockMvc.perform(post("/api/wallet/convert-points")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -168,36 +169,5 @@ class WalletControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].amount").value(10))
                 .andExpect(jsonPath("$[0].status").value("SUCCESS"));
-    }
-
-    @Test
-    @WithMockUser(username = "user@example.com", authorities = "ROLE_USER")
-    void testUpdateBankDetails() throws Exception {
-        WalletController.BankDetailsRequest request = new WalletController.BankDetailsRequest("ACC12345");
-
-        User mockUser = new User();
-        mockUser.setId(1L);
-        mockUser.setEmail("user@example.com");
-        mockUser.setPointsBalance(100L);
-        mockUser.setAccountNumber("ACC12345");
-
-        when(walletService.updateBankDetails("user@example.com", "ACC12345")).thenReturn(mockUser);
-
-        UserDTO mockUserDTO = new UserDTO(
-                1L,
-                "user@example.com",
-                null,
-                100L,
-                null,
-                null,
-                null,
-                "ACC12345");
-        when(userMapper.toDTO(any())).thenReturn(mockUserDTO);
-
-        mockMvc.perform(put("/api/wallet/bank-details")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accountNumber").value("ACC12345"));
     }
 }

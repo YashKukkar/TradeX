@@ -3,7 +3,7 @@ import Card from "./Card";
 import styles from "../Dashboard.module.css";
 import { TICKERS_DATA } from "../utils/dashboardHelpers";
 import type { NavigateFunction } from "react-router-dom";
-import { useWalletData, usePublicSettings } from "../hooks/useDashboard";
+import { useWalletData, usePublicSettings, useCurrentUser } from "../hooks/useDashboard";
 import CashWalletSection from "./CashWalletSection";
 import WalletActivityLog from "./WalletActivityLog";
 
@@ -17,7 +17,6 @@ interface UserDashboardProps {
   emailVerified: boolean;
   phoneNumber: string;
   phoneVerified: boolean;
-  accountNumber: string;
   memberSince: string;
   startVerification: (target: "email" | "phone") => void;
   navigate: NavigateFunction;
@@ -35,13 +34,15 @@ export default function UserDashboard({
   emailVerified,
   phoneNumber,
   phoneVerified,
-  accountNumber,
   memberSince,
   startVerification,
   navigate,
   withdrawableBalance,
   bonusBalance,
 }: UserDashboardProps) {
+  const { data: user } = useCurrentUser();
+  const primaryBank = user?.bankAccounts?.find((b: any) => b.isPrimary);
+  const accountNumber = primaryBank?.accountNumber || "";
   const { data: walletData } = useWalletData();
   const { data: publicSettings } = usePublicSettings();
   const transactions = walletData?.transactions || [];
@@ -69,7 +70,7 @@ export default function UserDashboard({
           <div className={styles.heroRight}>
             <div className={styles.heroPointsCard}>
               <div className={styles.pointsBadge}>
-                <Icon name="toll" style={{ fontSize: "16px", color: "var(--accent)" }} />
+                <Icon name="stars" style={{ fontSize: "16px", color: "var(--accent)" }} />
                 <span>TradeX Points</span>
               </div>
               <div className={styles.pointsValue}>
@@ -100,7 +101,6 @@ export default function UserDashboard({
       <div className={styles.grid}>
         <CashWalletSection
           pointsBalance={pointsBalance}
-          accountNumber={accountNumber}
           withdrawableBalance={withdrawableBalance}
           bonusBalance={bonusBalance}
           hasDeposited={hasDeposited}

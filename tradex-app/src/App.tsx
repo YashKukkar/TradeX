@@ -3,6 +3,7 @@ import Login from "./Login";
 import Dashboard from "./Dashboard";
 import Referrals from "./Referrals";
 import SupportTickets from "./SupportTickets";
+import Settings from "./Settings";
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/settings" element={<Settings />} />
         <Route path="/referrals" element={<Referrals />} />
         <Route path="/support" element={<SupportTickets />} />
         <Route path="/admin/users" element={<Navigate to="/dashboard?tab=users" replace />} />

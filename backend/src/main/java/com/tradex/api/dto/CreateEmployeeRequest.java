@@ -17,5 +17,7 @@ public record CreateEmployeeRequest(
     String password,
 
     @NotNull(message = "Permissions list is required")
-    List<String> permissions
+    List<String> permissions,
+
+    List<String> teams
 ) {}

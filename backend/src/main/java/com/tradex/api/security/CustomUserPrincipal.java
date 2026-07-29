@@ -35,8 +35,9 @@ public class CustomUserPrincipal implements UserDetails {
                 authorities.add(new SimpleGrantedAuthority(perm.getAuthority()));
             }
         } else if (role == Role.EMPLOYEE && user.getPermissions() != null) {
-            for (Permission perm : user.getPermissions()) {
-                authorities.add(new SimpleGrantedAuthority(perm.getAuthority()));
+            for (String perm : user.getPermissions()) {
+                String auth = perm.startsWith("PERM_") ? perm : "PERM_" + perm;
+                authorities.add(new SimpleGrantedAuthority(auth));
             }
         }
 

@@ -1,25 +1,55 @@
 package com.tradex.api.mapper;
 
+import com.tradex.api.dto.BankDetailDTO;
 import com.tradex.api.dto.UserDTO;
 import com.tradex.api.entity.User;
-import com.tradex.api.enums.Permission;
 import com.tradex.api.enums.Role;
+import com.tradex.api.repository.PointsTransactionRepository;
+import com.tradex.api.repository.TeamRepository;
 
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-@SuppressWarnings("null")
 public class UserMapper {
+
+    @Autowired
+    private TeamRepository teamRepository;
+
+    @Autowired
+    private PointsTransactionRepository pointsTransactionRepository;
 
     public UserDTO toDTO(User user) {
         if (user == null) {
             return null;
         }
+
+        Set<String> effective = new HashSet<>();
+        if (user.getPermissions() != null) {
+            effective.addAll(user.getPermissions());
+        }
+        if (user.getTeams() != null && !user.getTeams().isEmpty()) {
+            for (String teamName : user.getTeams()) {
+                teamRepository.findByName(teamName).ifPresent(t -> {
+                    if (t.getPermissions() != null) {
+                        effective.addAll(t.getPermissions());
+                    }
+                });
+            }
+        }
+
+        Long pointsAcquired = 0L;
+        if (user.getRole() == Role.USER) {
+            pointsAcquired = pointsTransactionRepository.sumPositivePointsByUser(user);
+        }
+
         return new UserDTO(
                 user.getId(),
                 user.getEmail(),
@@ -28,7 +58,6 @@ public class UserMapper {
                 (user.getRole() == Role.USER) ? user.getReferralPath() : null,
                 (user.getRole() == Role.USER && user.getReferredBy() != null) ? user.getReferredBy().getEmail() : null,
                 user.getPhoneNumber(),
-                user.getAccountNumber(),
                 user.getRole() != null ? user.getRole().name() : "USER",
                 user.getCreatedAt() != null
                         ? user.getCreatedAt().atZone(ZoneId.systemDefault()).toEpochSecond()
@@ -44,7 +73,15 @@ public class UserMapper {
                 user.isEnabled(),
                 user.isLocked(),
                 user.getPermissions() != null
-                        ? user.getPermissions().stream().map(Permission::name).collect(Collectors.toList())
-                        : Collections.emptyList());
+                        ? new java.util.ArrayList<>(user.getPermissions())
+                        : Collections.emptyList(),
+                user.getTeams() != null
+                        ? new java.util.ArrayList<>(user.getTeams())
+                        : Collections.emptyList(),
+                user.getBankDetails() != null
+                        ? user.getBankDetails().stream().map(b -> new BankDetailDTO(b.getId(), b.getAccountNumber(), b.getIfscCode(), b.getHolderName(), b.getBankName(), b.isPrimary())).collect(Collectors.toList())
+                        : Collections.emptyList(),
+                new java.util.ArrayList<>(effective),
+                pointsAcquired);
     }
 }

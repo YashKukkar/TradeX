@@ -1,17 +1,12 @@
-import { useState } from "react";
 import Icon from "./Icon";
-import Toast from "./Toast";
 import styles from "../AdminUsers.module.css";
+import LoadingState from "./LoadingState";
 import { formatDateTime, getDisplayName } from "../utils/dashboardHelpers";
-import ApproveTransactionModal from "./ApproveTransactionModal";
-import {
-  usePendingTransactions,
-  useAllTransactions,
-  useApproveTransaction,
-  useRejectTransaction,
-} from "../hooks/useAdmin";
+import ResolveTransactionModal from "./ResolveTransactionModal";
 import type { UserProfile } from "../utils/dashboardHelpers";
 import { hasPermission } from "../utils/permissions";
+import DataTable, { type ColumnDef } from "./DataTable";
+import { usePendingTransactionsState } from "../hooks/usePendingTransactionsState";
 
 export interface PendingTransaction {
   id: number;
@@ -21,6 +16,7 @@ export interface PendingTransaction {
   status: string;
   notes: string;
   createdAt: number;
+  approvedAt: number;
   userEmail: string;
   userPhone?: string;
   userAccountNumber?: string;
@@ -30,286 +26,292 @@ interface PendingTransactionsRegistryProps {
   user: UserProfile;
 }
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function statusStyle(status: string): React.CSSProperties {
+  const map: Record<string, { color: string; background: string; border: string }> = {
+    SUCCESS: {
+      color: "var(--success)",
+      background: "var(--success-bg)",
+      border: "1px solid var(--success-border)",
+    },
+    FAILED: {
+      color: "var(--danger)",
+      background: "var(--danger-bg)",
+      border: "1px solid var(--danger-border)",
+    },
+    PENDING: {
+      color: "var(--warning)",
+      background: "var(--warning-bg)",
+      border: "1px solid var(--warning-border)",
+    },
+  };
+  return map[status] ?? map["PENDING"];
+}
+
+// ── Static base columns ───────────────────────────────────────────────────────
+
+const BASE_COLUMNS: ColumnDef<PendingTransaction>[] = [
+  {
+    label: "User",
+    width: "170px",
+    render: (t) => (
+      <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+        <span style={{ fontWeight: 600, fontSize: "14px", color: "var(--text)", lineHeight: 1.2 }}>
+          {getDisplayName(t.userEmail)}
+        </span>
+        <span style={{ fontSize: "12px", color: "var(--muted)" }}>
+          {t.userEmail}
+        </span>
+      </div>
+    ),
+  },
+  {
+    label: "Type",
+    width: "100px",
+    render: (t) => (
+      <span className={`${styles.verifiedPill} ${t.type === "DEPOSIT" ? styles.pillVerified : styles.pillUnverified}`}>
+        {t.type}
+      </span>
+    ),
+  },
+  {
+    label: "Amount",
+    width: "160px",
+    render: (t) => (
+      <span style={{ fontWeight: 700, fontSize: "14px", color: "var(--text)" }}>
+        ₹{t.amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+      </span>
+    ),
+  },
+  {
+    label: "Status",
+    width: "110px",
+    render: (t) => (
+      <span style={{
+        display: "inline-flex",
+        alignItems: "center",
+        padding: "4px 10px",
+        borderRadius: "999px",
+        fontSize: "11px",
+        fontWeight: 700,
+        textTransform: "uppercase",
+        ...statusStyle(t.status),
+      }}>
+        {t.status}
+      </span>
+    ),
+  },
+  {
+    label: "Requested",
+    width: "160px",
+    render: (t) => {
+      const tooltip = t.status !== "PENDING"
+        ? `${t.status === "SUCCESS" ? "Accepted" : "Rejected"} at ${formatDateTime(t.approvedAt || t.createdAt)}`
+        : undefined;
+      return (
+        <span
+          title={tooltip}
+          style={{ fontSize: "13px", color: "var(--text)", cursor: tooltip ? "help" : "default" }}
+        >
+          {formatDateTime(t.createdAt)}
+        </span>
+      );
+    },
+  },
+  {
+    label: "Notes",
+    render: (t) => (
+      <span title={t.notes} style={{
+        display: "block",
+        maxWidth: 260,
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        fontSize: "13px",
+        color: "var(--muted)",
+      }}>
+        {t.notes || "—"}
+      </span>
+    ),
+  },
+];
+
+// ── Component ─────────────────────────────────────────────────────────────────
+
 export default function PendingTransactionsRegistry({ user }: PendingTransactionsRegistryProps) {
-  const [activeTab, setActiveTab] = useState<"pending" | "all">("pending");
-  const [rejectingId, setRejectingId] = useState<number | null>(null);
-  const [rejectReason, setRejectReason] = useState("");
-  const [approvingId, setApprovingId] = useState<number | null>(null);
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastType, setToastType] = useState<"success" | "error" | "warning" | "info">("success");
+  const {
+    activeTab,
+    setActiveTab,
+    rejectingId,
+    setRejectingId,
+    approvingId,
+    setApprovingId,
+    processingIds,
+    searchQuery,
+    setSearchQuery,
+    filteredList,
+    activeLoading,
+    activeError,
+    transactionToApprove,
+    transactionToReject,
+    handleApprove,
+    handleRejectClick,
+    executeApprove,
+    executeReject,
+    approveMutationPending,
+    rejectMutationPending,
+    pendingTransactionsCount,
+    allTransactionsCount,
+    allLoading,
+  } = usePendingTransactionsState();
 
-  const { data: pendingTransactions = [], isLoading: pendingLoading, isError: pendingError } = usePendingTransactions();
+  // Action column is only shown in the pending tab
+  const actionColumn: ColumnDef<PendingTransaction> = {
+    label: "Actions",
+    align: "right",
+    width: "200px",
+    render: (t) => {
+      const noDepositPerm    = t.type === "DEPOSIT"    && !hasPermission(user, "MANAGE_DEPOSITS");
+      const noWithdrawPerm   = t.type === "WITHDRAWAL" && !hasPermission(user, "MANAGE_WITHDRAWALS");
 
-  const { data: allTransactions = [], isLoading: allLoading, isError: allError } = useAllTransactions(activeTab === "all");
+      if (noDepositPerm || noWithdrawPerm) {
+        return (
+          <span style={{ fontSize: "12px", color: "var(--muted)", fontStyle: "italic" }}>
+            No permission
+          </span>
+        );
+      }
 
-  const approveMutation = useApproveTransaction({
-    onSuccess: () => {
-      setApprovingId(null);
-      setToastType("success");
-      setToastMessage("Transaction approved successfully!");
+      const procType = processingIds[t.id];
+      if (procType) {
+        return (
+          <div className={styles.processingCellText}>
+            <Icon name="sync" className={styles.spinnerRotate} style={{ fontSize: "16px" }} />
+            {procType === "approve" ? "Approving..." : "Rejecting..."}
+          </div>
+        );
+      }
+
+      return (
+        <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+          <button
+            className={styles.approveBtn}
+            onClick={(e) => { e.stopPropagation(); handleApprove(t.id); }}
+            disabled={approveMutationPending}
+          >
+            <Icon name="check_circle" style={{ fontSize: "15px" }} />
+            Approve
+          </button>
+          <button
+            className={styles.rejectBtn}
+            onClick={(e) => { e.stopPropagation(); handleRejectClick(t.id); }}
+            disabled={approveMutationPending || rejectMutationPending}
+          >
+            <Icon name="cancel" style={{ fontSize: "15px" }} />
+            Reject
+          </button>
+        </div>
+      );
     },
-  });
-
-  const rejectMutation = useRejectTransaction({
-    onSuccess: () => {
-      setRejectingId(null);
-      setRejectReason("");
-      setToastType("success");
-      setToastMessage("Transaction rejected successfully!");
-    },
-  });
-
-  const handleApprove = (id: number) => {
-    setApprovingId(id);
-    setRejectingId(null);
   };
 
-  const handleRejectClick = (id: number) => {
-    setRejectingId(id);
-    setRejectReason("");
-    setApprovingId(null);
-  };
-
-  const submitReject = (id: number) => {
-    if (rejectReason.trim()) {
-      rejectMutation.mutate({ id, reason: rejectReason.trim() });
-    }
-  };
-
-  const activeLoading = activeTab === "pending" ? pendingLoading : allLoading;
-  const activeError = activeTab === "pending" ? pendingError : allError;
-  const currentList = activeTab === "pending" ? pendingTransactions : allTransactions;
+  const columns = activeTab === "pending" ? [...BASE_COLUMNS, actionColumn] : BASE_COLUMNS;
 
   return (
     <div className={styles.tableSection} style={{ marginTop: "32px" }}>
+
+      {/* Header */}
       <div className={styles.tableHeader} style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "16px" }}>
         <h2 className={styles.tableTitle}>Transactions Control Console</h2>
-        <div style={{ display: "flex", gap: "12px", borderBottom: "1px solid var(--border)", width: "100%", paddingBottom: "4px" }}>
-          <button
-            type="button"
-            onClick={() => setActiveTab("pending")}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: activeTab === "pending" ? "var(--primary)" : "var(--muted)",
-              fontWeight: "750",
-              fontSize: "14px",
-              cursor: "pointer",
-              padding: "8px 16px",
-              borderBottom: activeTab === "pending" ? "2px solid var(--primary)" : "2px solid transparent",
-              transition: "all 0.2s"
-            }}
-          >
-            Pending Actions ({pendingTransactions.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("all")}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: activeTab === "all" ? "var(--primary)" : "var(--muted)",
-              fontWeight: "750",
-              fontSize: "14px",
-              cursor: "pointer",
-              padding: "8px 16px",
-              borderBottom: activeTab === "all" ? "2px solid var(--primary)" : "2px solid transparent",
-              transition: "all 0.2s"
-            }}
-          >
-            All Audit Log ({allTransactions.length || currentList.length})
-          </button>
+
+        {/* Toolbar row (tab strip on left, search box on right) */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", flexWrap: "wrap", gap: "12px" }}>
+          {/* Tab strip */}
+          <div style={{ display: "flex", gap: "4px", borderBottom: "1px solid var(--border)", paddingBottom: "4px" }}>
+            {(["pending", "all"] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setActiveTab(tab)}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: activeTab === tab ? "var(--primary)" : "var(--muted)",
+                fontWeight: 700,
+                fontSize: "14px",
+                cursor: "pointer",
+                padding: "8px 18px",
+                borderBottom: activeTab === tab ? "2px solid var(--primary)" : "2px solid transparent",
+                marginBottom: "-1px",
+                transition: "color 0.2s, border-color 0.2s",
+                letterSpacing: "0.01em",
+              }}
+            >
+              {tab === "pending"
+                ? `Pending (${pendingTransactionsCount})`
+                : `All Transactions (${allLoading && allTransactionsCount === 0 ? "..." : allTransactionsCount})`}
+            </button>
+          ))}
+        </div>
+
+        {/* Fuzzy Search Box */}
+        <div className={styles.searchBox} style={{ padding: "6px 12px" }}>
+          <Icon name="search" className={styles.searchIcon} style={{ fontSize: "16px" }} />
+          <label htmlFor="transactionSearch" style={{ display: "none" }}>Search Transactions</label>
+          <input
+            id="transactionSearch"
+            name="transactionSearch"
+            type="text"
+            placeholder="Search email, type, amount..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={styles.searchInput}
+            style={{ fontSize: "13px", width: "240px" }}
+          />
         </div>
       </div>
+    </div>
 
+      {/* Table / Loading / Error */}
       {activeLoading ? (
-        <div className={styles.loadingState}>
-          <div className={styles.spinner}></div>
-          <p>Querying transaction ledger...</p>
-        </div>
+        <LoadingState message="Querying transaction ledger..." />
       ) : activeError ? (
         <div className={styles.emptyState} style={{ color: "var(--danger)" }}>
           Failed to load transactions.
         </div>
-      ) : currentList.length === 0 ? (
-        <div className={styles.emptyState}>No transactions found in this view.</div>
       ) : (
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>User Details</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Amount</th>
-                <th>Notes & Date</th>
-                {activeTab === "pending" && <th style={{ textAlign: "right" }}>Actions</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {currentList.map((t) => (
-                <tr key={t.id}>
-                  <td>
-                    <span className={styles.idBadge}>#{t.id}</span>
-                  </td>
-                  <td>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                        <span style={{ fontWeight: "650", color: "var(--text)" }}>
-                          {getDisplayName(t.userEmail)}
-                        </span>
-                        <span
-                          style={{
-                            fontSize: "11px",
-                            color: "var(--muted)",
-                            background: "rgba(255, 255, 255, 0.05)",
-                            padding: "2px 6px",
-                            borderRadius: "4px",
-                          }}
-                        >
-                          {t.userEmail}
-                        </span>
-                      </div>
-                      <div style={{ display: "flex", gap: "12px", fontSize: "11px", color: "var(--muted)" }}>
-                        {t.userPhone && (
-                          <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                            <Icon name="phone" style={{ fontSize: "12px" }} />
-                            {t.userPhone}
-                          </span>
-                        )}
-                        {t.userAccountNumber && (
-                          <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                            <Icon name="account_balance" style={{ fontSize: "12px" }} />
-                            {t.userAccountNumber}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span
-                      className={`${styles.verifiedPill} ${
-                        t.type === "DEPOSIT" ? styles.pillVerified : styles.pillUnverified
-                      }`}
-                    >
-                      {t.type}
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      style={{
-                        display: "inline-block",
-                        padding: "4px 8px",
-                        borderRadius: "6px",
-                        fontSize: "10px",
-                        fontWeight: "700",
-                        textTransform: "uppercase",
-                        color: t.status === "SUCCESS" ? "#00e0a4" : t.status === "FAILED" ? "var(--danger)" : "var(--accent)",
-                        background: t.status === "SUCCESS" ? "rgba(0, 224, 164, 0.1)" : t.status === "FAILED" ? "rgba(255, 90, 106, 0.1)" : "rgba(255, 176, 32, 0.1)",
-                        border: `1px solid ${t.status === "SUCCESS" ? "rgba(0, 224, 164, 0.25)" : t.status === "FAILED" ? "rgba(255, 90, 106, 0.25)" : "rgba(255, 176, 32, 0.25)"}`
-                      }}
-                    >
-                      {t.status}
-                    </span>
-                  </td>
-                  <td style={{ fontWeight: "700" }}>₹{t.amount.toFixed(2)}</td>
-                  <td>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                      <span style={{ color: "var(--text)", fontSize: "13.5px" }}>{t.notes}</span>
-                      <span style={{ fontSize: "11px", color: "var(--muted)" }}>
-                        {formatDateTime(t.createdAt)}
-                      </span>
-                    </div>
-                  </td>
-                  {activeTab === "pending" && (
-                    <td style={{ textAlign: "right" }}>
-                      {rejectingId === t.id ? (
-                        <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end", alignItems: "center" }}>
-                          <input
-                            type="text"
-                            autoFocus
-                            value={rejectReason}
-                            onChange={(e) => setRejectReason(e.target.value)}
-                            placeholder="Reason (max 150 chars)"
-                            maxLength={150}
-                            style={{
-                              padding: "6px 12px",
-                              borderRadius: "6px",
-                              border: "1px solid var(--border)",
-                              background: "var(--surface)",
-                              color: "var(--text)",
-                              fontSize: "12px",
-                              width: "200px"
-                            }}
-                          />
-                          <button
-                            className={styles.rejectBtn}
-                            onClick={() => submitReject(t.id)}
-                            disabled={rejectMutation.isPending || !rejectReason.trim()}
-                          >
-                            Confirm
-                          </button>
-                          <button
-                            className={styles.viewBtn}
-                            onClick={() => setRejectingId(null)}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
-                        t.type === "DEPOSIT" && !hasPermission(user, "MANAGE_DEPOSITS") ? (
-                          <span style={{ fontSize: "12.5px", color: "var(--muted)", fontStyle: "italic" }}>No Deposit Permission</span>
-                        ) : t.type === "WITHDRAWAL" && !hasPermission(user, "MANAGE_WITHDRAWALS") ? (
-                          <span style={{ fontSize: "12.5px", color: "var(--muted)", fontStyle: "italic" }}>No Withdrawal Permission</span>
-                        ) : (
-                          <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
-                            <button
-                              className={styles.approveBtn}
-                              onClick={() => handleApprove(t.id)}
-                              disabled={approveMutation.isPending}
-                            >
-                              <Icon name="check_circle" style={{ fontSize: "16px" }} />
-                              Approve
-                            </button>
-                            <button
-                              className={styles.rejectBtn}
-                              onClick={() => handleRejectClick(t.id)}
-                              disabled={approveMutation.isPending}
-                            >
-                              <Icon name="cancel" style={{ fontSize: "16px" }} />
-                              Reject
-                            </button>
-                          </div>
-                        )
-                      )}
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className={styles.transactionTableWrapper}>
+          <DataTable
+            columns={columns}
+            data={filteredList}
+            rowKey={(t) => t.id}
+            emptyMessage="No transactions found in this view."
+            clickableRow={false}
+            rowClassName={(t) => (processingIds[t.id] ? styles.processingRow : undefined)}
+          />
         </div>
       )}
 
-      {approvingId && (() => {
-        const transactionToApprove = pendingTransactions.find(t => t.id === approvingId) || allTransactions.find(t => t.id === approvingId);
-        if (!transactionToApprove) return null;
-        return (
-          <ApproveTransactionModal
-            transaction={transactionToApprove}
-            isPending={approveMutation.isPending}
-            onClose={() => setApprovingId(null)}
-            onConfirm={() => approveMutation.mutate(approvingId)}
-          />
-        );
-      })()}
+      {/* Approve modal */}
+      {transactionToApprove && approvingId !== null && (
+        <ResolveTransactionModal
+          transaction={transactionToApprove}
+          isPending={false}
+          mode="approve"
+          onClose={() => setApprovingId(null)}
+          onConfirm={() => executeApprove(approvingId)}
+        />
+      )}
 
-      {toastMessage && (
-        <Toast
-          message={toastMessage}
-          type={toastType}
-          onClose={() => setToastMessage("")}
+      {/* Reject modal */}
+      {transactionToReject && rejectingId !== null && (
+        <ResolveTransactionModal
+          transaction={transactionToReject}
+          isPending={false}
+          mode="reject"
+          onClose={() => setRejectingId(null)}
+          onConfirm={(reason) => executeReject(rejectingId, reason)}
         />
       )}
     </div>

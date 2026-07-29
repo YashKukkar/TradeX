@@ -2,17 +2,17 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../utils/api";
+import { useOverlay, getPollingInterval } from "../context/OverlayContext";
 import Icon from "./Icon";
 import Card from "./Card";
 import styles from "../Dashboard.module.css";
 
 import PendingTransactionsRegistry from "./PendingTransactionsRegistry";
-import UserDirectoryTab from "./UserDirectoryTab";
+import UserManagementTab from "./UserManagementTab";
 import SettingsTab from "./SettingsTab";
 import AuditLogsTab from "./AuditLogsTab";
 import AdminTicketsTab from "./AdminTicketsTab";
-import EmployeeManagement from "./EmployeeManagement";
-import Toast from "./Toast";
+import { useToast } from "../context/ToastContext";
 import { useSeedTestData, useAdminTelemetry } from "../hooks/useDashboard";
 import type { UserProfile } from "../utils/dashboardHelpers";
 import { hasPermission, hasAnyPermission, isAdminRole } from "../utils/permissions";
@@ -31,28 +31,26 @@ export default function AdminDashboard({
 }: AdminDashboardProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "overview";
-  const [toastMessage, setToastMessage] = useState("");
+  const { showToast } = useToast();
   const [showDevTools, setShowDevTools] = useState(false);
+  const { isOverlayActive } = useOverlay();
 
   // ── Queries & Mutations ──────────────────────────────────────────
-  const { data: pendingTx = [] } = useQuery<any[]>({
-    queryKey: ["pendingTransactions"],
-    queryFn: () => api("/admin/transactions/pending"),
-    enabled: hasAnyPermission(currentUser, ["MANAGE_DEPOSITS", "MANAGE_WITHDRAWALS"]),
-  });
-
   const { data: adminData, isLoading: adminLoading } = useAdminTelemetry(true, currentUser);
   const users = adminData?.usersList || [];
   const totalPoints = users.reduce((sum, u) => sum + (u.pointsBalance || 0), 0);
   const adminSettings = adminData?.settingsConfig;
 
+  const { data: pendingTx = [] } = useQuery<any[]>({
+    queryKey: ["pendingTransactions"],
+    queryFn: () => api("/admin/transactions/pending"),
+    enabled: hasAnyPermission(currentUser, ["MANAGE_DEPOSITS", "MANAGE_WITHDRAWALS"]) && !adminLoading,
+    refetchInterval: () => getPollingInterval(isOverlayActive, 5000),
+  });
+
   const seedMutation = useSeedTestData(
-    () => {
-      setToastMessage("Database seeded successfully with test users (u1-u5)!");
-    },
-    (err) => {
-      setToastMessage(err);
-    }
+    () => { showToast("Database seeded successfully with test users (u1-u5)!", "success"); },
+    (err) => { showToast(err, "error"); }
   );
 
   const handleSeedTestData = () => {
@@ -81,13 +79,6 @@ export default function AdminDashboard({
 
   return (
     <div className={styles.adminMainContent}>
-      {toastMessage && (
-        <Toast
-          message={toastMessage}
-          type={seedMutation.isError ? "error" : "success"}
-          onClose={() => setToastMessage("")}
-        />
-      )}
 
       {/* Greeting and Console Active Badge */}
       <div className={styles.greeting}>
@@ -114,7 +105,7 @@ export default function AdminDashboard({
             className={`${styles.adminTab} ${activeTab === "overview" ? styles.adminTabActive : ""}`}
             onClick={() => handleTabChange("overview")}
           >
-            <Icon name="monitoring" className={styles.adminTabIcon} />
+            <Icon name="insights" className={styles.adminTabIcon} />
             Overview
           </button>
         )}
@@ -136,7 +127,7 @@ export default function AdminDashboard({
             onClick={() => handleTabChange("users")}
           >
             <Icon name="group" className={styles.adminTabIcon} />
-            User Directory
+            User Management
           </button>
         )}
         {hasPermission(currentUser, "MANAGE_SETTINGS") && (
@@ -162,17 +153,8 @@ export default function AdminDashboard({
             className={`${styles.adminTab} ${activeTab === "tickets" ? styles.adminTabActive : ""}`}
             onClick={() => handleTabChange("tickets")}
           >
-            <Icon name="confirmation_number" className={styles.adminTabIcon} />
+            <Icon name="support_agent" className={styles.adminTabIcon} />
             Support Tickets
-          </button>
-        )}
-        {currentUser.role === "SUPER_ADMIN" && (
-          <button
-            className={`${styles.adminTab} ${activeTab === "employees" ? styles.adminTabActive : ""}`}
-            onClick={() => handleTabChange("employees")}
-          >
-            <Icon name="badge" className={styles.adminTabIcon} />
-            Employees
           </button>
         )}
       </div>
@@ -199,7 +181,7 @@ export default function AdminDashboard({
 
                   <Card className={styles.adminTelemetryCard}>
                     <div className={styles.adminTelemetryHeader}>
-                      <Card.Icon name="toll" color="var(--accent)" className={styles.telemetryIcon} />
+                      <Card.Icon name="stars" color="var(--accent)" className={styles.telemetryIcon} />
                       <span className={styles.telemetryLabel}>Minted Points Pool</span>
                     </div>
                     <div className={styles.telemetryValue} style={{ color: "var(--accent)" }}>
@@ -338,7 +320,7 @@ export default function AdminDashboard({
 
         {activeTab === "users" && hasPermission(currentUser, "MANAGE_USERS") && (
           <div className={styles.fadeInContainer}>
-            <UserDirectoryTab user={currentUser} users={users} adminLoading={adminLoading} />
+            <UserManagementTab user={currentUser} users={users} adminLoading={adminLoading} />
           </div>
         )}
 
@@ -357,12 +339,6 @@ export default function AdminDashboard({
         {activeTab === "tickets" && isAdminRole(currentUser) && (
           <div className={styles.fadeInContainer}>
             <AdminTicketsTab user={currentUser} />
-          </div>
-        )}
-
-        {activeTab === "employees" && currentUser.role === "SUPER_ADMIN" && (
-          <div className={styles.fadeInContainer}>
-            <EmployeeManagement />
           </div>
         )}
       </div>

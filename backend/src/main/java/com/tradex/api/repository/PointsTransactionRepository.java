@@ -15,6 +15,9 @@ import java.util.List;
 public interface PointsTransactionRepository extends JpaRepository<PointsTransaction, Long> {
     List<PointsTransaction> findByUserOrderByCreatedAtDesc(User user);
 
+    @Query("SELECT COALESCE(SUM(pt.amount), 0) FROM PointsTransaction pt WHERE pt.user = :user AND pt.amount > 0")
+    Long sumPositivePointsByUser(@Param("user") User user);
+
     @Modifying
     @Query("DELETE FROM PointsTransaction pt WHERE pt.user IN :users")
     void deleteByUserIn(@Param("users") List<User> users);

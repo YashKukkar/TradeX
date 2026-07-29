@@ -44,6 +44,10 @@ public class WalletTransaction {
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "approved_at")
+    @Builder.Default
+    private LocalDateTime approvedAt = LocalDateTime.now();
+
     @Column(length = 255)
     private String notes;
 
@@ -55,5 +59,6 @@ public class WalletTransaction {
         this.status = status;
         this.notes = notes;
         this.createdAt = LocalDateTime.now();
+        this.approvedAt = LocalDateTime.now();
     }
 }

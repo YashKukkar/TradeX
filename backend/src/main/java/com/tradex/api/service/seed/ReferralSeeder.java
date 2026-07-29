@@ -25,6 +25,7 @@ public class ReferralSeeder {
         User u2 = seededUsers.get(1);
         User u3 = seededUsers.get(2);
         User u4 = seededUsers.get(3);
+        User u5 = seededUsers.get(4);
 
         // -- Referral u2 (referred by u1) --
         referralRewards.add(ReferralReward.builder()
@@ -81,6 +82,34 @@ public class ReferralSeeder {
                 .pointsAwarded(100L)
                 .status(ReferralRewardStatus.CREDITED)
                 .createdAt(u4.getCreatedAt())
+                .build());
+
+        // -- Referral u5 (referred by u4) --
+        referralRewards.add(ReferralReward.builder()
+                .referrer(u4)
+                .referredUser(u5)
+                .level(1)
+                .pointsAwarded(500L)
+                .status(ReferralRewardStatus.CREDITED)
+                .createdAt(u5.getCreatedAt())
+                .build());
+
+        referralRewards.add(ReferralReward.builder()
+                .referrer(u3)
+                .referredUser(u5)
+                .level(2)
+                .pointsAwarded(200L)
+                .status(ReferralRewardStatus.CREDITED)
+                .createdAt(u5.getCreatedAt())
+                .build());
+
+        referralRewards.add(ReferralReward.builder()
+                .referrer(u2)
+                .referredUser(u5)
+                .level(3)
+                .pointsAwarded(100L)
+                .status(ReferralRewardStatus.CREDITED)
+                .createdAt(u5.getCreatedAt())
                 .build());
 
         referralRewardRepository.saveAll(referralRewards);

@@ -23,7 +23,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
     boolean existsByUserIdAndTypeAndStatus(Long userId, WalletTransactionType type, WalletTransactionStatus status);
 
     List<WalletTransaction> findByStatusOrderByCreatedAtDesc(WalletTransactionStatus status);
-    List<WalletTransaction> findAllByOrderByCreatedAtDesc();
+    List<WalletTransaction> findAllByOrderByApprovedAtDesc();
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT wt FROM WalletTransaction wt WHERE wt.id = :id")

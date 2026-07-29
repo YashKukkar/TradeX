@@ -26,7 +26,7 @@ export const ROUTE_QUEUE_LABELS: Record<string, string> = {
   MANAGE_POINTS: "Points Team",
   MANAGE_DEPOSITS: "Deposit Review",
   MANAGE_WITHDRAWALS: "Withdrawal Review",
-  MANAGE_SETTINGS: "System Config",
+  MANAGE_SETTINGS: "Admin Ops",
 };
 
 /**
@@ -37,7 +37,7 @@ export function hasPermission(user: UserProfile | null | undefined, perm: Permis
   if (!user) return false;
   if (user.role === "SUPER_ADMIN") return true;
   if (user.role !== "EMPLOYEE") return false;
-  return user.permissions?.includes(perm) ?? false;
+  return (user.effectivePermissions?.includes(perm) || user.permissions?.includes(perm)) ?? false;
 }
 
 /**

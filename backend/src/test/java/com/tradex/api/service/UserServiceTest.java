@@ -6,6 +6,7 @@ import com.tradex.api.dto.SignupRequest;
 import com.tradex.api.dto.UserDTO;
 import com.tradex.api.entity.*;
 import com.tradex.api.enums.*;
+import com.tradex.api.exception.AppException;
 import com.tradex.api.repository.PointsTransactionRepository;
 import com.tradex.api.repository.UserRepository;
 import com.tradex.api.security.JwtUtil;
@@ -75,7 +76,6 @@ class UserServiceTest {
                 u.getReferralPath(),
                 u.getReferredBy() != null ? u.getReferredBy().getEmail() : null,
                 u.getPhoneNumber(),
-                u.getAccountNumber(),
                 u.getRole() != null ? u.getRole().name() : "USER",
                 0L,
                 u.isEmailVerified(),
@@ -161,5 +161,28 @@ class UserServiceTest {
         when(passwordEncoder.matches("wrong", "password")).thenReturn(false);
 
         assertThrows(BadCredentialsException.class, () -> userService.login(req));
+    }
+
+    @Test
+    void testChangePasswordSuccess() {
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("password", "password")).thenReturn(true);
+        when(passwordEncoder.encode("newpassword")).thenReturn("encodedNewPassword");
+
+        userService.changePassword("test@example.com", "password", "newpassword");
+
+        assertEquals("encodedNewPassword", user.getPassword());
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void testChangePasswordFailureIncorrectCurrentPassword() {
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("wrongpassword", "password")).thenReturn(false);
+
+        assertThrows(AppException.BadRequestException.class, () ->
+            userService.changePassword("test@example.com", "wrongpassword", "newpassword")
+        );
+        verify(userRepository, never()).save(any(User.class));
     }
 }

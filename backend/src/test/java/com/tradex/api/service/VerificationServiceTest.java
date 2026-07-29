@@ -1,6 +1,6 @@
 package com.tradex.api.service;
 import com.tradex.api.mapper.UserMapper;
-
+import com.tradex.api.config.AppProperties;
 import com.tradex.api.dto.UserDTO;
 import com.tradex.api.entity.*;
 import com.tradex.api.enums.*;
@@ -42,7 +42,7 @@ class VerificationServiceTest {
     private UserMapper userMapper;
 
     private VerificationService verificationService;
-    private com.tradex.api.config.AppProperties appProperties;
+    private AppProperties appProperties;
 
     private User user;
 
@@ -55,7 +55,7 @@ class VerificationServiceTest {
         appProperties.getOtp().setExpiryMinutes(10);
         appProperties.getOtp().setMaxAttempts(3);
         appProperties.getOtp().setResendCooldownSeconds(60);
-        
+
         lenient().when(userMapper.toDTO(any())).thenAnswer(invocation -> {
             User u = invocation.getArgument(0);
             return new UserDTO(
@@ -66,7 +66,6 @@ class VerificationServiceTest {
                 u.getReferralPath(),
                 u.getReferredBy() != null ? u.getReferredBy().getEmail() : null,
                 u.getPhoneNumber(),
-                u.getAccountNumber(),
                 u.getRole() != null ? u.getRole().name() : "USER",
                 System.currentTimeMillis() / 1000,
                 u.isEmailVerified(),

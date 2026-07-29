@@ -1,3 +1,12 @@
+export interface BankDetail {
+  id: number;
+  accountNumber: string;
+  ifscCode: string;
+  holderName: string;
+  bankName: string;
+  isPrimary: boolean;
+}
+
 export interface UserProfile {
   email: string;
   referralCode: string;
@@ -11,6 +20,8 @@ export interface UserProfile {
   withdrawableBalance: number;
   bonusBalance: number;
   permissions?: string[];
+  bankAccounts?: BankDetail[];
+  effectivePermissions?: string[];
 }
 
 export interface WalletTransaction {
@@ -21,6 +32,7 @@ export interface WalletTransaction {
   status: string;
   notes: string;
   createdAt: number;
+  approvedAt: number;
 }
 
 export interface UserInfo {
@@ -28,6 +40,7 @@ export interface UserInfo {
   email: string;
   referralCode: string;
   pointsBalance: number;
+  pointsAcquired?: number;
   referralPath: string;
   referredByEmail?: string;
   phoneNumber?: string;
@@ -41,6 +54,14 @@ export interface UserInfo {
   locked?: boolean;
   createdAt?: number;
   permissions?: string[];
+  teams?: string[];
+  bankAccounts?: BankDetail[];
+  effectivePermissions?: string[];
+}
+
+/** Returns the primary bank account number for a user, or undefined if none is linked. */
+export function getPrimaryAccountNumber(user: UserProfile | UserInfo | null | undefined): string | undefined {
+  return user?.bankAccounts?.find(b => b.isPrimary)?.accountNumber;
 }
 
 export interface SystemSetting {
@@ -113,10 +134,13 @@ export function formatDate(val: number | string | Date): string {
       ? new Date(val)
       : val;
 
+  const currentYear = new Date().getFullYear();
+  const dateYear = date.getFullYear();
+
   return date.toLocaleDateString("en-IN", {
     day: "numeric",
     month: "short",
-    year: "numeric",
+    ...(dateYear !== currentYear ? { year: "numeric" } : {}),
   });
 }
 
@@ -140,4 +164,22 @@ export function formatDateTime(val: number | string | Date): string {
   const dStr = formatDate(val);
   const tStr = formatTime(val);
   return `${dStr}, ${tStr}`;
+}
+
+export function formatEpochTime(
+  epochSeconds: number,
+  options?: Intl.DateTimeFormatOptions
+): string {
+  const date = new Date(epochSeconds * 1000);
+  const currentYear = new Date().getFullYear();
+  const dateYear = date.getFullYear();
+
+  return date.toLocaleString("en-IN", options || {
+    day: "2-digit",
+    month: "short",
+    ...(dateYear !== currentYear ? { year: "numeric" } : {}),
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 }

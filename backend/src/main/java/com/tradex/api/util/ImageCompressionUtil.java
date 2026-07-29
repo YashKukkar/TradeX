@@ -111,7 +111,7 @@ public class ImageCompressionUtil {
 
                 writer.write(null, new IIOImage(targetImage, null, null), param);
                 writer.dispose();
-                
+
                 ios.flush();
 
                 byte[] compressedBytes = baos.toByteArray();
@@ -170,8 +170,6 @@ public class ImageCompressionUtil {
             String lower = originalName.toLowerCase();
             if (lower.endsWith(".png")) {
                 return originalName.substring(0, originalName.length() - 4) + ".jpg";
-            } else if (lower.endsWith(".webp")) {
-                return originalName.substring(0, originalName.length() - 5) + ".jpg";
             }
         }
         return originalName;

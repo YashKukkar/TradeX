@@ -5,30 +5,41 @@ import { useReferralsData } from "./hooks/useDashboard";
 import Icon from "./components/Icon";
 import StatCard from "./components/StatCard";
 import { formatDate, formatTime } from "./utils/dashboardHelpers";
- 
+
+function maskEmail(text: string): string {
+  if (!text) return "";
+  const emailRegex = /([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
+  return text.replace(emailRegex, (_, prefix, domain) => {
+    if (prefix.length <= 2) {
+      return `${prefix}***@${domain}`;
+    }
+    return `${prefix.substring(0, 2)}***@${domain}`;
+  });
+}
+
 export default function Referrals() {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<"referrals" | "ledger">("referrals");
- 
+
   const { data, isLoading, error } = useReferralsData();
- 
+
   useEffect(() => {
     if (error) {
       navigate("/login");
     }
   }, [error, navigate]);
- 
+
   const rewards = data?.downline || [];
   const transactions = data?.txs || [];
   const pointsBalance = data?.user?.pointsBalance ?? 0;
   const loading = isLoading;
- 
+
   const filtered = filter ? rewards.filter(r => r.level === filter) : rewards;
- 
+
   const referralPoints = rewards.reduce((sum, r) => sum + (r.pointsAwarded ?? 0), 0);
   const welcomeCoins = transactions.find(t => t.type === "WELCOME_BONUS")?.amount || 0;
- 
+
   function getFriendlyTxType(type: string) {
     switch (type) {
       case "WELCOME_BONUS": return "Welcome Bonus";
@@ -39,7 +50,7 @@ export default function Referrals() {
       default: return type.replace(/_/g, " ");
     }
   }
- 
+
   return (
     <div className={styles.wrapper}>
       <header className={styles.topBar}>
@@ -49,7 +60,7 @@ export default function Referrals() {
         </button>
         <h1 className={styles.pageTitle}>Points & Referrals</h1>
       </header>
- 
+
       {/* Stats Cards Row */}
       <div className={styles.statsRow}>
         <StatCard
@@ -83,14 +94,14 @@ export default function Referrals() {
 
       {/* Tab Selectors */}
       <div className={styles.tabsContainer}>
-        <button 
+        <button
           className={`${styles.tabBtn} ${activeTab === "referrals" ? styles.active : ""}`}
           onClick={() => setActiveTab("referrals")}
         >
           <Icon name="share" />
           Referral Network ({rewards.length})
         </button>
-        <button 
+        <button
           className={`${styles.tabBtn} ${activeTab === "ledger" ? styles.active : ""}`}
           onClick={() => setActiveTab("ledger")}
         >
@@ -160,7 +171,7 @@ export default function Referrals() {
                   <tbody>
                     {filtered.map(r => (
                       <tr key={r.id}>
-                        <td className={styles.emailCell}>{r.referredUserEmail}</td>
+                        <td className={styles.emailCell}>{maskEmail(r.referredUserEmail)}</td>
                         <td>
                           <span className={`${styles.levelBadge} ${styles["level" + r.level]}`}>
                             Level {r.level}
@@ -233,7 +244,7 @@ export default function Referrals() {
                         <td className={styles.emailCell}>{getFriendlyTxType(tx.type)}</td>
                         <td className={styles.pointsCell}>+{tx.amount}</td>
                         <td style={{ fontWeight: 600 }}>{tx.balanceAfter}</td>
-                        <td style={{ color: "var(--muted)" }}>{tx.notes}</td>
+                        <td style={{ color: "var(--muted)" }}>{maskEmail(tx.notes)}</td>
                         <td className={styles.dateCell}>
                           {(() => {
                             const dateStr = formatDate(tx.createdAt);

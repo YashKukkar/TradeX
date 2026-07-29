@@ -7,6 +7,8 @@ import com.tradex.api.enums.TicketCategory;
 import com.tradex.api.enums.TicketStatus;
 import com.tradex.api.repository.UserRepository;
 import com.tradex.api.exception.AppException.BadRequestException;
+import com.tradex.api.exception.AppException.ForbiddenException;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -194,16 +196,6 @@ class SupportTicketServiceIntegrationTest {
     }
 
 
-    @Test
-    void testAdminNotesUpdate() {
-        TicketCreateRequest request = new TicketCreateRequest(TicketCategory.GENERAL, "Subject", "Desc");
-        TicketDetailDTO ticket = supportTicketService.createTicket(testUser.getEmail(), request, null);
-
-        assertNull(ticket.getAdminNotes());
-
-        TicketDetailDTO updated = supportTicketService.updateAdminNotes(ticket.getId(), "This user is complaining a lot", testAdmin.getEmail());
-        assertEquals("This user is complaining a lot", updated.getAdminNotes());
-    }
 
     @Test
     void testAddCommentWithAttachments() {
@@ -233,5 +225,72 @@ class SupportTicketServiceIntegrationTest {
         String fileName = updatedTicket.getAttachments().get(0).getFileName();
         assertTrue(fileName.startsWith("comment-doc"));
         assertTrue(fileName.endsWith(".txt"));
+    }
+
+    @Test
+    void testEmployeeTicketVisibilityAndAccessRights() {
+        // Create Employee 1 with MANAGE_DEPOSITS
+        User employee1 = User.builder()
+                .email("emp.deposit@example.com")
+                .password("password123")
+                .role(Role.EMPLOYEE)
+                .permissions(Set.of("MANAGE_DEPOSITS"))
+                .emailVerified(true)
+                .build();
+        employee1 = userRepository.save(employee1);
+
+        // Create Employee 2 with MANAGE_WITHDRAWALS
+        User employee2 = User.builder()
+                .email("emp.withdrawal@example.com")
+                .password("password123")
+                .role(Role.EMPLOYEE)
+                .permissions(Set.of("MANAGE_WITHDRAWALS"))
+                .emailVerified(true)
+                .build();
+        employee2 = userRepository.save(employee2);
+
+        // Create a ticket
+        TicketCreateRequest request = new TicketCreateRequest(TicketCategory.GENERAL, "Deposit Issue", "Details");
+        TicketDetailDTO ticket = supportTicketService.createTicket(testUser.getEmail(), request, null);
+
+        // Assign the ticket to MANAGE_DEPOSITS queue
+        supportTicketService.assignTicket(ticket.getId(), "MANAGE_DEPOSITS", testAdmin.getEmail());
+
+        // Employee 1 should see it in their list
+        List<TicketDTO> emp1Tickets = supportTicketService.getAllTickets(employee1.getEmail());
+        assertTrue(emp1Tickets.stream().anyMatch(t -> t.getId().equals(ticket.getId())));
+
+        // Employee 2 should NOT see it in their list
+        List<TicketDTO> emp2Tickets = supportTicketService.getAllTickets(employee2.getEmail());
+        assertFalse(emp2Tickets.stream().anyMatch(t -> t.getId().equals(ticket.getId())));
+
+        // Employee 2 attempts to claim it -> should throw ForbiddenException
+        User finalEmp2 = employee2;
+        assertThrows(ForbiddenException.class, () -> {
+            supportTicketService.claimTicket(ticket.getId(), finalEmp2.getEmail());
+        });
+
+        // Employee 2 attempts to resolve it -> should throw ForbiddenException
+        assertThrows(ForbiddenException.class, () -> {
+            supportTicketService.updateTicketStatus(ticket.getId(), TicketStatus.RESOLVED, finalEmp2.getEmail());
+        });
+
+        // Employee 2 attempts to comment -> should throw ForbiddenException
+        assertThrows(ForbiddenException.class, () -> {
+            supportTicketService.addComment(finalEmp2.getEmail(), ticket.getId(), new TicketCommentRequest("Hacking"), null);
+        });
+
+        // Employee 1 claims it -> should succeed
+        TicketDetailDTO claimedByEmp1 = supportTicketService.claimTicket(ticket.getId(), employee1.getEmail());
+        assertNotNull(claimedByEmp1.getAssignedToUserEmail());
+        assertEquals(employee1.getEmail(), claimedByEmp1.getAssignedToUserEmail());
+
+        // Employee 1 comments -> should succeed
+        TicketCommentDTO emp1Comment = supportTicketService.addComment(employee1.getEmail(), ticket.getId(), new TicketCommentRequest("Checking deposits"), null);
+        assertNotNull(emp1Comment);
+
+        // Employee 1 resolves -> should succeed
+        TicketDetailDTO resolvedByEmp1 = supportTicketService.updateTicketStatus(ticket.getId(), TicketStatus.RESOLVED, employee1.getEmail());
+        assertEquals(TicketStatus.RESOLVED, resolvedByEmp1.getStatus());
     }
 }

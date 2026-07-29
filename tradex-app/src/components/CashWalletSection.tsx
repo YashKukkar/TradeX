@@ -1,17 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Card from "./Card";
-import PaymentGatewayModal from "./PaymentGatewayModal";
-import WithdrawModal from "./WithdrawModal";
-import ConvertPointsModal from "./ConvertPointsModal";
+import WalletTransactionModal from "./WalletTransactionModal";
 import Icon from "./Icon";
-import { useUpdateBankDetails } from "../hooks/useDashboard";
+import { useCurrentUser } from "../hooks/useDashboard";
+import { getPrimaryAccountNumber } from "../utils/dashboardHelpers";
 import type { SystemSetting } from "../utils/dashboardHelpers";
 import styles from "../Dashboard.module.css";
 import cwStyles from "./CashWallet.module.css";
 
 interface CashWalletSectionProps {
   pointsBalance: number;
-  accountNumber: string;
   withdrawableBalance: number;
   bonusBalance: number;
   hasDeposited: boolean;
@@ -21,43 +19,17 @@ interface CashWalletSectionProps {
 
 export default function CashWalletSection({
   pointsBalance,
-  accountNumber,
   withdrawableBalance,
   bonusBalance,
   publicSettings,
   className,
 }: CashWalletSectionProps) {
+  const { data: user } = useCurrentUser();
+  const accountNumber = getPrimaryAccountNumber(user) || "";
+
   const [showPaymentGateway, setShowPaymentGateway] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [showConvertModal, setShowConvertModal] = useState(false);
-
-  const [bankAcc, setBankAcc] = useState(accountNumber || "");
-  const [isEditingBank, setIsEditingBank] = useState(false);
-  const [bankStatusMsg, setBankStatusMsg] = useState({ text: "", isError: false });
-
-  useEffect(() => {
-    setBankAcc(accountNumber || "");
-  }, [accountNumber]);
-
-  const updateBankMutation = useUpdateBankDetails(
-    () => {
-      setBankStatusMsg({ text: "Bank account details updated successfully!", isError: false });
-      setIsEditingBank(false);
-      setTimeout(() => setBankStatusMsg({ text: "", isError: false }), 4000);
-    },
-    (err) => {
-      setBankStatusMsg({ text: err || "Failed to update bank details.", isError: true });
-    }
-  );
-
-  const handleSaveBank = () => {
-    if (!bankAcc.trim()) {
-      setBankStatusMsg({ text: "Bank account number cannot be empty", isError: true });
-      return;
-    }
-    setBankStatusMsg({ text: "", isError: false });
-    updateBankMutation.mutate({ accountNumber: bankAcc });
-  };
 
   return (
     <>
@@ -135,113 +107,11 @@ export default function CashWalletSection({
         </Card.Body>
       </Card>
 
-      <Card>
-        <Card.Icon name="account_balance" />
-        <Card.Title>Linked Bank Account</Card.Title>
-        <Card.Body>
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span className={styles.balanceLabel} style={{ fontSize: "11px", fontWeight: "700" }}>Linked Bank Account</span>
-              <span
-                className={`${cwStyles.bankStatus} ${
-                  accountNumber ? cwStyles.bankStatusLinked : cwStyles.bankStatusPending
-                }`}
-              >
-                {accountNumber ? "Linked" : "Not Linked"}
-              </span>
-            </div>
-            
-            {isEditingBank ? (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "8px" }}>
-                <input
-                  type="text"
-                  placeholder="Enter account number"
-                  className={styles.actionInput}
-                  value={bankAcc}
-                  onChange={(e) => setBankAcc(e.target.value)}
-                  style={{
-                    flex: 1,
-                    minWidth: "160px",
-                    padding: "10px 14px",
-                    fontSize: "13.5px",
-                    borderRadius: "10px",
-                    border: "1px solid var(--border)",
-                    background: "var(--bg-2)",
-                    color: "var(--text)",
-                  }}
-                />
-                <button
-                  className={styles.actionBtn}
-                  onClick={handleSaveBank}
-                  disabled={updateBankMutation.isPending}
-                  style={{
-                    padding: "10px 16px",
-                    fontSize: "13px",
-                    borderRadius: "10px",
-                    background: "var(--primary)",
-                    color: "#05231c",
-                    border: "none",
-                    fontWeight: "750",
-                    cursor: "pointer",
-                  }}
-                >
-                  Save
-                </button>
-                <button
-                  className={`${styles.actionBtn} ${styles.secondaryBtn}`}
-                  onClick={() => {
-                    setIsEditingBank(false);
-                    setBankAcc(accountNumber || "");
-                  }}
-                  style={{
-                    padding: "10px 16px",
-                    fontSize: "13px",
-                    borderRadius: "10px",
-                    background: "transparent",
-                    border: "1px solid var(--border)",
-                    color: "var(--text)",
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            ) : (
-              <div className={cwStyles.bankDetailsRow}>
-                <span className={cwStyles.bankAccountMask}>
-                  {accountNumber ? `•••• •••• ${accountNumber.slice(-4)}` : "No bank linked"}
-                </span>
-                <button
-                  onClick={() => {
-                    setIsEditingBank(true);
-                    setBankStatusMsg({ text: "", isError: false });
-                  }}
-                  className={cwStyles.bankChangeBtn}
-                >
-                  {accountNumber ? "Change" : "Link Account"}
-                </button>
-              </div>
-            )}
-            {bankStatusMsg.text && (
-              <div
-                style={{
-                  fontSize: "12px",
-                  color: bankStatusMsg.isError ? "var(--danger)" : "var(--primary)",
-                  fontWeight: "600",
-                  marginTop: "2px",
-                }}
-              >
-                {bankStatusMsg.text}
-              </div>
-            )}
-          </div>
-        </Card.Body>
-      </Card>
-
       {showPaymentGateway && (
-        <PaymentGatewayModal
+        <WalletTransactionModal
           isOpen={showPaymentGateway}
           onClose={() => setShowPaymentGateway(false)}
+          type="deposit"
           onSuccess={() => {
             setShowPaymentGateway(false);
           }}
@@ -249,18 +119,20 @@ export default function CashWalletSection({
       )}
 
       {showWithdrawModal && (
-        <WithdrawModal
+        <WalletTransactionModal
           isOpen={showWithdrawModal}
           onClose={() => setShowWithdrawModal(false)}
+          type="withdraw"
           withdrawableBalance={withdrawableBalance}
           accountNumber={accountNumber}
         />
       )}
 
       {showConvertModal && (
-        <ConvertPointsModal
+        <WalletTransactionModal
           isOpen={showConvertModal}
           onClose={() => setShowConvertModal(false)}
+          type="convert"
           pointsBalance={pointsBalance}
           publicSettings={publicSettings}
         />

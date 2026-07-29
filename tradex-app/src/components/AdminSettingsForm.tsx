@@ -2,8 +2,7 @@ import React from "react";
 import Icon from "./Icon";
 import type { SystemSetting } from "../utils/dashboardHelpers";
 import styles from "../AdminUsers.module.css";
-import SettingToggle from "./SettingToggle";
-import SettingInput from "./SettingInput";
+import SettingField from "./SettingField";
 
 interface AdminSettingsFormProps {
   settings: SystemSetting;
@@ -24,24 +23,23 @@ export default function AdminSettingsForm({
   savingSettings,
   saveSettings,
 }: AdminSettingsFormProps) {
-  const [collapsed, setCollapsed] = React.useState<Record<string, boolean>>({
+  const [collapsed, setCollapsed] = React.useState({
     onboarding: false,
     referrals: false,
     security: false,
   });
 
-  const toggleCollapse = (key: string) => {
-    setCollapsed(prev => ({ ...prev, [key]: !prev[key] }));
+  const toggleCollapse = (section: keyof typeof collapsed) => {
+    setCollapsed(prev => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
   };
 
   return (
-    <div id="platform-settings-controls" className={styles.settingsSection}>
-      <h2 className={styles.settingsTitle}>
-        <Icon name="settings_suggest" style={{ color: "var(--primary)" }} />
-        Platform Settings
-      </h2>
+    <div className={styles.settingsSection}>
       <div className={styles.settingsGrid}>
-        {/* Column 1: Onboarding & Deposits */}
+        {/* Column 1: Onboarding Bonuses */}
         <div className={styles.settingsColumn}>
           <h3
             onClick={() => toggleCollapse("onboarding")}
@@ -59,20 +57,22 @@ export default function AdminSettingsForm({
               userSelect: "none"
             }}
           >
-            <Icon name="rocket_launch" style={{ fontSize: "18px" }} />
-            <span style={{ flex: 1 }}>Onboarding & Deposits</span>
+            <Icon name="emoji_events" style={{ fontSize: "18px" }} />
+            <span style={{ flex: 1 }}>Onboarding Rewards</span>
             <Icon name={collapsed.onboarding ? "expand_more" : "expand_less"} style={{ fontSize: "18px", opacity: 0.6 }} />
           </h3>
 
           {!collapsed.onboarding && (
             <div>
-              <SettingToggle
-                title="Welcome Points"
-                desc="Reward new users with signup points"
+              <SettingField
+                type="toggle"
+                label="Welcome Points"
+                description="Reward new users with signup points"
                 checked={settings.welcomeCoinsEnabled}
                 onChange={checked => setSettings({ ...settings, welcomeCoinsEnabled: checked })}
               />
-              <SettingInput
+              <SettingField
+                type="number"
                 label="Welcome Amount (Points)"
                 disabled={!settings.welcomeCoinsEnabled}
                 value={settings.welcomeCoinsAmount}
@@ -81,20 +81,23 @@ export default function AdminSettingsForm({
               />
 
               <div style={{ marginTop: "12px", borderTop: "1px dashed var(--border)", paddingTop: "16px" }}>
-                <SettingToggle
-                  title="First Deposit Bonus"
-                  desc="Reward users on first wallet load"
+                <SettingField
+                  type="toggle"
+                  label="First Deposit Bonus"
+                  description="Reward users on first wallet load"
                   checked={settings.firstDepositRewardEnabled}
                   onChange={checked => setSettings({ ...settings, firstDepositRewardEnabled: checked })}
                 />
-                <SettingInput
+                <SettingField
+                  type="number"
                   label="First Deposit Reward (₹)"
                   disabled={!settings.firstDepositRewardEnabled}
                   value={settings.firstDepositRewardAmount}
                   error={errors.firstDepositRewardAmount}
                   onChange={val => setSettings({ ...settings, firstDepositRewardAmount: val })}
                 />
-                <SettingInput
+                <SettingField
+                  type="number"
                   label="Min Deposit Threshold (₹)"
                   disabled={!settings.firstDepositRewardEnabled}
                   value={settings.firstDepositRewardThreshold}
@@ -131,13 +134,15 @@ export default function AdminSettingsForm({
 
           {!collapsed.referrals && (
             <div>
-              <SettingToggle
-                title="Referral Program"
-                desc="Reward referrers up the chain"
+              <SettingField
+                type="toggle"
+                label="Referral Program"
+                description="Reward referrers up the chain"
                 checked={settings.referralCoinsEnabled}
                 onChange={checked => setSettings({ ...settings, referralCoinsEnabled: checked })}
               />
-              <SettingInput
+              <SettingField
+                type="number"
                 label="Specific Tiers Reward Limit (1-3)"
                 disabled={!settings.referralCoinsEnabled}
                 value={settings.referralCoinsLimitTier}
@@ -146,21 +151,24 @@ export default function AdminSettingsForm({
                 max="3"
                 onChange={val => setSettings({ ...settings, referralCoinsLimitTier: val })}
               />
-              <SettingInput
+              <SettingField
+                type="number"
                 label="Level 1 Reward (Points)"
                 disabled={!settings.referralCoinsEnabled}
                 value={settings.referralCoinsL1Amount}
                 error={errors.referralCoinsL1Amount}
                 onChange={val => setSettings({ ...settings, referralCoinsL1Amount: val })}
               />
-              <SettingInput
+              <SettingField
+                type="number"
                 label={`Level 2 Reward (Points) ${settings.referralCoinsLimitTier < 2 ? "(Disabled by Limit)" : ""}`}
                 disabled={!settings.referralCoinsEnabled || settings.referralCoinsLimitTier < 2}
                 value={settings.referralCoinsL2Amount}
                 error={errors.referralCoinsL2Amount}
                 onChange={val => setSettings({ ...settings, referralCoinsL2Amount: val })}
               />
-              <SettingInput
+              <SettingField
+                type="number"
                 label={`Level 3 Reward (Points) ${settings.referralCoinsLimitTier < 3 ? "(Disabled by Limit)" : ""}`}
                 disabled={!settings.referralCoinsEnabled || settings.referralCoinsLimitTier < 3}
                 value={settings.referralCoinsL3Amount}
@@ -169,14 +177,16 @@ export default function AdminSettingsForm({
               />
 
               <div style={{ marginTop: "12px", borderTop: "1px dashed var(--border)", paddingTop: "16px" }}>
-                <SettingToggle
-                  title="Subsequent Levels Incentive"
-                  desc="Reward remaining chain (infinite depth)"
+                <SettingField
+                  type="toggle"
+                  label="Subsequent Levels Incentive"
+                  description="Reward remaining chain (infinite depth)"
                   checked={settings.referralCoinsSubsequentEnabled}
                   disabled={!settings.referralCoinsEnabled}
                   onChange={checked => setSettings({ ...settings, referralCoinsSubsequentEnabled: checked })}
                 />
-                <SettingInput
+                <SettingField
+                  type="number"
                   label="Subsequent Level Reward (Points)"
                   disabled={!settings.referralCoinsEnabled || !settings.referralCoinsSubsequentEnabled}
                   value={settings.referralCoinsSubsequentAmount}
@@ -213,28 +223,32 @@ export default function AdminSettingsForm({
 
           {!collapsed.security && (
             <div>
-              <SettingToggle
-                title="Email Verification"
-                desc="Require OTP / link to verify email on signup"
+              <SettingField
+                type="toggle"
+                label="Email Verification"
+                description="Require OTP / link to verify email on signup"
                 checked={settings.emailVerificationEnabled}
                 onChange={checked => setSettings({ ...settings, emailVerificationEnabled: checked })}
               />
-              <SettingToggle
-                title="Phone Verification"
-                desc="Require OTP to verify phone number on signup"
+              <SettingField
+                type="toggle"
+                label="Phone Verification"
+                description="Require OTP to verify phone number on signup"
                 checked={settings.phoneVerificationEnabled}
                 onChange={checked => setSettings({ ...settings, phoneVerificationEnabled: checked })}
                 style={{ marginTop: "12px", borderTop: "1px dashed var(--border)", paddingTop: "16px" }}
               />
 
               <div style={{ marginTop: "24px", borderTop: "1px dashed var(--border)", paddingTop: "16px" }}>
-                <SettingToggle
-                  title="Points Conversion"
-                  desc="Allow converting points to cash"
+                <SettingField
+                  type="toggle"
+                  label="Points Conversion"
+                  description="Allow converting points to cash"
                   checked={settings.pointsConversionEnabled}
                   onChange={checked => setSettings({ ...settings, pointsConversionEnabled: checked })}
                 />
-                <SettingInput
+                <SettingField
+                  type="number"
                   label="Points to ₹1.00 Cash Rate"
                   disabled={!settings.pointsConversionEnabled}
                   value={settings.pointsToCashConversionRate}

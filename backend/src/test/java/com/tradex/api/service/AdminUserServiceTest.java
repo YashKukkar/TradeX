@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import com.tradex.api.mapper.UserMapper;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,7 +75,6 @@ class AdminUserServiceTest {
                 null,
                 null,
                 null,
-                null,
                 u.getRole() != null ? u.getRole().name() : "USER",
                 0L,
                 u.isEmailVerified(),
@@ -83,7 +83,7 @@ class AdminUserServiceTest {
                 u.getBonusBalance(),
                 u.isEnabled(),
                 u.isLocked(),
-                java.util.Collections.emptyList()
+                Collections.emptyList()
             );
         });
         targetUser = new User();
@@ -118,7 +118,7 @@ class AdminUserServiceTest {
     void testLockUserSelfActionGuard() {
         when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(adminUser));
 
-        assertThrows(BadRequestException.class, () -> 
+        assertThrows(BadRequestException.class, () ->
             adminUserService.lockUser("admin@example.com", 1L)
         );
     }
@@ -128,7 +128,7 @@ class AdminUserServiceTest {
         targetUser.setLocked(true);
         when(userRepository.findByIdForUpdate(2L)).thenReturn(Optional.of(targetUser));
 
-        assertThrows(BadRequestException.class, () -> 
+        assertThrows(BadRequestException.class, () ->
             adminUserService.lockUser("admin@example.com", 2L)
         );
     }
@@ -137,7 +137,7 @@ class AdminUserServiceTest {
     void testLockUserNotFound() {
         when(userRepository.findByIdForUpdate(99L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> 
+        assertThrows(ResourceNotFoundException.class, () ->
             adminUserService.lockUser("admin@example.com", 99L)
         );
     }
@@ -157,7 +157,7 @@ class AdminUserServiceTest {
     void testUnlockUserNotLocked() {
         when(userRepository.findByIdForUpdate(2L)).thenReturn(Optional.of(targetUser));
 
-        assertThrows(BadRequestException.class, () -> 
+        assertThrows(BadRequestException.class, () ->
             adminUserService.unlockUser("admin@example.com", 2L)
         );
     }
@@ -178,7 +178,7 @@ class AdminUserServiceTest {
     void testDisableUserSelfActionGuard() {
         when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(adminUser));
 
-        assertThrows(BadRequestException.class, () -> 
+        assertThrows(BadRequestException.class, () ->
             adminUserService.disableUser("admin@example.com", 1L)
         );
     }
@@ -188,7 +188,7 @@ class AdminUserServiceTest {
         targetUser.setEnabled(false);
         when(userRepository.findByIdForUpdate(2L)).thenReturn(Optional.of(targetUser));
 
-        assertThrows(BadRequestException.class, () -> 
+        assertThrows(BadRequestException.class, () ->
             adminUserService.disableUser("admin@example.com", 2L)
         );
     }
@@ -208,7 +208,7 @@ class AdminUserServiceTest {
     void testEnableUserAlreadyEnabled() {
         when(userRepository.findByIdForUpdate(2L)).thenReturn(Optional.of(targetUser));
 
-        assertThrows(BadRequestException.class, () -> 
+        assertThrows(BadRequestException.class, () ->
             adminUserService.enableUser("admin@example.com", 2L)
         );
     }
@@ -230,7 +230,7 @@ class AdminUserServiceTest {
         targetUser.setEmailVerified(true);
         when(userRepository.findByIdForUpdate(2L)).thenReturn(Optional.of(targetUser));
 
-        assertThrows(BadRequestException.class, () -> 
+        assertThrows(BadRequestException.class, () ->
             adminUserService.forceVerifyEmail("admin@example.com", 2L)
         );
     }
@@ -250,7 +250,7 @@ class AdminUserServiceTest {
     void testSendPasswordResetEmailNotFound() {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> 
+        assertThrows(ResourceNotFoundException.class, () ->
             adminUserService.sendPasswordResetEmail("admin@example.com", 99L)
         );
     }
@@ -287,7 +287,7 @@ class AdminUserServiceTest {
 
         AdminAdjustPointsRequest request = new AdminAdjustPointsRequest(-150L, "Too much deduction");
 
-        assertThrows(BadRequestException.class, () -> 
+        assertThrows(BadRequestException.class, () ->
             adminUserService.adjustPoints("admin@example.com", 2L, request)
         );
     }

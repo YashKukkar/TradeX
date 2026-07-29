@@ -44,9 +44,9 @@ class SeedDataServiceIntegrationTest {
         User u4 = userRepository.findByEmail("u4@test.com").orElseThrow();
 
         assertEquals(1800L, u1.getPointsBalance());
-        assertEquals(1700L, u2.getPointsBalance());
-        assertEquals(1500L, u3.getPointsBalance());
-        assertEquals(1000L, u4.getPointsBalance());
+        assertEquals(1800L, u2.getPointsBalance());
+        assertEquals(1700L, u3.getPointsBalance());
+        assertEquals(1500L, u4.getPointsBalance());
 
         // 2. Verify points transactions are populated and match balances
         List<PointsTransaction> u1Txs = pointsTransactionRepository.findByUserOrderByCreatedAtDesc(u1);
@@ -56,31 +56,31 @@ class SeedDataServiceIntegrationTest {
         assertEquals(1800L, u1Txs.stream().mapToLong(PointsTransaction::getAmount).sum());
 
         List<PointsTransaction> u2Txs = pointsTransactionRepository.findByUserOrderByCreatedAtDesc(u2);
-        // Welcome bonus (1000) + Referral L1 (500) + Referral L2 (200) = 3 transactions
-        assertEquals(3, u2Txs.size());
-        assertEquals(1700L, u2Txs.stream().mapToLong(PointsTransaction::getAmount).sum());
+        // Welcome bonus (1000) + Referral L1 (500) + Referral L2 (200) + Referral L3 (100) = 4 transactions
+        assertEquals(4, u2Txs.size());
+        assertEquals(1800L, u2Txs.stream().mapToLong(PointsTransaction::getAmount).sum());
 
         List<PointsTransaction> u3Txs = pointsTransactionRepository.findByUserOrderByCreatedAtDesc(u3);
-        // Welcome bonus (1000) + Referral L1 (500) = 2 transactions
-        assertEquals(2, u3Txs.size());
-        assertEquals(1500L, u3Txs.stream().mapToLong(PointsTransaction::getAmount).sum());
+        // Welcome bonus (1000) + Referral L1 (500) + Referral L2 (200) = 3 transactions
+        assertEquals(3, u3Txs.size());
+        assertEquals(1700L, u3Txs.stream().mapToLong(PointsTransaction::getAmount).sum());
 
         List<PointsTransaction> u4Txs = pointsTransactionRepository.findByUserOrderByCreatedAtDesc(u4);
-        // Welcome bonus (1000) = 1 transaction
-        assertEquals(1, u4Txs.size());
-        assertEquals(1000L, u4Txs.stream().mapToLong(PointsTransaction::getAmount).sum());
+        // Welcome bonus (1000) + Referral L1 (500) = 2 transactions
+        assertEquals(2, u4Txs.size());
+        assertEquals(1500L, u4Txs.stream().mapToLong(PointsTransaction::getAmount).sum());
 
         // 3. Verify referral rewards are populated
         List<ReferralReward> u1Rewards = referralRewardRepository.findByReferrerOrderByCreatedAtDesc(u1);
         assertEquals(3, u1Rewards.size()); // Referred u2 (L1), u3 (L2), u4 (L3)
 
         List<ReferralReward> u2Rewards = referralRewardRepository.findByReferrerOrderByCreatedAtDesc(u2);
-        assertEquals(2, u2Rewards.size()); // Referred u3 (L1), u4 (L2)
+        assertEquals(3, u2Rewards.size()); // Referred u3 (L1), u4 (L2), u5 (L3)
 
         List<ReferralReward> u3Rewards = referralRewardRepository.findByReferrerOrderByCreatedAtDesc(u3);
-        assertEquals(1, u3Rewards.size()); // Referred u4 (L1)
+        assertEquals(2, u3Rewards.size()); // Referred u4 (L1), u5 (L2)
 
         List<ReferralReward> u4Rewards = referralRewardRepository.findByReferrerOrderByCreatedAtDesc(u4);
-        assertEquals(0, u4Rewards.size());
+        assertEquals(1, u4Rewards.size()); // Referred u5 (L1)
     }
 }

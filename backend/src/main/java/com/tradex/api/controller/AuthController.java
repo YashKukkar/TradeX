@@ -1,10 +1,12 @@
 package com.tradex.api.controller;
 
+import com.tradex.api.dto.AddBankAccountRequest;
 import com.tradex.api.dto.AuthRequest;
 import com.tradex.api.dto.AuthResponse;
 import com.tradex.api.dto.SignupRequest;
 import com.tradex.api.dto.UserDTO;
 import com.tradex.api.dto.SystemSettingDTO;
+import com.tradex.api.dto.UpdateProfileRequest;
 import com.tradex.api.enums.VerificationType;
 import com.tradex.api.service.UserService;
 import com.tradex.api.service.VerificationService;
@@ -122,6 +124,71 @@ public class AuthController {
     @GetMapping("/settings")
     public ResponseEntity<SystemSettingDTO> getPublicSettings() {
         return ResponseEntity.ok(systemSettingService.getSettingsDTO());
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<UserDTO> updateProfile(
+            @Valid @RequestBody UpdateProfileRequest request
+    ) {
+        String email = securityService.getAuthenticatedUserEmail();
+        if (email == null) {
+            return ResponseEntity.status(401).build();
+        }
+        UserDTO updated = userService.updateProfile(email, request);
+        return ResponseEntity.ok(updated);
+    }
+
+    @PostMapping("/profile/bank")
+    public ResponseEntity<UserDTO> addBankAccount(
+            @Valid @RequestBody AddBankAccountRequest request
+    ) {
+        String email = securityService.getAuthenticatedUserEmail();
+        if (email == null) {
+            return ResponseEntity.status(401).build();
+        }
+        UserDTO updated = userService.addBankAccount(email, request);
+        return ResponseEntity.ok(updated);
+    }
+
+    @PutMapping("/profile/bank/{id}/primary")
+    public ResponseEntity<UserDTO> setPrimaryBankAccount(@PathVariable Long id) {
+        String email = securityService.getAuthenticatedUserEmail();
+        if (email == null) {
+            return ResponseEntity.status(401).build();
+        }
+        UserDTO updated = userService.setPrimaryBankAccount(email, id);
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/profile/bank/{id}")
+    public ResponseEntity<UserDTO> deleteBankAccount(@PathVariable Long id) {
+        String email = securityService.getAuthenticatedUserEmail();
+        if (email == null) {
+            return ResponseEntity.status(401).build();
+        }
+        UserDTO updated = userService.deleteBankAccount(email, id);
+        return ResponseEntity.ok(updated);
+    }
+
+    public record ChangePasswordRequest(
+        @NotBlank(message = "Current password is required")
+        String currentPassword,
+
+        @NotBlank(message = "New password is required")
+        @Size(min = 8, max = 100, message = "New password must be between 8 and 100 characters")
+        String newPassword
+    ) {}
+
+    @PostMapping("/change-password")
+    public ResponseEntity<Void> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request
+    ) {
+        String email = securityService.getAuthenticatedUserEmail();
+        if (email == null) {
+            return ResponseEntity.status(401).build();
+        }
+        userService.changePassword(email, request.currentPassword(), request.newPassword());
+        return ResponseEntity.ok().build();
     }
 }
 

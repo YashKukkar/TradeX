@@ -46,6 +46,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 
                 // Truncate tables
                 jdbcTemplate.execute("TRUNCATE TABLE user_permissions");
+                jdbcTemplate.execute("TRUNCATE TABLE user_teams");
                 jdbcTemplate.execute("TRUNCATE TABLE ticket_history");
                 jdbcTemplate.execute("TRUNCATE TABLE ticket_comments");
                 jdbcTemplate.execute("TRUNCATE TABLE ticket_attachments");
@@ -53,9 +54,11 @@ public class DatabaseInitializer implements CommandLineRunner {
                 jdbcTemplate.execute("TRUNCATE TABLE referral_rewards");
                 jdbcTemplate.execute("TRUNCATE TABLE points_transactions");
                 jdbcTemplate.execute("TRUNCATE TABLE wallet_transactions");
+                jdbcTemplate.execute("TRUNCATE TABLE bank_details");
                 jdbcTemplate.execute("TRUNCATE TABLE verification_tokens");
                 jdbcTemplate.execute("TRUNCATE TABLE admin_audit_log");
                 jdbcTemplate.execute("TRUNCATE TABLE system_settings");
+                jdbcTemplate.execute("TRUNCATE TABLE teams");
                 jdbcTemplate.execute("TRUNCATE TABLE users");
 
                 log.info("All tables truncated successfully.");

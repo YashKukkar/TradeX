@@ -39,6 +39,7 @@ public class AdminUserService {
     private final WalletTransactionRepository walletTransactionRepository;
     private final VerificationService verificationService;
     private final UserMapper userMapper;
+    private final WalletBalanceManager walletBalanceManager;
     private final ConcurrentHashMap<Long, Instant> passwordResetCooldowns = new ConcurrentHashMap<>();
 
 
@@ -188,29 +189,20 @@ public class AdminUserService {
         User target = loadTargetForUpdate(userId);
 
         BigDecimal delta = request.delta();
-        BigDecimal currentBalance;
         BigDecimal newBalance;
 
-        if ("BONUS".equalsIgnoreCase(request.walletType())) {
-            currentBalance = target.getBonusBalance() != null ? target.getBonusBalance() : BigDecimal.ZERO;
-            newBalance = currentBalance.add(delta);
-            if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
-                throw new BadRequestException(
-                        "Adjustment would result in a negative bonus balance (current: " + currentBalance +
-                        ", delta: " + delta + ")");
+        try {
+            if ("BONUS".equalsIgnoreCase(request.walletType())) {
+                target = walletBalanceManager.mutateBonusBalance(target, delta);
+                newBalance = target.getBonusBalance();
+            } else if ("CASH".equalsIgnoreCase(request.walletType())) {
+                target = walletBalanceManager.mutateWithdrawableBalance(target, delta);
+                newBalance = target.getWithdrawableBalance();
+            } else {
+                throw new BadRequestException("Invalid wallet type: " + request.walletType());
             }
-            target.setBonusBalance(newBalance);
-        } else if ("CASH".equalsIgnoreCase(request.walletType())) {
-            currentBalance = target.getWithdrawableBalance() != null ? target.getWithdrawableBalance() : BigDecimal.ZERO;
-            newBalance = currentBalance.add(delta);
-            if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
-                throw new BadRequestException(
-                        "Adjustment would result in a negative withdrawable balance (current: " + currentBalance +
-                        ", delta: " + delta + ")");
-            }
-            target.setWithdrawableBalance(newBalance);
-        } else {
-            throw new BadRequestException("Invalid wallet type: " + request.walletType());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Adjustment failed: " + e.getMessage());
         }
 
         WalletTransaction tx = new WalletTransaction(

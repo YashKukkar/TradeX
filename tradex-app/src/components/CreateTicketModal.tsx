@@ -47,9 +47,9 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
         setErrorMsg(`File ${file.name} exceeds the 5MB size limit.`);
         return;
       }
-      const validTypes = ["image/jpeg", "image/png", "image/webp"];
+      const validTypes = ["image/jpeg", "image/png"];
       if (!validTypes.includes(file.type)) {
-        setErrorMsg(`File ${file.name} is not a supported format (JPEG, PNG, WEBP).`);
+        setErrorMsg(`File ${file.name} is not a supported format (JPEG, PNG).`);
         return;
       }
     }
@@ -90,14 +90,14 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
     }
 
     const formData = new FormData();
-    
+
     // Spring Boot consumes Multipart Request with a JSON part named "ticket" and file parts named "files"
     const ticketData = JSON.stringify({
       category,
       subject,
       description
     });
-    
+
     formData.append(
       "ticket",
       new Blob([ticketData], { type: "application/json" })
@@ -209,8 +209,8 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
 
         {/* Drag & Drop File Upload Area */}
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-          <label style={{ fontSize: "14px", color: "var(--muted)" }}>Attachments (Max 5, JPEG/PNG/WEBP under 5MB)</label>
-          
+          <label style={{ fontSize: "14px", color: "var(--muted)" }}>Attachments (Max 5, JPEG/PNG under 5MB)</label>
+
           <div
             onDragEnter={handleDrag}
             onDragOver={handleDrag}
@@ -236,7 +236,7 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
               ref={fileInputRef}
               style={{ display: "none" }}
               multiple
-              accept="image/png, image/jpeg, image/webp"
+              accept="image/png, image/jpeg"
               onChange={handleFileChange}
             />
             <Icon name="cloud_upload" style={{ fontSize: "32px", color: "var(--primary)" }} />
@@ -317,8 +317,30 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
             transition: "all 0.2s ease"
           }}
         >
-          {createMutation.isPending ? "Submitting..." : "Raise Ticket"}
-          <Icon name="send" style={{ fontSize: "18px" }} />
+          {createMutation.isPending ? (
+            <>
+              <style>{`
+                @keyframes create-ticket-spin { to { transform: rotate(360deg); } }
+                .create-ticket-spinner {
+                  display: inline-block;
+                  width: 14px;
+                  height: 14px;
+                  border: 2px solid rgba(255, 255, 255, 0.2);
+                  border-top-color: currentColor;
+                  border-radius: 50%;
+                  animation: create-ticket-spin 0.8s linear infinite;
+                  flex-shrink: 0;
+                }
+              `}</style>
+              <span className="create-ticket-spinner" />
+              <span>Submitting...</span>
+            </>
+          ) : (
+            <>
+              <span>Raise Ticket</span>
+              <Icon name="send" style={{ fontSize: "18px" }} />
+            </>
+          )}
         </button>
       </form>
     </Modal>

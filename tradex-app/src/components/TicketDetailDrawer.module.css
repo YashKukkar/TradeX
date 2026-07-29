@@ -1,70 +1,4 @@
-.drawerOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(10px);
-  z-index: 1000;
-  animation: fadeIn 0.25s ease-out;
-}
-
-.drawer {
-  position: fixed;
-  top: 0;
-  right: 0;
-  height: 100vh;
-  width: 650px;
-  max-width: 100%;
-  background: var(--bg-2);
-  border-left: 1px solid var(--border);
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
-  z-index: 1001;
-  display: flex;
-  flex-direction: column;
-  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.drawerHeader {
-  padding: var(--space-5) var(--space-6);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.drawerTitle {
-  margin: 0;
-  font-size: 20px;
-  color: var(--text);
-  font-weight: 700;
-}
-
-.drawerSub {
-  margin: var(--space-1) 0 0 0;
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.closeBtn {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.closeBtn:hover {
-  background: var(--border);
-  transform: rotate(90deg);
-}
+/* Top-level drawer wrappers now handled by SplitDrawerLayout.module.css */
 
 /* Tabs */
 .tabBar {
@@ -111,58 +45,71 @@
 .chatTimeline {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: 16px;
   flex: 1;
 }
 
-.commentBubble {
-  max-width: 85%;
-  padding: var(--space-4) var(--space-5);
-  border-radius: 14px;
+.commentList {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
-  line-height: 1.5;
+  gap: 16px;
+  margin-top: 8px;
 }
 
-.bubbleUser {
-  align-self: flex-start;
-  background: var(--surface);
+.commentBlock {
+  padding: 16px;
+  background: var(--surface-2);
   border: 1px solid var(--border);
-  border-bottom-left-radius: 4px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.bubbleAdmin {
-  align-self: flex-end;
-  background: rgba(181, 95, 230, 0.08);
-  border: 1px solid rgba(181, 95, 230, 0.25);
-  border-bottom-right-radius: 4px;
+.commentBlockAdmin {
+  border-left: 3px solid var(--primary);
 }
 
 .commentHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--space-4);
-  margin-bottom: 2px;
+  gap: 12px;
 }
 
-.authorName {
-  font-size: 11px;
+.authorWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.authorEmail {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.roleBadge {
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
 }
 
-.authorUser {
+.roleUser {
+  background: rgba(255, 255, 255, 0.08);
   color: var(--muted);
 }
 
-.authorAdmin {
-  color: var(--primary);
+.roleAdmin {
+  background: rgba(0, 224, 164, 0.15);
+  color: #00e0a4;
 }
 
 .commentTime {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--muted);
 }
 
@@ -170,6 +117,7 @@
   margin: 0;
   font-size: 13.5px;
   color: var(--text);
+  line-height: 1.5;
   white-space: pre-line;
   word-break: break-word;
 }
@@ -626,4 +574,228 @@
 .saveNotesBtn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.timelineThread {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-left: 8px;
+  margin-top: 16px;
+}
+
+.timelineThread::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 26px; /* center of avatar circle (8px padding + 18px radius) */
+  width: 2px;
+  background: linear-gradient(to bottom, var(--border) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.01) 100%);
+  z-index: 0;
+}
+
+.timelinePost {
+  position: relative;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  z-index: 1;
+  margin-top: 8px;
+}
+
+.timelinePostGrouped {
+  margin-top: -6px !important;
+}
+
+.avatarCircle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+  z-index: 2;
+  transition: transform 0.2s ease;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+}
+
+.avatarAdmin {
+  border-color: rgba(0, 224, 164, 0.35);
+  box-shadow: 0 0 10px rgba(0, 224, 164, 0.25), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.postContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.postHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.authorEmail {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text) !important; /* Strongest element */
+}
+
+.roleBadge {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.roleAdmin {
+  background: rgba(0, 224, 164, 0.05) !important;
+  border-color: rgba(0, 224, 164, 0.2) !important;
+  color: #00e0a4 !important;
+}
+
+.postTime {
+  font-size: 11px;
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+.messageBubble {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  width: fit-content;
+  max-width: 85%;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.bubbleUser {
+  background: linear-gradient(135deg, var(--surface-2), var(--surface-3));
+}
+
+.bubbleAdmin {
+  background: linear-gradient(135deg, rgba(0, 224, 164, 0.035), rgba(0, 224, 164, 0.01));
+  border-color: rgba(0, 224, 164, 0.18);
+  border-left: 3px solid #00e0a4;
+}
+
+.hoverTime {
+  position: absolute;
+  left: -48px;
+  top: 10px;
+  font-size: 9px;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.timelinePostGrouped:hover .hoverTime {
+  opacity: 0.85;
+}
+
+.postMessage {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text);
+  line-height: 1.5;
+  white-space: pre-line;
+  word-break: break-word;
+}
+
+.stickyFooterContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.unifiedInputBox {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  box-sizing: border-box;
+  transition: border-color 0.25s;
+}
+
+.unifiedInputBox:focus-within {
+  border-color: var(--primary);
+}
+
+.compactTextarea {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  color: var(--text);
+  font-size: 13.5px;
+  line-height: 1.5;
+  resize: none;
+  min-height: 50px;
+  padding: 8px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.inputActionRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  padding: 6px 8px 0 8px;
+  margin-top: 4px;
+}
+
+.attachButtonLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--muted);
+  transition: all 0.2s;
+}
+
+.attachButtonLabel:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+}
+
+.compactSendBtn {
+  background: var(--primary) !important;
+  color: var(--bg) !important;
+  border: none !important;
+  padding: 6px 14px !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  height: 28px !important;
+}
+
+.compactSendBtn:hover:not(:disabled) {
+  opacity: 0.95;
 }

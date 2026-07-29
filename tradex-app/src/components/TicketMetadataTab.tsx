@@ -1,8 +1,9 @@
-import Card from "./Card";
-import TicketAttachments from "./TicketAttachments";
 import PermissionsTooltip from "./PermissionsTooltip";
+import SegmentedControl from "./SegmentedControl";
+import SearchablePopover from "./SearchablePopover";
+import ActionButton from "./ActionButton";
 import { formatDateTime } from "../utils/dashboardHelpers";
-import { ROUTE_QUEUE_LABELS } from "../utils/permissions";
+import { ALL_PERMISSIONS, ROUTE_QUEUE_LABELS } from "../utils/permissions";
 import styles from "./TicketDetailDrawer.module.css";
 
 interface TicketMetadataTabProps {
@@ -18,35 +19,86 @@ interface TicketMetadataTabProps {
     subject: string;
     description: string;
     attachments?: any[] | null;
+    reopenCount?: number;
   };
   isAdmin: boolean;
   onClaim: () => void;
   isClaimPending: boolean;
+  onStatusChange: (status: string) => void;
+  onAssignChange: (permission: string) => void;
+  isAssignPending: boolean;
+  isStatusPending?: boolean;
+  onCloseTicket: () => void;
+  onReopen: () => void;
+  isClosePending: boolean;
+  isReopenPending: boolean;
 }
+
+const statusOptions = [
+  { value: "OPEN", label: "Open", activeColor: "#00e0a4", activeBg: "rgba(0, 224, 164, 0.12)" },
+  { value: "IN_PROGRESS", label: "In Progress", activeColor: "#ffb020", activeBg: "rgba(255, 176, 32, 0.12)" },
+  { value: "RESOLVED", label: "Resolved", activeColor: "#b55fe6", activeBg: "rgba(181, 95, 230, 0.12)" },
+  { value: "CLOSED", label: "Closed", activeColor: "var(--text)", activeBg: "var(--surface-3)" },
+];
 
 export default function TicketMetadataTab({
   ticket,
   isAdmin,
   onClaim,
-  isClaimPending
+  isClaimPending,
+  onStatusChange,
+  onAssignChange,
+  isAssignPending,
+  isStatusPending = false,
+  onCloseTicket,
+  isClosePending,
 }: TicketMetadataTabProps) {
+  const getPermissionColor = (perm: string) => {
+    switch (perm) {
+      case "MANAGE_DEPOSITS": return "#00e0a4";
+      case "MANAGE_WITHDRAWALS": return "#ff5a6a";
+      case "MANAGE_USERS": return "#0096ff";
+      case "MANAGE_POINTS": return "#ffb200";
+      case "MANAGE_SETTINGS": return "#ff7b00";
+      default: return "var(--muted)";
+    }
+  };
+
+  const assignOptions = [
+    { value: "", label: "Unassigned", color: "var(--muted)" },
+    ...ALL_PERMISSIONS.map((perm) => ({
+      value: perm,
+      label: ROUTE_QUEUE_LABELS[perm] || perm,
+      color: getPermissionColor(perm)
+    })),
+  ];
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      
+
       {/* Status Card */}
       <div className={styles.infoCard}>
         <p className={styles.infoSectionTitle}>Metadata</p>
-        <div className={styles.infoRow}>
+        <div className={styles.infoRow} style={{ flexDirection: isAdmin ? "column" : "row", alignItems: isAdmin ? "flex-start" : "center", gap: isAdmin ? "8px" : "0" }}>
           <span className={styles.infoLabel}>Status</span>
-          <span className={`status-pill-${ticket.status.toLowerCase().replace("_", "")}`} style={{
-            padding: "3px 8px",
-            borderRadius: "6px",
-            fontSize: "11px",
-            fontWeight: "600",
-            textTransform: "uppercase"
-          }}>
-            {ticket.status.replace("_", " ")}
-          </span>
+          {isAdmin ? (
+            <SegmentedControl
+              options={statusOptions}
+              value={ticket.status}
+              onChange={onStatusChange}
+              loading={isStatusPending}
+            />
+          ) : (
+            <span className={`status-pill-${ticket.status.toLowerCase().replace("_", "")}`} style={{
+              padding: "3px 8px",
+              borderRadius: "6px",
+              fontSize: "11px",
+              fontWeight: "600",
+              textTransform: "uppercase"
+            }}>
+              {ticket.status.replace("_", " ")}
+            </span>
+          )}
         </div>
         <div className={styles.infoRow}>
           <span className={styles.infoLabel}>Category</span>
@@ -61,48 +113,56 @@ export default function TicketMetadataTab({
             {ticket.category.replace("_", " ")}
           </span>
         </div>
-        <div className={styles.infoRow}>
-          <span className={styles.infoLabel}>Assigned Group</span>
-          <span className={styles.infoValue}>
-            {ticket.assignedToPermission ? (
-              <span style={{ fontSize: "11px", fontWeight: 600, background: "rgba(181, 95, 230, 0.15)", color: "#b55fe6", padding: "2px 6px", borderRadius: "4px" }}>
-                {ROUTE_QUEUE_LABELS[ticket.assignedToPermission] || ticket.assignedToPermission}
-              </span>
-            ) : (ticket.assignedToUserEmail ? "-" : "Unassigned")}
-          </span>
-        </div>
-        <div className={styles.infoRow}>
-          <span className={styles.infoLabel}>Assigned Agent</span>
-          <span className={styles.infoValue}>
-            {ticket.assignedToUserEmail ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "2px" }}>
-                <PermissionsTooltip
-                  email={ticket.assignedToUserEmail}
-                  permissions={ticket.assignedToUserPermissions || undefined}
-                  isAdmin={isAdmin}
+
+        {/* Assigned Group and Assigned Agent are Admin/Employee Only */}
+        {isAdmin && (
+          <>
+            <div className={styles.infoRow}>
+              <span className={styles.infoLabel}>Assigned Group</span>
+              <div style={{ width: "200px" }}>
+                <SearchablePopover
+                  options={assignOptions}
+                  value={ticket.assignedToPermission || ""}
+                  onChange={onAssignChange}
+                  disabled={isAssignPending}
                 />
-                {ticket.claimedAt && (
-                  <span style={{ fontSize: "10px", color: "var(--muted)", fontStyle: "italic" }}>
-                    assigned {formatDateTime(ticket.claimedAt)}
-                  </span>
-                )}
               </div>
-            ) : (
-               isAdmin && ticket.status !== "CLOSED" && ticket.status !== "RESOLVED" ? (
-                 <button
-                   onClick={onClaim}
-                   disabled={isClaimPending}
-                   className={styles.claimBtn}
-                   style={{ marginLeft: 0 }}
-                 >
-                   {isClaimPending ? "Assigning..." : "Assign to Me"}
-                 </button>
-               ) : (
-                 <span style={{ fontStyle: "italic", color: "var(--muted)" }}>Unassigned</span>
-               )
-             )}
-          </span>
-        </div>
+            </div>
+            <div className={styles.infoRow}>
+              <span className={styles.infoLabel}>Assigned Agent</span>
+              <span className={styles.infoValue}>
+                {ticket.assignedToUserEmail ? (
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "2px" }}>
+                    <PermissionsTooltip
+                      email={ticket.assignedToUserEmail}
+                      permissions={ticket.assignedToUserPermissions || undefined}
+                      isAdmin={isAdmin}
+                    />
+                    {ticket.claimedAt && (
+                      <span style={{ fontSize: "10px", color: "var(--muted)", fontStyle: "italic" }}>
+                        assigned {formatDateTime(ticket.claimedAt)}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  ticket.status !== "CLOSED" && ticket.status !== "RESOLVED" ? (
+                    <button
+                      onClick={onClaim}
+                      disabled={isClaimPending}
+                      className={styles.claimBtn}
+                      style={{ marginLeft: 0 }}
+                    >
+                      {isClaimPending ? "Assigning..." : "Assign to Me"}
+                    </button>
+                  ) : (
+                    <span style={{ fontStyle: "italic", color: "var(--muted)" }}>Unassigned</span>
+                  )
+                )}
+              </span>
+            </div>
+          </>
+        )}
+
         <div className={styles.infoRow}>
           <span className={styles.infoLabel}>Created At</span>
           <span className={styles.infoValue}>{formatDateTime(ticket.createdAt)}</span>
@@ -115,15 +175,21 @@ export default function TicketMetadataTab({
         )}
       </div>
 
-      {/* Subject & Description Card */}
-      <Card className={styles.descCard}>
-        <p className={styles.infoSectionTitle}>Issue Summary</p>
-        <h3 style={{ margin: "10px 0 6px 0", fontSize: "16px", color: "var(--text)" }}>{ticket.subject}</h3>
-        <p className={styles.descText}>{ticket.description}</p>
-      </Card>
+      {/* Customer Close Action (Only visible to customers if the ticket is OPEN or IN_PROGRESS) */}
+      {!isAdmin && ticket.status !== "CLOSED" && ticket.status !== "RESOLVED" && (
+        <div style={{ marginTop: "4px" }}>
+          <ActionButton
+            onClick={onCloseTicket}
+            loading={isClosePending}
+            loadingText="Closing..."
+            iconName="check_circle"
+            style={{ width: "100%", justifyContent: "center",  }}
+          >
+            Close This Ticket
+          </ActionButton>
+        </div>
+      )}
 
-      {/* Attachments Card */}
-      <TicketAttachments attachments={ticket.attachments || []} />
     </div>
   );
 }

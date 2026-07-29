@@ -27,7 +27,10 @@ public class SupportTicketSeeder {
         User u1 = seededUsers.get(0);
         LocalDateTime now = LocalDateTime.now();
 
-        // Seed a sample support ticket for u1
+        // Ticket raised yesterday afternoon at 3:22 PM
+        LocalDateTime ticketCreatedAt = now.minusDays(1).withHour(15).withMinute(22).withSecond(0).withNano(0);
+        LocalDateTime commentAt       = now.minusDays(1).withHour(16).withMinute(5).withSecond(0).withNano(0);
+
         SupportTicket sampleTicket = SupportTicket.builder()
                 .ticketNumber("TKT-00001")
                 .user(u1)
@@ -35,8 +38,8 @@ public class SupportTicketSeeder {
                 .subject("Deposit of ₹5000 not showing in wallet")
                 .description("I deposited ₹5000 using the gateway but my wallet balance is still zero. Please help.")
                 .status(TicketStatus.OPEN)
-                .createdAt(now.minusDays(1))
-                .updatedAt(now.minusDays(1))
+                .createdAt(ticketCreatedAt)
+                .updatedAt(ticketCreatedAt)
                 .build();
 
         sampleTicket = supportTicketRepository.save(sampleTicket);
@@ -46,7 +49,7 @@ public class SupportTicketSeeder {
                 .author(u1)
                 .message("Also, my bank transaction status is successful. I can provide the receipt if needed.")
                 .adminReply(false)
-                .createdAt(now.minusHours(23))
+                .createdAt(commentAt)
                 .build();
         ticketCommentRepository.save(sampleComment);
     }

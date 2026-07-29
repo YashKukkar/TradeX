@@ -1,5 +1,10 @@
 import Icon from "./Icon";
 import styles from "../AdminUsers.module.css";
+import ActionBadge from "./ActionBadge";
+import { formatEpochTime } from "../utils/dashboardHelpers";
+import LoadingState from "./LoadingState";
+import DataTable, { type ColumnDef } from "./DataTable";
+import { useToast } from "../context/ToastContext";
 
 export interface AuditLogItem {
   id: number;
@@ -18,27 +23,36 @@ interface AdminAuditLogsRegistryProps {
   onPageChange: (newPage: number) => void;
 }
 
-function ActionBadge({ action }: { action: string }) {
-  let badgeClass = styles.badgeLSub;
-  if (action === "LOCK" || action === "DISABLE") {
-    badgeClass = styles.badgeL1; // yellow/orange
-  } else if (action === "UNLOCK" || action === "ENABLE") {
-    badgeClass = styles.badgeLActive; // green (we will add this CSS rule)
-  } else if (action === "FORCE_EMAIL_VERIFY" || action === "PASSWORD_RESET_EMAIL_SENT") {
-    badgeClass = styles.badgeL3; // cyan
-  } else if (action === "POINTS_ADJUSTMENT") {
-    badgeClass = styles.badgeL2; // violet/purple
-  }
-
-  // format action name to user-friendly label (e.g. PASSWORD_RESET_EMAIL_SENT -> RESET EMAIL)
-  const label = action.replace(/_/g, " ");
-
-  return (
-    <span className={`${styles.depthBadge} ${badgeClass}`}>
-      {label}
-    </span>
-  );
-}
+const BASE_COLUMNS: ColumnDef<AuditLogItem>[] = [
+  {
+    label: "Timestamp",
+    render: (log) => (
+      <span className={styles.mutedText} style={{ whiteSpace: "nowrap" }}>
+        {formatEpochTime(log.createdAt)}
+      </span>
+    ),
+  },
+  {
+    label: "Actor (Admin)",
+    render: (log) => <span className={styles.userEmail}>{log.actorEmail}</span>,
+  },
+  {
+    label: "Action",
+    render: (log) => <ActionBadge action={log.action} />,
+  },
+  {
+    label: "Target User",
+    render: (log) => <span className={styles.userEmail}>{log.targetEmail}</span>,
+  },
+  {
+    label: "Details",
+    render: (log) => (
+      <span style={{ fontSize: "13px", fontWeight: 500, color: "var(--muted)" }}>
+        {log.details}
+      </span>
+    ),
+  },
+];
 
 export default function AdminAuditLogsRegistry({
   logs,
@@ -47,15 +61,14 @@ export default function AdminAuditLogsRegistry({
   totalPages,
   onPageChange,
 }: AdminAuditLogsRegistryProps) {
-  const formatTime = (epochSeconds: number) => {
-    return new Date(epochSeconds * 1000).toLocaleString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
+  const { showToast } = useToast();
+
+  const handleRowClick = (log: AuditLogItem) => {
+    showToast(
+      `${log.action} · ${log.actorEmail} → ${log.targetEmail}`,
+      "info",
+      5000
+    );
   };
 
   return (
@@ -65,50 +78,16 @@ export default function AdminAuditLogsRegistry({
       </div>
 
       {loading ? (
-        <div className={styles.loadingState}>
-          <div className={styles.spinner}></div>
-          <p>Querying audit records...</p>
-        </div>
-      ) : logs.length === 0 ? (
-        <div className={styles.emptyState}>No audit logs found.</div>
+        <LoadingState message="Querying audit records..." />
       ) : (
         <>
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Timestamp</th>
-                  <th>Actor (Admin)</th>
-                  <th>Action</th>
-                  <th>Target User</th>
-                  <th>Details</th>
-                </tr>
-              </thead>
-              <tbody>
-                {logs.map((log) => (
-                  <tr key={log.id}>
-                    <td className={styles.mutedText} style={{ whiteSpace: "nowrap" }}>
-                      {formatTime(log.createdAt)}
-                    </td>
-                    <td>
-                      <span className={styles.userEmail}>{log.actorEmail}</span>
-                    </td>
-                    <td>
-                      <ActionBadge action={log.action} />
-                    </td>
-                    <td>
-                      <span className={styles.userEmail}>{log.targetEmail}</span>
-                    </td>
-                    <td>
-                      <span style={{ fontSize: "13px", fontWeight: 500, color: "var(--text-muted)" }}>
-                        {log.details}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            columns={BASE_COLUMNS}
+            data={logs}
+            rowKey={(log) => log.id}
+            emptyMessage="No audit logs found."
+            onRowClick={handleRowClick}
+          />
 
           {totalPages > 1 && (
             <div className={styles.modalFooter} style={{ borderTop: "1px solid var(--border)", background: "none", padding: "16px 0 0" }}>

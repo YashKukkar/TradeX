@@ -2,7 +2,6 @@ package com.tradex.api.entity;
 
 import com.tradex.api.enums.TicketCategory;
 import com.tradex.api.enums.TicketStatus;
-import com.tradex.api.enums.Permission;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -52,16 +51,13 @@ public class SupportTicket {
 
 
 
-    @Column(name = "admin_notes", columnDefinition = "TEXT")
-    private String adminNotes;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resolved_by_id")
     private User resolvedBy;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "assigned_to_permission", length = 50)
-    private Permission assignedToPermission;
+    private String assignedToPermission;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_to_user_id")

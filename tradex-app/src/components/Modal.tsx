@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
 import styles from "./Modal.module.css";
 import Icon from "./Icon";
+import { useRegisterOverlay } from "../context/OverlayContext";
 
 interface ModalProps {
   isOpen: boolean;
@@ -22,6 +23,8 @@ export default function Modal({
   closeBtnRef,
   children,
 }: ModalProps) {
+  useRegisterOverlay("modal-" + (typeof title === "string" ? title.toLowerCase().replace(/\s+/g, "-") : "generic"), isOpen);
+
   useEffect(() => {
     if (!isOpen) return;
 

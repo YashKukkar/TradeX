@@ -4,7 +4,7 @@ import AdminUserControlModal from "./AdminUserControlModal";
 import AdjustPointsModal from "./AdjustPointsModal";
 import ResetPasswordConfirmModal from "./ResetPasswordConfirmModal";
 import ReferralTreeModal from "./ReferralTreeModal";
-import Toast from "./Toast";
+import { useToast } from "../context/ToastContext";
 
 import {
   useReferralTree,
@@ -22,10 +22,7 @@ type ModalState =
   | { type: "resetConfirm"; user: UserInfo }
   | null;
 
-interface ToastState {
-  message: string;
-  type: "success" | "error" | "warning" | "info";
-}
+
 
 interface UserDirectoryTabProps {
   user: UserProfile;
@@ -35,17 +32,8 @@ interface UserDirectoryTabProps {
 
 export default function UserDirectoryTab({ user, users, adminLoading }: UserDirectoryTabProps) {
   const [modal, setModal] = useState<ModalState>(null);
-  const [toast, setToast] = useState<ToastState | null>(null);
+  const { showToast } = useToast();
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
-
-  function showToast(message: string, type: ToastState["type"] = "success") {
-    setToast({ message, type });
-  }
-
-  function handleMutationError(err: unknown) {
-    const msg = (err as { message?: string })?.message ?? "Something went wrong";
-    showToast(msg, "error");
-  }
 
   const selectedUser = modal && "user" in modal
     ? users.find((u) => u.id === modal.user.id) || modal.user
@@ -66,12 +54,12 @@ export default function UserDirectoryTab({ user, users, adminLoading }: UserDire
       };
       showToast(labels[action]);
     },
-    onError: handleMutationError,
+    onError: (err) => showToast((err as { message?: string })?.message ?? "Something went wrong", "error"),
   });
 
   const resetEmailMutation = useResetUserPassword({
     onSuccess: () => showToast("Password reset email sent"),
-    onError: handleMutationError,
+    onError: (err) => showToast((err as { message?: string })?.message ?? "Something went wrong", "error"),
   });
 
   const adjustPointsMutation = useAdjustUserPoints({
@@ -79,24 +67,21 @@ export default function UserDirectoryTab({ user, users, adminLoading }: UserDire
       setModal(null);
       showToast("Points balance updated");
     },
-    onError: handleMutationError,
+    onError: (err) => showToast((err as { message?: string })?.message ?? "Something went wrong", "error"),
   });
+
+  const customersOnly = users.filter(
+    (u) => u.email !== user.email && u.role !== "SUPER_ADMIN" && u.role !== "EMPLOYEE"
+  );
 
   const act = (action: AdminAction, user: UserInfo) =>
     statusMutation.mutate({ userId: user.id, action });
 
   return (
     <div>
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
 
       <UserAuditRegistry
-        users={users}
+        users={customersOnly}
         loading={adminLoading}
         onRowClick={(u) => setModal({ type: "controlPanel", user: u })}
       />
@@ -127,6 +112,12 @@ export default function UserDirectoryTab({ user, users, adminLoading }: UserDire
           onSendResetEmail={() => setModal({ type: "resetConfirm", user: selectedUser })}
           onAdjustPoints={() => setModal({ type: "points", user: selectedUser })}
           viewNetwork={() => setModal({ type: "network", user: selectedUser })}
+          isLockPending={statusMutation.isPending && statusMutation.variables?.action === "LOCK"}
+          isUnlockPending={statusMutation.isPending && statusMutation.variables?.action === "UNLOCK"}
+          isEnablePending={statusMutation.isPending && statusMutation.variables?.action === "ENABLE"}
+          isDisablePending={statusMutation.isPending && statusMutation.variables?.action === "DISABLE"}
+          isVerifyEmailPending={statusMutation.isPending && statusMutation.variables?.action === "FORCE_EMAIL_VERIFY"}
+          isResetPending={resetEmailMutation.isPending}
         />
       )}
 

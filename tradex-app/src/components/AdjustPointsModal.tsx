@@ -41,8 +41,10 @@ export default function AdjustPointsModal({ user, onClose, onConfirm, isPending 
         <div className={styles.modalBody}>
           <div className={styles.modalForm}>
             <div className={styles.formField}>
-              <label className={styles.formLabel}>Point Delta</label>
+              <label htmlFor="pointDelta" className={styles.formLabel}>Point Delta</label>
               <input
+                id="pointDelta"
+                name="pointDelta"
                 type="number"
                 className={styles.formInput}
                 placeholder="e.g. 500 or -200"
@@ -65,8 +67,10 @@ export default function AdjustPointsModal({ user, onClose, onConfirm, isPending 
             )}
 
             <div className={styles.formField}>
-              <label className={styles.formLabel}>Reason</label>
+              <label htmlFor="adjustmentReason" className={styles.formLabel}>Reason</label>
               <input
+                id="adjustmentReason"
+                name="adjustmentReason"
                 type="text"
                 className={styles.formInput}
                 placeholder="e.g. Compensation for referral issue"

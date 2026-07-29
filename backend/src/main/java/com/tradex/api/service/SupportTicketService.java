@@ -17,8 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,7 +72,8 @@ public class SupportTicketService {
     }
 
     @Transactional
-    public TicketCommentDTO addComment(String userEmail, Long ticketId, TicketCommentRequest request, List<MultipartFile> files) {
+    public TicketCommentDTO addComment(String userEmail, Long ticketId, TicketCommentRequest request,
+            List<MultipartFile> files) {
         return ticketCommentService.addComment(userEmail, ticketId, request, files);
     }
 
@@ -91,8 +92,19 @@ public class SupportTicketService {
             throw new ForbiddenException("You do not have permission to view support tickets");
         }
 
-        return supportTicketRepository.findAllByOrderByCreatedAtDesc()
-                .stream()
+        List<SupportTicket> tickets = supportTicketRepository.findAllByOrderByCreatedAtDesc();
+
+        if (user.getRole() == Role.EMPLOYEE) {
+            Set<String> employeePerms = user.getPermissions();
+            return tickets.stream()
+                    .filter(t -> t.getAssignedToPermission() == null
+                            || employeePerms.contains(t.getAssignedToPermission())
+                            || (t.getAssignedToUser() != null && t.getAssignedToUser().getId().equals(user.getId())))
+                    .map(ticketMapper::mapToDTO)
+                    .collect(Collectors.toList());
+        }
+
+        return tickets.stream()
                 .map(ticketMapper::mapToDTO)
                 .collect(Collectors.toList());
     }
@@ -100,22 +112,6 @@ public class SupportTicketService {
     @Transactional
     public TicketDetailDTO updateTicketStatus(Long ticketId, TicketStatus status, String adminEmail) {
         return ticketStatusService.updateTicketStatus(ticketId, status, adminEmail);
-    }
-
-    @Transactional
-    public TicketDetailDTO updateAdminNotes(Long ticketId, String notes, String adminEmail) {
-        SupportTicket ticket = supportTicketRepository.findById(ticketId)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
-
-        userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("Admin user not found: " + adminEmail));
-
-        ticket.setAdminNotes(notes);
-        ticket.setUpdatedAt(LocalDateTime.now());
-
-        supportTicketRepository.save(ticket);
-        log.info("Admin {} updated notes on ticket {}", adminEmail, ticket.getTicketNumber());
-        return ticketMapper.mapToDetailDTO(ticket, true);
     }
 
     @Transactional

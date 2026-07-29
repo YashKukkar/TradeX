@@ -235,20 +235,6 @@ export function useUpdateTicketStatus(ticketId: number) {
   });
 }
 
-export function useUpdateAdminNotes(ticketId: number) {
-  const queryClient = useQueryClient();
-  return useMutation<TicketDetail, Error, { notes: string }>({
-    mutationFn: (body) => {
-      return api(`/admin/tickets/${ticketId}/notes`, {
-        method: "PATCH",
-        body: JSON.stringify(body)
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticketDetail", ticketId] });
-    }
-  });
-}
 
 export function useAssignTicket(ticketId: number) {
   const queryClient = useQueryClient();

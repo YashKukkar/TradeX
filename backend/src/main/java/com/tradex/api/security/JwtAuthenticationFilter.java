@@ -2,7 +2,6 @@ package com.tradex.api.security;
 
 import com.tradex.api.entity.User;
 import com.tradex.api.entity.SystemSetting;
-import com.tradex.api.enums.Permission;
 import com.tradex.api.enums.Role;
 import com.tradex.api.repository.UserRepository;
 import com.tradex.api.service.SystemSettingService;
@@ -23,9 +22,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import jakarta.servlet.http.Cookie;
 
@@ -68,7 +66,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (tokenBlacklistCache.isBlacklisted(jwt)) {
-            writeErrorResponse(request, response, HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized", "Token is blacklisted/revoked.");
+            writeErrorResponse(request, response, HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized",
+                    "Token is blacklisted/revoked.");
             return;
         }
 
@@ -93,9 +92,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (settings.isEmailVerificationEnabled() || settings.isPhoneVerificationEnabled()) {
                 String path = request.getRequestURI();
                 boolean isBypass = path.endsWith("/verify-email") ||
-                                   path.endsWith("/verify-phone") ||
-                                   path.endsWith("/logout") ||
-                                   path.endsWith("/me");
+                        path.endsWith("/verify-phone") ||
+                        path.endsWith("/logout") ||
+                        path.endsWith("/me");
 
                 if (!isBypass) {
                     user = userRepository.findByEmail(userEmail).orElse(null);
@@ -105,12 +104,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     }
 
                     if (settings.isEmailVerificationEnabled() && !user.isEmailVerified()) {
-                        writeErrorResponse(request, response, HttpServletResponse.SC_FORBIDDEN, "Forbidden", "Email verification is required.");
+                        writeErrorResponse(request, response, HttpServletResponse.SC_FORBIDDEN, "Forbidden",
+                                "Email verification is required.");
                         return;
                     }
 
-                    if (settings.isPhoneVerificationEnabled() && user.getPhoneNumber() != null && !user.isPhoneVerified()) {
-                        writeErrorResponse(request, response, HttpServletResponse.SC_FORBIDDEN, "Forbidden", "Phone verification is required.");
+                    if (settings.isPhoneVerificationEnabled() && user.getPhoneNumber() != null
+                            && !user.isPhoneVerified()) {
+                        writeErrorResponse(request, response, HttpServletResponse.SC_FORBIDDEN, "Forbidden",
+                                "Phone verification is required.");
                         return;
                     }
                 }
@@ -120,25 +122,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 user = new User();
                 user.setEmail(userEmail);
                 user.setRole(Role.valueOf(role != null ? role.toUpperCase() : "USER"));
-                // JWT for EMPLOYEE role
-                List<String> permStrings = jwtUtil.extractPermissions(jwt);
-                if (!permStrings.isEmpty()) {
-                    Set<Permission> perms = EnumSet.noneOf(Permission.class);
-                    for (String p : permStrings) {
-                        try {
-                            perms.add(Permission.valueOf(p));
-                        } catch (IllegalArgumentException ignored) {}
-                    }
-                    user.setPermissions(perms);
-                }
+            }
+            // Populate permissions from JWT (which includes team inherited permissions)
+            List<String> permStrings = jwtUtil.extractPermissions(jwt);
+            if (!permStrings.isEmpty()) {
+                user.setPermissions(new HashSet<>(permStrings));
             }
 
             CustomUserPrincipal principal = new CustomUserPrincipal(user);
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     principal,
                     null,
-                    principal.getAuthorities()
-            );
+                    principal.getAuthorities());
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
 
@@ -149,7 +144,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void writeErrorResponse(HttpServletRequest request, HttpServletResponse response, int status, String error, String message) throws IOException {
+    private void writeErrorResponse(HttpServletRequest request, HttpServletResponse response, int status, String error,
+            String message) throws IOException {
         response.setStatus(status);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -161,4 +157,3 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.getWriter().write(mapper.writeValueAsString(errorResponse));
     }
 }
-

@@ -6,35 +6,47 @@ import com.tradex.api.enums.*;
 import com.tradex.api.repository.UserRepository;
 import com.tradex.api.repository.WalletTransactionRepository;
 import com.tradex.api.util.WalletTransactionHelper;
-import com.tradex.api.repository.PointsTransactionRepository;
-import com.tradex.api.repository.AdminAuditLogRepository;
 import com.tradex.api.exception.AppException.*;
 import com.tradex.api.config.AppProperties;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 
+import com.tradex.api.service.handler.TransactionHandler;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.function.Function;
+
 @Service
-@RequiredArgsConstructor
 @Slf4j
 @SuppressWarnings("null")
 public class WalletService {
 
     private final UserRepository userRepository;
     private final WalletTransactionRepository walletTransactionRepository;
-    private final PointsTransactionRepository pointsTransactionRepository;
-    private final SystemSettingService systemSettingService;
     private final WalletTransactionHelper walletTransactionHelper;
     private final AppProperties appProperties;
-    private final AdminAuditLogRepository adminAuditLogRepository;
+    private final WalletBalanceManager walletBalanceManager;
+    private final Map<WalletTransactionType, TransactionHandler> transactionHandlers;
+
+    public WalletService(
+            UserRepository userRepository,
+            WalletTransactionRepository walletTransactionRepository,
+            WalletTransactionHelper walletTransactionHelper,
+            AppProperties appProperties,
+            WalletBalanceManager walletBalanceManager,
+            List<TransactionHandler> handlers) {
+        this.userRepository = userRepository;
+        this.walletTransactionRepository = walletTransactionRepository;
+        this.walletTransactionHelper = walletTransactionHelper;
+        this.appProperties = appProperties;
+        this.walletBalanceManager = walletBalanceManager;
+        this.transactionHandlers = handlers.stream()
+                .collect(Collectors.toMap(TransactionHandler::getType, Function.identity()));
+    }
 
     @Transactional
     public WalletTransactionDTO deposit(String email, BigDecimal amount) {
@@ -63,42 +75,6 @@ public class WalletService {
         return new WalletTransactionDTO(depositTx);
     }
 
-    private void applyFirstDepositBonus(User user, BigDecimal amount, boolean isFirstDeposit) {
-        if (!isFirstDeposit) {
-            return;
-        }
-
-        SystemSetting settings = systemSettingService.getSettings();
-        if (!settings.isFirstDepositRewardEnabled()) {
-            return;
-        }
-
-        BigDecimal threshold = settings.getFirstDepositRewardThreshold();
-        if (threshold == null || amount.compareTo(threshold) < 0) {
-            log.info("Deposit amount did not meet threshold for first deposit bonus");
-            return;
-        }
-
-        BigDecimal rewardAmount = settings.getFirstDepositRewardAmount();
-        if (rewardAmount == null || rewardAmount.compareTo(BigDecimal.ZERO) <= 0) {
-            return;
-        }
-
-        BigDecimal currentBonus = user.getBonusBalance();
-        BigDecimal newBonus = currentBonus.add(rewardAmount);
-        user.setBonusBalance(newBonus);
-
-        WalletTransaction bonusTx = new WalletTransaction(
-                user,
-                rewardAmount,
-                newBonus,
-                WalletTransactionType.FIRST_DEPOSIT_BONUS,
-                WalletTransactionStatus.SUCCESS,
-                "First-time wallet load bonus reward");
-        walletTransactionRepository.save(bonusTx);
-        log.info("Awarded first-time deposit bonus of {} to user {}", rewardAmount, user.getEmail());
-    }
-
     @Transactional
     public WalletTransactionDTO withdraw(String email, BigDecimal amount) {
         User user = userRepository.findByEmailForUpdate(email)
@@ -110,9 +86,8 @@ public class WalletService {
 
         validateWithdrawal(user, amount);
 
-        BigDecimal currentBalance = user.getWithdrawableBalance();
-        BigDecimal newBalance = currentBalance.subtract(amount);
-        user.setWithdrawableBalance(newBalance);
+        user = walletBalanceManager.mutateWithdrawableBalance(user, amount.negate());
+        BigDecimal newBalance = user.getWithdrawableBalance();
 
         WalletTransaction withdrawTx = new WalletTransaction(
                 user,
@@ -120,80 +95,13 @@ public class WalletService {
                 newBalance,
                 WalletTransactionType.WITHDRAWAL,
                 WalletTransactionStatus.PENDING,
-                "Withdrawal of funds from wallet to bank account " + user.getAccountNumber());
+                "Withdrawal of funds from wallet to bank account "
+                        + user.getPrimaryBank().map(BankDetail::getAccountNumber).orElse("N/A"));
         walletTransactionRepository.save(withdrawTx);
 
         log.info("Processed withdrawal request of {} (PENDING) for user {}", amount, email);
 
         return new WalletTransactionDTO(withdrawTx);
-    }
-
-    @Transactional
-    public WalletTransactionDTO convertPoints(String email, Long points) {
-        if (points == null || points <= 0) {
-            throw new BadRequestException("Points to convert must be greater than zero");
-        }
-
-        SystemSetting settings = systemSettingService.getSettings();
-        if (!settings.isPointsConversionEnabled()) {
-            throw new ForbiddenException("Points conversion is currently disabled by system configuration");
-        }
-
-        User user = userRepository.findByEmailForUpdate(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
-
-        if (user.getRole() == Role.EMPLOYEE || user.getRole() == Role.SUPER_ADMIN) {
-            throw new ForbiddenException("This operation is only available to customers");
-        }
-
-        Long currentPoints = user.getPointsBalance();
-        if (currentPoints < points) {
-            throw new BadRequestException("Insufficient TradeX Points balance");
-        }
-
-        BigDecimal rate = settings.getPointsToCashConversionRate();
-        if (rate == null || rate.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BadRequestException("Invalid points-to-cash conversion rate setting");
-        }
-
-        BigDecimal cashAwarded = new BigDecimal(points)
-                .divide(rate, 4, RoundingMode.HALF_UP);
-
-        Long newPoints = currentPoints - points;
-        user.setPointsBalance(newPoints);
-
-        BigDecimal currentBonus = user.getBonusBalance();
-        BigDecimal newBonus = currentBonus.add(cashAwarded);
-        user.setBonusBalance(newBonus);
-
-        PointsTransaction pointsTx = new PointsTransaction(
-                user,
-                -points,
-                newPoints,
-                PointsTransactionType.CONVERT_TO_CASH,
-                "Converted " + points + " points to bonus cash");
-        pointsTransactionRepository.save(pointsTx);
-
-        WalletTransaction walletTx = new WalletTransaction(
-                user,
-                cashAwarded,
-                newBonus,
-                WalletTransactionType.POINTS_CONVERSION,
-                WalletTransactionStatus.SUCCESS,
-                "Converted " + points + " TradeX Points into bonus cash");
-        walletTransactionRepository.save(walletTx);
-
-        AdminAuditLog auditLog = new AdminAuditLog(
-                user,
-                user,
-                AdminAction.POINTS_CONVERSION,
-                "Converted " + points + " points to ₹" + cashAwarded.setScale(2, RoundingMode.HALF_UP) + " bonus cash"
-        );
-        adminAuditLogRepository.save(auditLog);
-
-        log.info("Converted {} points to {} bonus cash for user {}", points, cashAwarded, email);
-
-        return new WalletTransactionDTO(walletTx);
     }
 
     @Transactional(readOnly = true)
@@ -207,22 +115,9 @@ public class WalletService {
                 .toList();
     }
 
-    @Transactional
-    public User updateBankDetails(String email, String accountNumber) {
-        if (accountNumber == null || accountNumber.trim().isEmpty()) {
-            throw new BadRequestException("Account number cannot be empty");
-        }
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
-
-        user.setAccountNumber(accountNumber.trim().toUpperCase());
-        return userRepository.save(user);
-    }
-
     @Transactional(readOnly = true)
     public List<WalletTransactionDTO> getAllTransactions() {
-        return walletTransactionRepository.findAllByOrderByCreatedAtDesc()
+        return walletTransactionRepository.findAllByOrderByApprovedAtDesc()
                 .stream()
                 .map(WalletTransactionDTO::new)
                 .toList();
@@ -240,7 +135,10 @@ public class WalletService {
     public WalletTransactionDTO approveTransaction(Long transactionId) {
         WalletTransaction tx = walletTransactionRepository.findByIdForUpdate(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));
+        return approveTransactionInternal(tx);
+    }
 
+    private WalletTransactionDTO approveTransactionInternal(WalletTransaction tx) {
         if (tx.getStatus() != WalletTransactionStatus.PENDING) {
             throw new BadRequestException("Transaction is not pending");
         }
@@ -248,28 +146,25 @@ public class WalletService {
         User user = userRepository.findByIdForUpdate(tx.getUser().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        switch (tx.getType()) {
-            case DEPOSIT -> approveDeposit(user, tx);
-            case WITHDRAWAL -> approveWithdrawal(tx);
-            default -> throw new BadRequestException("Unsupported transaction type for approval: " + tx.getType());
+        TransactionHandler handler = transactionHandlers.get(tx.getType());
+        if (handler == null) {
+            throw new BadRequestException("Unsupported transaction type for approval: " + tx.getType());
         }
 
-        return new WalletTransactionDTO(tx);
-    }
+        User actor = getAuthenticatedActorOrDefault(user);
+        handler.approve(actor, user, tx);
 
-    @Transactional
-    public WalletTransactionDTO approveTransaction(Long transactionId, Authentication auth) {
-        WalletTransaction tx = walletTransactionRepository.findByIdForUpdate(transactionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));
-        enforceTransactionPermission(auth, tx.getType());
-        return approveTransaction(transactionId);
+        return new WalletTransactionDTO(tx);
     }
 
     @Transactional
     public WalletTransactionDTO rejectTransaction(Long transactionId, String reason) {
         WalletTransaction tx = walletTransactionRepository.findByIdForUpdate(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));
+        return rejectTransactionInternal(tx, reason);
+    }
 
+    private WalletTransactionDTO rejectTransactionInternal(WalletTransaction tx, String reason) {
         if (tx.getStatus() != WalletTransactionStatus.PENDING) {
             throw new BadRequestException("Transaction is not pending");
         }
@@ -282,79 +177,24 @@ public class WalletService {
             throw new BadRequestException("Rejection reason must not exceed 200 characters");
         }
 
-        switch (tx.getType()) {
-            case DEPOSIT -> rejectDeposit(tx, safeReason);
-            case WITHDRAWAL -> rejectWithdrawal(user, tx, safeReason);
-            default -> throw new BadRequestException("Unsupported transaction type for rejection: " + tx.getType());
+        TransactionHandler handler = transactionHandlers.get(tx.getType());
+        if (handler == null) {
+            throw new BadRequestException("Unsupported transaction type for rejection: " + tx.getType());
         }
+
+        User actor = getAuthenticatedActorOrDefault(user);
+        handler.reject(actor, user, tx, safeReason);
 
         return new WalletTransactionDTO(tx);
     }
 
-    @Transactional
-    public WalletTransactionDTO rejectTransaction(Long transactionId, String reason, Authentication auth) {
-        WalletTransaction tx = walletTransactionRepository.findByIdForUpdate(transactionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));
-        enforceTransactionPermission(auth, tx.getType());
-        return rejectTransaction(transactionId, reason);
-    }
-
-    private void enforceTransactionPermission(Authentication auth, WalletTransactionType type) {
-        boolean isSuperAdmin = auth.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .anyMatch(a -> a.equals("ROLE_SUPER_ADMIN"));
-        if (isSuperAdmin) return;
-
-        String requiredPerm = switch (type) {
-            case DEPOSIT -> "PERM_MANAGE_DEPOSITS";
-            case WITHDRAWAL -> "PERM_MANAGE_WITHDRAWALS";
-            default -> throw new BadRequestException("Unsupported transaction type: " + type);
-        };
-
-        boolean hasPermission = auth.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .anyMatch(a -> a.equals(requiredPerm));
-
-        if (!hasPermission) {
-            throw new AccessDeniedException("You do not have permission to manage " + type.name().toLowerCase() + " transactions.");
+    private User getAuthenticatedActorOrDefault(User defaultValue) {
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+            return userRepository.findByEmail(auth.getName()).orElse(defaultValue);
         }
-    }
-
-    private void approveDeposit(User user, WalletTransaction tx) {
-        boolean isFirstDeposit = !walletTransactionRepository.existsByUserIdAndTypeAndStatus(
-                user.getId(),
-                WalletTransactionType.DEPOSIT,
-                WalletTransactionStatus.SUCCESS);
-
-        BigDecimal currentBalance = user.getWithdrawableBalance();
-        BigDecimal newBalance = currentBalance.add(tx.getAmount());
-        user.setWithdrawableBalance(newBalance);
-
-        finalizeTransaction(tx, WalletTransactionStatus.SUCCESS, newBalance, "Deposit approved by admin");
-        applyFirstDepositBonus(user, tx.getAmount(), isFirstDeposit);
-    }
-
-    private void approveWithdrawal(WalletTransaction tx) {
-        finalizeTransaction(tx, WalletTransactionStatus.SUCCESS, tx.getBalanceAfter(), "Withdrawal approved by admin");
-    }
-
-    private void rejectDeposit(WalletTransaction tx, String reason) {
-        finalizeTransaction(tx, WalletTransactionStatus.FAILED, tx.getBalanceAfter(), "Deposit rejected by admin: " + reason);
-    }
-
-    private void rejectWithdrawal(User user, WalletTransaction tx, String reason) {
-        BigDecimal currentBalance = user.getWithdrawableBalance();
-        BigDecimal newBalance = currentBalance.add(tx.getAmount());
-        user.setWithdrawableBalance(newBalance);
-
-        finalizeTransaction(tx, WalletTransactionStatus.FAILED, newBalance, "Withdrawal rejected by admin: " + reason);
-    }
-
-    private void finalizeTransaction(WalletTransaction tx, WalletTransactionStatus status, BigDecimal balanceAfter, String notes) {
-        tx.setStatus(status);
-        tx.setBalanceAfter(balanceAfter);
-        tx.setNotes(notes);
-        walletTransactionRepository.save(tx);
+        return defaultValue;
     }
 
     private void validateWithdrawal(User user, BigDecimal amount) {
@@ -374,7 +214,7 @@ public class WalletService {
             throw new BadRequestException("Maximum withdrawal amount per transaction is ₹" + maxWithdrawal);
         }
 
-        if (user.getAccountNumber() == null || user.getAccountNumber().trim().isEmpty()) {
+        if (user.getPrimaryBank().isEmpty()) {
             logFailedWithdrawal(user, amount, "Withdrawal failed: Bank account details not provided");
             throw new BadRequestException("Bank account details must be provided in order to withdraw money");
         }

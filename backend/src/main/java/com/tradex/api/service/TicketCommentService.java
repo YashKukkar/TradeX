@@ -51,6 +51,17 @@ public class TicketCommentService {
             throw new ForbiddenException("You do not have permission to reply to this ticket");
         }
 
+        if (author.getRole() == Role.EMPLOYEE) {
+            // Cannot comment if claimed by someone else
+            if (ticket.getAssignedToUser() != null && !ticket.getAssignedToUser().getId().equals(author.getId())) {
+                throw new ForbiddenException("You cannot reply to a ticket claimed by another agent.");
+            }
+            // Cannot comment if group is assigned and they don't have the permission
+            if (ticket.getAssignedToPermission() != null && !author.getPermissions().contains(ticket.getAssignedToPermission())) {
+                throw new ForbiddenException("You do not have the required permission group to reply to this ticket.");
+            }
+        }
+
         if (ticket.getStatus() == TicketStatus.RESOLVED || ticket.getStatus() == TicketStatus.CLOSED) {
             throw new BadRequestException("Chat is disabled for resolved or closed tickets. Please reopen the ticket first.");
         }

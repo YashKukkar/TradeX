@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { config } from "./config";
 import styles from "./Auth.module.css";
 import { api } from "./utils/api";
 import Icon from "./components/Icon";
 
 export default function Login() {
+  const queryClient = useQueryClient();
   const [mode, setMode] = useState<"login" | "reset">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,6 +38,7 @@ export default function Login() {
       });
 
       localStorage.setItem("token", data.token);
+      queryClient.clear();
       setIsRedirecting(true);
       setTimeout(() => {
         navigate("/dashboard");
@@ -94,8 +97,10 @@ export default function Login() {
               <p className={styles.subtitle}>Log in to your trading dashboard.</p>
               <form onSubmit={handleLogin} className={styles.form}>
                 <div className={styles.fieldGroup}>
-                  <label className={styles.label}>Email Address</label>
+                  <label htmlFor="loginEmail" className={styles.label}>Email Address</label>
                   <input
+                    id="loginEmail"
+                    name="email"
                     type="email"
                     placeholder="you@example.com"
                     value={email}
@@ -106,7 +111,7 @@ export default function Login() {
                 </div>
                 <div className={styles.fieldGroup}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <label className={styles.label}>Password</label>
+                    <label htmlFor="loginPassword" className={styles.label}>Password</label>
                     <button
                       type="button"
                       className={styles.link}
@@ -118,6 +123,8 @@ export default function Login() {
                   </div>
                   <div className={styles.passwordWrapper}>
                     <input
+                      id="loginPassword"
+                      name="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Your password"
                       value={password}
@@ -146,8 +153,10 @@ export default function Login() {
               <p className={styles.subtitle}>Enter the verification code sent to your email.</p>
               <form onSubmit={handleResetPassword} className={styles.form}>
                 <div className={styles.fieldGroup}>
-                  <label className={styles.label}>Email Address</label>
+                  <label htmlFor="resetEmail" className={styles.label}>Email Address</label>
                   <input
+                    id="resetEmail"
+                    name="email"
                     type="email"
                     placeholder="you@example.com"
                     value={email}
@@ -157,8 +166,10 @@ export default function Login() {
                   />
                 </div>
                 <div className={styles.fieldGroup}>
-                  <label className={styles.label}>Verification Code (OTP)</label>
+                  <label htmlFor="resetOtp" className={styles.label}>Verification Code (OTP)</label>
                   <input
+                    id="resetOtp"
+                    name="otp"
                     type="text"
                     placeholder="6-digit code"
                     value={otpCode}
@@ -168,9 +179,11 @@ export default function Login() {
                   />
                 </div>
                 <div className={styles.fieldGroup}>
-                  <label className={styles.label}>New Password</label>
+                  <label htmlFor="resetNewPassword" className={styles.label}>New Password</label>
                   <div className={styles.passwordWrapper}>
                     <input
+                      id="resetNewPassword"
+                      name="newPassword"
                       type={showPassword ? "text" : "password"}
                       placeholder="Choose a new password (min. 8 characters)"
                       value={newPassword}

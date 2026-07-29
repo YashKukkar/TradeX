@@ -59,7 +59,6 @@ class ReferralServiceTest {
                 null,
                 null,
                 null,
-                null,
                 u.getRole() != null ? u.getRole().name() : "USER",
                 0L,
                 u.isEmailVerified(),

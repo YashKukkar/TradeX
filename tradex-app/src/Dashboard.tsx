@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Dashboard.module.css";
 import Icon from "./components/Icon";
-import Toast from "./components/Toast";
+import { useToast } from "./context/ToastContext";
 import DashboardSkeleton from "./components/DashboardSkeleton";
 import VerificationModal from "./components/VerificationModal";
 import AdminDashboard from "./components/AdminDashboard";
@@ -21,10 +21,10 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const { showToast } = useToast();
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastType, setToastType] = useState<"success" | "error" | "warning" | "info">("success");
 
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [verifyTarget, setVerifyTarget] = useState<"email" | "phone" | null>(null);
@@ -47,9 +47,7 @@ export default function Dashboard() {
     () => {
       setVerifySuccess(true);
       const targetLabel = verifyTarget === "email" ? "Email Address" : "Phone Number";
-      setToastType("success");
-      setToastMessage(`${targetLabel} verified successfully!`);
-      
+      showToast(`${targetLabel} verified successfully!`, "success");
       timeoutRef.current = setTimeout(() => {
         setShowVerifyModal(false);
         setVerifySuccess(false);
@@ -57,17 +55,13 @@ export default function Dashboard() {
     },
     (err) => {
       setVerifyError(err);
-      setToastType("error");
-      setToastMessage(err);
+      showToast(err, "error");
     }
   );
 
   const resendMutation = useResendOtp(
-    () => {
-      setToastType("success");
-      setToastMessage("Verification OTP resent successfully!");
-    },
-    () => {} // Handled inline inside VerificationModal
+    () => { showToast("Verification OTP resent successfully!", "success"); },
+    () => {}
   );
 
   const handleResendOtp = async () => {
@@ -118,12 +112,8 @@ export default function Dashboard() {
     const link = `${config.websiteUrl}/signup?ref=${user?.referralCode}`;
     navigator.clipboard.writeText(link);
     setCopied(true);
-    setToastType("success");
-    setToastMessage("Referral link copied to clipboard!");
-    
-    timeoutRef.current = setTimeout(() => {
-      setCopied(false);
-    }, 2000);
+    showToast("Referral link copied to clipboard!", "success");
+    timeoutRef.current = setTimeout(() => { setCopied(false); }, 2000);
   };
 
   const pageLoading = userLoading;
@@ -134,7 +124,6 @@ export default function Dashboard() {
   const referralCode = user?.referralCode || "";
   const pointsBalance = user?.pointsBalance ?? 0;
   const phoneNumber = user?.phoneNumber || "";
-  const accountNumber = user?.accountNumber || "";
   const emailVerified = !!user?.emailVerified;
   const phoneVerified = !!user?.phoneVerified;
   const memberSince = user?.createdAt ? formatDate(user.createdAt) : "";
@@ -188,6 +177,13 @@ export default function Dashboard() {
                   <div className={styles.dropdownMeta}>Member since {memberSince}</div>
                 )}
                 <div className={styles.dropdownDivider} />
+                <button
+                  className={styles.dropdownItem}
+                  onClick={() => navigate("/settings")}
+                >
+                  <Icon name="manage_accounts" style={{ fontSize: "16px", color: "var(--primary)" }} />
+                  Profile & Settings
+                </button>
                 <button className={styles.dropdownLogout} onClick={handleLogout}>
                   Sign out
                 </button>
@@ -215,7 +211,6 @@ export default function Dashboard() {
             emailVerified={emailVerified}
             phoneNumber={phoneNumber}
             phoneVerified={phoneVerified}
-            accountNumber={accountNumber}
             memberSince={memberSince}
             startVerification={startVerification}
             navigate={navigate}
@@ -237,13 +232,6 @@ export default function Dashboard() {
         />
       )}
 
-      {toastMessage && (
-        <Toast
-          message={toastMessage}
-          type={toastType}
-          onClose={() => setToastMessage("")}
-        />
-      )}
     </div>
   );
 }

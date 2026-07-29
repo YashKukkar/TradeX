@@ -1,17 +1,18 @@
 .card {
-  background: linear-gradient(160deg, var(--surface), var(--surface-2));
+  background: var(--surface-grad);
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   padding: 24px;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow);
+  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
 }
 
 .card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow);
+  border-color: var(--card-hover-border);
+  box-shadow: var(--card-hover-shadow);
 }
 
 .icon {
@@ -57,4 +58,11 @@
 @keyframes loadingShimmer {
   from { background-position: 200% 0; }
   to { background-position: -200% 0; }
+}
+
+.footer {
+  font-size: 12px;
+  color: var(--muted);
+  opacity: 0.8;
+  margin-top: 6px;
 }

@@ -2,10 +2,11 @@ package com.tradex.api.entity;
 
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
-import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import jakarta.persistence.*;
-import com.tradex.api.enums.Permission;
 import com.tradex.api.enums.Role;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -59,18 +60,25 @@ public class User {
     private Role role = Role.USER;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_permissions", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "permission")
     @BatchSize(size = 50)
     @Builder.Default
-    private Set<Permission> permissions = EnumSet.noneOf(Permission.class);
+    private Set<String> permissions = new HashSet<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_teams", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "team_name")
+    @BatchSize(size = 50)
+    @Builder.Default
+    private Set<String> teams = new HashSet<>();
 
     @Column(name = "phone_number", length = 15)
     private String phoneNumber;
 
-    @Column(name = "account_number", length = 20)
-    private String accountNumber;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<BankDetail> bankDetails = new java.util.ArrayList<>();
 
     @Column(name = "email_verified", nullable = false)
     @Builder.Default
@@ -126,6 +134,13 @@ public class User {
 
     public BigDecimal getBonusBalance() {
         return this.bonusBalance == null ? BigDecimal.ZERO : this.bonusBalance;
+    }
+
+    public Optional<BankDetail> getPrimaryBank() {
+        if (bankDetails == null || bankDetails.isEmpty()) return Optional.empty();
+        return bankDetails.stream()
+                .filter(bank -> bank.isPrimary())
+                .findFirst();
     }
 }
 

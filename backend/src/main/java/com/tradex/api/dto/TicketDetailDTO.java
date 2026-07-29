@@ -22,7 +22,6 @@ public class TicketDetailDTO {
     private String description;
     private TicketStatus status;
 
-    private String adminNotes;
     private String resolvedByEmail;
     private String assignedToPermission;
     private String assignedToUserEmail;

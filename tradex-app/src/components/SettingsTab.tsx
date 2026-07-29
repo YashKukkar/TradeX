@@ -13,7 +13,7 @@ export default function SettingsTab({ settingsConfig }: { settingsConfig?: Syste
     referralCoinsL2Amount: 200,
     referralCoinsL3Amount: 100,
     referralCoinsSubsequentEnabled: true,
-    referralCoinsSubsequentAmount: 50,
+    referralCoinsSubsequentAmount: 10,
     referralCoinsLimitTier: 3,
     emailVerificationEnabled: false,
     phoneVerificationEnabled: false,

@@ -8,6 +8,7 @@ interface StatCardProps {
   iconColor?: string;
   valueColor?: string;
   isLoading?: boolean;
+  footer?: string;
 }
 
 export default function StatCard({
@@ -17,6 +18,7 @@ export default function StatCard({
   iconColor,
   valueColor,
   isLoading = false,
+  footer,
 }: StatCardProps) {
   return (
     <div className={styles.card}>
@@ -33,6 +35,7 @@ export default function StatCard({
         )}
       </div>
       <div className={styles.label}>{label}</div>
+      {footer && <div className={styles.footer}>{footer}</div>}
     </div>
   );
 }

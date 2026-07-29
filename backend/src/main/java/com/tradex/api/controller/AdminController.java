@@ -3,11 +3,14 @@ package com.tradex.api.controller;
 import com.tradex.api.dto.AdminAdjustPointsRequest;
 import com.tradex.api.dto.AdminAdjustWalletRequest;
 import com.tradex.api.dto.AdminAuditLogDTO;
+import com.tradex.api.dto.PermissionRegistryDTO;
 import com.tradex.api.dto.PointsTransactionDTO;
 import com.tradex.api.dto.UserDTO;
 import com.tradex.api.dto.SystemSettingDTO;
 import com.tradex.api.dto.WalletTransactionDTO;
 import com.tradex.api.enums.AdminAction;
+import com.tradex.api.enums.Permission;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -27,6 +30,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -59,7 +63,8 @@ public class AdminController {
         return ResponseEntity.ok(userService.getUserById(id, auth.getName()));
     }
 
-    public record StatusActionRequest(AdminAction action) {}
+    public record StatusActionRequest(AdminAction action) {
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_USERS')")
     @PatchMapping("/users/{id}/status")
@@ -69,10 +74,10 @@ public class AdminController {
             Authentication auth) {
         String adminEmail = currentAdminEmail(auth);
         UserDTO result = switch (request.action()) {
-            case LOCK              -> adminUserService.lockUser(adminEmail, id);
-            case UNLOCK            -> adminUserService.unlockUser(adminEmail, id);
-            case DISABLE           -> adminUserService.disableUser(adminEmail, id);
-            case ENABLE            -> adminUserService.enableUser(adminEmail, id);
+            case LOCK -> adminUserService.lockUser(adminEmail, id);
+            case UNLOCK -> adminUserService.unlockUser(adminEmail, id);
+            case DISABLE -> adminUserService.disableUser(adminEmail, id);
+            case ENABLE -> adminUserService.enableUser(adminEmail, id);
             case FORCE_EMAIL_VERIFY -> adminUserService.forceVerifyEmail(adminEmail, id);
             default -> throw new BadRequestException("Action not supported via status endpoint: " + request.action());
         };
@@ -156,9 +161,8 @@ public class AdminController {
     }
 
     public record RejectTransactionRequest(
-        @NotBlank(message = "Rejection reason cannot be blank")
-        String reason
-    ) {}
+            @NotBlank(message = "Rejection reason cannot be blank") String reason) {
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_DEPOSITS', 'PERM_MANAGE_WITHDRAWALS')")
     @GetMapping("/transactions")
@@ -172,20 +176,32 @@ public class AdminController {
         return ResponseEntity.ok(walletService.getPendingTransactions());
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_DEPOSITS', 'PERM_MANAGE_WITHDRAWALS')")
+    @PreAuthorize("@walletSecurity.canManageTransaction(#id)")
     @PostMapping("/transactions/{id}/approve")
-    public ResponseEntity<WalletTransactionDTO> approveTransaction(@PathVariable Long id, Authentication auth) {
+    public ResponseEntity<WalletTransactionDTO> approveTransaction(@PathVariable Long id) {
         log.info("Admin approved transaction ID: {}", id);
-        return ResponseEntity.ok(walletService.approveTransaction(id, auth));
+        return ResponseEntity.ok(walletService.approveTransaction(id));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_DEPOSITS', 'PERM_MANAGE_WITHDRAWALS')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'ROLE_EMPLOYEE')")
+    @GetMapping("/permissions")
+    public ResponseEntity<List<PermissionRegistryDTO>> getPermissions() {
+        List<PermissionRegistryDTO> registry = Arrays.stream(Permission.values())
+                .map(p -> new PermissionRegistryDTO(
+                        p.name(),
+                        p.getDisplayName(),
+                        p.getDescription(),
+                        p.getCategory()))
+                .toList();
+        return ResponseEntity.ok(registry);
+    }
+
+    @PreAuthorize("@walletSecurity.canManageTransaction(#id)")
     @PostMapping("/transactions/{id}/reject")
     public ResponseEntity<WalletTransactionDTO> rejectTransaction(
             @PathVariable Long id,
-            @Valid @RequestBody RejectTransactionRequest request,
-            Authentication auth) {
+            @Valid @RequestBody RejectTransactionRequest request) {
         log.info("Admin rejected transaction ID: {} with reason: {}", id, request.reason());
-        return ResponseEntity.ok(walletService.rejectTransaction(id, request.reason(), auth));
+        return ResponseEntity.ok(walletService.rejectTransaction(id, request.reason()));
     }
 }

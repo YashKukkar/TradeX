@@ -325,4 +325,41 @@ class AuthControllerTest {
                 org.junit.jupiter.api.Assertions.assertFalse(updatedUser.isCredentialsExpired());
                 org.junit.jupiter.api.Assertions.assertTrue(passwordEncoder.matches("newsecurepassword", updatedUser.getPassword()));
         }
+
+        @Test
+        @WithMockUser(username = "change@example.com", authorities = "ROLE_USER")
+        void testChangePasswordSuccess() throws Exception {
+                User user = new User("change@example.com", passwordEncoder.encode("oldpassword"));
+                userRepository.save(user);
+
+                AuthController.ChangePasswordRequest request = new AuthController.ChangePasswordRequest(
+                        "oldpassword",
+                        "newpassword123"
+                );
+
+                mockMvc.perform(post("/api/auth/change-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isOk());
+
+                User updatedUser = userRepository.findByEmail("change@example.com").orElseThrow();
+                org.junit.jupiter.api.Assertions.assertTrue(passwordEncoder.matches("newpassword123", updatedUser.getPassword()));
+        }
+
+        @Test
+        @WithMockUser(username = "change@example.com", authorities = "ROLE_USER")
+        void testChangePasswordIncorrectCurrentPassword() throws Exception {
+                User user = new User("change@example.com", passwordEncoder.encode("oldpassword"));
+                userRepository.save(user);
+
+                AuthController.ChangePasswordRequest request = new AuthController.ChangePasswordRequest(
+                        "wrongoldpassword",
+                        "newpassword123"
+                );
+
+                mockMvc.perform(post("/api/auth/change-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isBadRequest());
+        }
 }

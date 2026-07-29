@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../utils/api";
 import styles from "../AdminUsers.module.css";
+import LoadingState from "./LoadingState";
 
 interface UserLedgerTabProps {
   userId: number;
@@ -61,10 +62,7 @@ export default function UserLedgerTab({ userId, type }: UserLedgerTabProps) {
       <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
         <p className={styles.drawerSectionTitle}>Cash Transactions</p>
         {walletLoading ? (
-          <div className={styles.loadingState} style={{ padding: "40px 0" }}>
-            <div className={styles.spinner}></div>
-            <p style={{ fontSize: "13px" }}>Querying ledger...</p>
-          </div>
+          <LoadingState message="Querying ledger..." padding="40px 0" />
         ) : !walletHistory || walletHistory.length === 0 ? (
           <div className={styles.emptyState} style={{ padding: "40px 0" }}>No cash transactions logged.</div>
         ) : (
@@ -107,10 +105,7 @@ export default function UserLedgerTab({ userId, type }: UserLedgerTabProps) {
     <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
       <p className={styles.drawerSectionTitle}>Points History</p>
       {pointsLoading ? (
-        <div className={styles.loadingState} style={{ padding: "40px 0" }}>
-          <div className={styles.spinner}></div>
-          <p style={{ fontSize: "13px" }}>Querying points...</p>
-        </div>
+        <LoadingState message="Querying points..." padding="40px 0" />
       ) : !pointsHistory || pointsHistory.length === 0 ? (
         <div className={styles.emptyState} style={{ padding: "40px 0" }}>No points history logged.</div>
       ) : (

@@ -1,12 +1,9 @@
 package com.tradex.api.controller;
 
 import com.tradex.api.dto.WalletTransactionDTO;
-import com.tradex.api.dto.UserDTO;
-import com.tradex.api.mapper.UserMapper;
 import com.tradex.api.service.WalletService;
-import com.tradex.api.entity.User;
+import com.tradex.api.service.PointsService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Min;
@@ -29,7 +26,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 public class WalletController {
 
     private final WalletService walletService;
-    private final UserMapper userMapper;
+    private final PointsService pointsService;
 
     public record WalletAmountRequest(
         @NotNull(message = "Amount cannot be null")
@@ -43,10 +40,6 @@ public class WalletController {
         Long points
     ) {}
 
-    public record BankDetailsRequest(
-        @NotBlank(message = "Bank account number cannot be blank")
-        String accountNumber
-    ) {}
 
     @PostMapping("/deposit")
     public ResponseEntity<WalletTransactionDTO> deposit(
@@ -74,7 +67,7 @@ public class WalletController {
             @Valid @RequestBody ConvertPointsRequest request
     ) {
         log.info("Points conversion request for user {} with points {}", principal.getName(), request.points());
-        WalletTransactionDTO tx = walletService.convertPoints(principal.getName(), request.points());
+        WalletTransactionDTO tx = pointsService.convertPoints(principal.getName(), request.points());
         return ResponseEntity.ok(tx);
     }
 
@@ -83,15 +76,5 @@ public class WalletController {
         log.info("Fetching wallet transactions for user {}", principal.getName());
         List<WalletTransactionDTO> txs = walletService.getMyWalletTransactions(principal.getName());
         return ResponseEntity.ok(txs);
-    }
-
-    @PutMapping("/bank-details")
-    public ResponseEntity<UserDTO> updateBankDetails(
-            Principal principal,
-            @Valid @RequestBody BankDetailsRequest request
-    ) {
-        log.info("Updating bank details for user {}", principal.getName());
-        User user = walletService.updateBankDetails(principal.getName(), request.accountNumber());
-        return ResponseEntity.ok(userMapper.toDTO(user));
     }
 }
