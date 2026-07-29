@@ -520,12 +520,12 @@
   background: linear-gradient(160deg, var(--surface), var(--surface-2));
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 24px;
+  padding: 16px 20px;
   box-shadow: var(--shadow);
   transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.25s ease;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .adminTelemetryCard:hover {

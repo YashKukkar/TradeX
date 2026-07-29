@@ -177,11 +177,11 @@ export function useAddComment(ticketId: number) {
   });
 }
 
-export function useReopenTicket(ticketId: number) {
+function useUserTicketMutation(ticketId: number, action: "reopen" | "close") {
   const queryClient = useQueryClient();
   return useMutation<TicketDetail, Error, void>({
     mutationFn: () => {
-      return api(`/tickets/${ticketId}/reopen`, {
+      return api(`/tickets/${ticketId}/${action}`, {
         method: "POST"
       });
     },
@@ -193,20 +193,28 @@ export function useReopenTicket(ticketId: number) {
   });
 }
 
-export function useCloseTicket(ticketId: number) {
+function useAdminTicketMutation<TVariables>(ticketId: number, action: "status" | "assign" | "claim", method: "PATCH" | "POST" = "PATCH") {
   const queryClient = useQueryClient();
-  return useMutation<TicketDetail, Error, void>({
-    mutationFn: () => {
-      return api(`/tickets/${ticketId}/close`, {
-        method: "POST"
+  return useMutation<TicketDetail, Error, TVariables>({
+    mutationFn: (body) => {
+      return api(`/admin/tickets/${ticketId}/${action}`, {
+        method,
+        body: body ? JSON.stringify(body) : undefined
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ticketDetail", ticketId] });
-      queryClient.invalidateQueries({ queryKey: ["myTickets"] });
       queryClient.invalidateQueries({ queryKey: ["adminTickets"] });
     }
   });
+}
+
+export function useReopenTicket(ticketId: number) {
+  return useUserTicketMutation(ticketId, "reopen");
+}
+
+export function useCloseTicket(ticketId: number) {
+  return useUserTicketMutation(ticketId, "close");
 }
 
 
@@ -220,51 +228,16 @@ export function useAdminTickets(isAdmin: boolean) {
 }
 
 export function useUpdateTicketStatus(ticketId: number) {
-  const queryClient = useQueryClient();
-  return useMutation<TicketDetail, Error, { status: string }>({
-    mutationFn: (body) => {
-      return api(`/admin/tickets/${ticketId}/status`, {
-        method: "PATCH",
-        body: JSON.stringify(body)
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticketDetail", ticketId] });
-      queryClient.invalidateQueries({ queryKey: ["adminTickets"] });
-    }
-  });
+  return useAdminTicketMutation<{ status: string }>(ticketId, "status");
 }
 
 
 export function useAssignTicket(ticketId: number) {
-  const queryClient = useQueryClient();
-  return useMutation<TicketDetail, Error, { assignedToPermission: string | null }>({
-    mutationFn: (body) => {
-      return api(`/admin/tickets/${ticketId}/assign`, {
-        method: "PATCH",
-        body: JSON.stringify(body)
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticketDetail", ticketId] });
-      queryClient.invalidateQueries({ queryKey: ["adminTickets"] });
-    }
-  });
+  return useAdminTicketMutation<{ assignedToPermission: string | null }>(ticketId, "assign");
 }
 
 export function useClaimTicket(ticketId: number) {
-  const queryClient = useQueryClient();
-  return useMutation<TicketDetail, Error, void>({
-    mutationFn: () => {
-      return api(`/admin/tickets/${ticketId}/claim`, {
-        method: "PATCH"
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticketDetail", ticketId] });
-      queryClient.invalidateQueries({ queryKey: ["adminTickets"] });
-    }
-  });
+  return useAdminTicketMutation<void>(ticketId, "claim");
 }
 
 export function useUserActiveTickets(email: string | null) {

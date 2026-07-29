@@ -246,9 +246,17 @@ export default function TicketComments({
             )}
 
             <textarea
-              placeholder="Type your reply here..."
+              placeholder="Type your reply here... (Press Enter to send, Shift+Enter for new line)"
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  if ((replyText.trim() || selectedFiles.length > 0) && !isAddCommentPending) {
+                    handleSubmit(e);
+                  }
+                }
+              }}
               className={styles.compactTextarea}
               maxLength={2000}
               rows={2}

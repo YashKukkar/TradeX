@@ -18,6 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tradex.api.annotation.EvictDashboardCache;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class TicketStatusService {
     private final AttachmentStorageService attachmentStorageService;
 
     @Transactional
+    @EvictDashboardCache("tickets")
     public TicketDetailDTO updateTicketStatus(Long ticketId, TicketStatus status, String adminEmail) {
         SupportTicket ticket = supportTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
@@ -78,8 +80,9 @@ public class TicketStatusService {
         return ticketMapper.mapToDetailDTO(ticket, true);
     }
 
-    @Transactional
-    public TicketDetailDTO reopenTicket(Long ticketId, String userEmail) {
+    private record TicketAccess(SupportTicket ticket, User user, boolean isAdmin) {}
+
+    private TicketAccess checkAccess(Long ticketId, String userEmail, String action) {
         SupportTicket ticket = supportTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
 
@@ -88,8 +91,17 @@ public class TicketStatusService {
 
         boolean isAdmin = user.getRole() == Role.SUPER_ADMIN || user.getRole() == Role.EMPLOYEE;
         if (!isAdmin && !ticket.getUser().getId().equals(user.getId())) {
-            throw new ForbiddenException("You do not have permission to reopen this ticket");
+            throw new ForbiddenException("You do not have permission to " + action + " this ticket");
         }
+        return new TicketAccess(ticket, user, isAdmin);
+    }
+
+    @Transactional
+    @EvictDashboardCache("tickets")
+    public TicketDetailDTO reopenTicket(Long ticketId, String userEmail) {
+        TicketAccess access = checkAccess(ticketId, userEmail, "reopen");
+        SupportTicket ticket = access.ticket();
+        boolean isAdmin = access.isAdmin();
 
         if (ticket.getStatus() != TicketStatus.RESOLVED) {
             throw new BadRequestException("Only resolved tickets can be reopened");
@@ -113,17 +125,11 @@ public class TicketStatusService {
     }
 
     @Transactional
+    @EvictDashboardCache("tickets")
     public TicketDetailDTO closeTicket(Long ticketId, String userEmail) {
-        SupportTicket ticket = supportTicketRepository.findById(ticketId)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
-
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userEmail));
-
-        boolean isAdmin = user.getRole() == Role.SUPER_ADMIN || user.getRole() == Role.EMPLOYEE;
-        if (!isAdmin && !ticket.getUser().getId().equals(user.getId())) {
-            throw new ForbiddenException("You do not have permission to close this ticket");
-        }
+        TicketAccess access = checkAccess(ticketId, userEmail, "close");
+        SupportTicket ticket = access.ticket();
+        boolean isAdmin = access.isAdmin();
 
         ticket.setStatus(TicketStatus.CLOSED);
         ticket.setUpdatedAt(LocalDateTime.now());
@@ -137,6 +143,7 @@ public class TicketStatusService {
 
     @Scheduled(cron = "0 0 * * * *") // Runs every hour
     @Transactional
+    @EvictDashboardCache("tickets")
     public void autoCloseResolvedTickets() {
         LocalDateTime cutoff = LocalDateTime.now().minusHours(36);
         List<SupportTicket> toClose = supportTicketRepository.findByStatusAndResolvedAtBefore(

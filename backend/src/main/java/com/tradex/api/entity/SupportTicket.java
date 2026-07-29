@@ -14,7 +14,10 @@ import java.util.List;
 @Table(name = "support_tickets", indexes = {
         @Index(name = "idx_ticket_number", columnList = "ticket_number", unique = true),
         @Index(name = "idx_ticket_user", columnList = "user_id"),
-        @Index(name = "idx_ticket_status", columnList = "status")
+        @Index(name = "idx_ticket_status", columnList = "status"),
+        @Index(name = "idx_support_tickets_status_resolved_at", columnList = "status, resolved_at"),
+        @Index(name = "idx_support_tickets_assigned_to_user_status", columnList = "assigned_to_user_id, status"),
+        @Index(name = "idx_support_tickets_resolved_by_status", columnList = "resolved_by_id, status")
 })
 @Getter
 @Setter
@@ -78,6 +81,7 @@ public class SupportTicket {
     private LocalDateTime resolvedAt;
 
     @Column(name = "reopen_count", nullable = false)
+
     @Builder.Default
     private int reopenCount = 0;
 

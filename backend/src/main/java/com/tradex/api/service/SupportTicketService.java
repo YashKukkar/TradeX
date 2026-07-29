@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import com.tradex.api.annotation.EvictDashboardCache;
 
 import java.util.List;
 import java.util.Set;
@@ -72,6 +73,7 @@ public class SupportTicketService {
     }
 
     @Transactional
+    @EvictDashboardCache("tickets")
     public TicketCommentDTO addComment(String userEmail, Long ticketId, TicketCommentRequest request,
             List<MultipartFile> files) {
         return ticketCommentService.addComment(userEmail, ticketId, request, files);

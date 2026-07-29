@@ -29,23 +29,4 @@ public final class DataFormatter {
         return maskedName + "@" + domain;
     }
 
-    public static String maskPhoneNumber(String phone) {
-
-        if (phone == null || phone.length() <= 4) {
-            return phone;
-        }
-
-        return "*".repeat(phone.length() - 4)
-                + phone.substring(phone.length() - 4);
-    }
-
-    public static String maskAccountNumber(String account) {
-
-        if (account == null || account.length() <= 4) {
-            return account;
-        }
-
-        return "*".repeat(account.length() - 4)
-                + account.substring(account.length() - 4);
-    }
 }

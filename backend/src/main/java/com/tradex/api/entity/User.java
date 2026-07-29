@@ -13,7 +13,8 @@ import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Table(name = "users", indexes = {
-        @Index(name = "idx_user_referral_path", columnList = "referral_path")
+        @Index(name = "idx_user_referral_path", columnList = "referral_path"),
+        @Index(name = "idx_users_role_created_at", columnList = "role, created_at")
 })
 @Getter
 @Setter

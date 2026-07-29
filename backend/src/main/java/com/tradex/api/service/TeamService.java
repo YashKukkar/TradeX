@@ -12,6 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,11 +29,13 @@ public class TeamService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "teamPermissions")
     public List<Team> getAllTeams() {
         return teamRepository.findAll();
     }
 
     @Transactional
+    @CacheEvict(value = "teamPermissions", allEntries = true)
     public Team createTeam(String name, String description, List<String> permissions) {
         if (teamRepository.findByName(name.trim()).isPresent()) {
             throw new BadRequestException("A team with this name already exists.");
@@ -46,6 +51,7 @@ public class TeamService {
     }
 
     @Transactional
+    @CacheEvict(value = "teamPermissions", allEntries = true)
     public Team updateTeam(Long id, String name, String description, List<String> permissions) {
         Team team = teamRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Team not found: " + id));
@@ -65,6 +71,7 @@ public class TeamService {
     }
 
     @Transactional
+    @CacheEvict(value = "teamPermissions", allEntries = true)
     public void deleteTeam(Long id) {
         Team team = teamRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Team not found: " + id));

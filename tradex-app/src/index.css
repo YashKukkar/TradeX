@@ -1,16 +1,21 @@
 :root {
-  --bg: #080c18;
-  --bg-2: #0e1224;
+  /* Shade Layering Palette (~0.1 lightness variations) */
+  --bg: #060913;
+  --bg-2: #090e1c;
+  --surface-recessed: #0a0f22;
   --surface: #121832;
-  --surface-2: #182042;
+  --surface-elevated: #192244;
+  --surface-2: #192244;
+  --surface-hover: #222d56;
+  
   --text: #e2e8f0;
   --muted: #8fa0dd;
   --primary: #00e0a4;
   --primary-2: #00b488;
   --accent: #ffb020;
   --danger: #ff5a6a;
-  --border: rgba(255, 255, 255, 0.05);
-  --border-strong: rgba(255, 255, 255, 0.1);
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.12);
 
   --success: #00e0a4;
   --success-bg: rgba(0, 224, 164, 0.06);
@@ -26,28 +31,41 @@
   --radius: 12px;
   --radius-lg: 16px;
   
-  /* Layered Shadows (Apple/Linear style with top-lit inset highlight) */
-  --shadow: inset 0 1px 0px rgba(255, 255, 255, 0.05),
-            0 1px 2px rgba(0, 0, 0, 0.1),
-            0 4px 12px rgba(0, 0, 0, 0.15),
-            0 12px 32px rgba(0, 0, 0, 0.2);
-            
-  /* Ambient glow derived from accent */
-  --glow: 0 0 32px -8px rgba(0, 224, 164, 0.12);
-  --glow-strong: 0 0 40px -4px rgba(0, 224, 164, 0.22);
+  /* Top-Down Realistic Light & Shadows */
+  /* Elevated Elements: Soft top-edge light inset highlight line + soft dark drop shadow underneath */
+  --shadow-elevated: inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
+                    0 2px 4px rgba(0, 0, 0, 0.25),
+                    0 8px 24px -4px rgba(0, 0, 0, 0.35);
+
+  /* Dynamic shadow expansion for hover / high priority elements */
+  --shadow-elevated-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.25),
+                          0 4px 8px rgba(0, 0, 0, 0.3),
+                          0 14px 36px -4px rgba(0, 0, 0, 0.45),
+                          var(--glow);
+
+  /* Recessed Elements (Inputs, Tables, Progress Tracks): Top dark inset shadow + Bottom light inset line */
+  --shadow-recessed: inset 0 2px 4px 0 rgba(0, 0, 0, 0.45),
+                     inset 0 -1px 0 0 rgba(255, 255, 255, 0.06);
+
+  --shadow-recessed-focus: inset 0 2px 4px 0 rgba(0, 0, 0, 0.5),
+                           inset 0 -1px 0 0 rgba(255, 255, 255, 0.12),
+                           0 0 0 2px rgba(0, 224, 164, 0.25);
   
-  /* Gentle gradients instead of flat fills */
-  --surface-grad: linear-gradient(160deg, #131934, #0e1224);
-  --surface-2-grad: linear-gradient(160deg, #1a2249, #131934);
+  --shadow: var(--shadow-elevated);
+  --glow: 0 0 32px -8px rgba(0, 224, 164, 0.14);
+  --glow-strong: 0 0 40px -4px rgba(0, 224, 164, 0.28);
+  
+  --surface-grad: linear-gradient(175deg, #161e3d, #0f142a);
+  --surface-2-grad: linear-gradient(175deg, #1c264d, #141b37);
+  --recessed-grad: linear-gradient(175deg, #070a16, #0c1022);
 
-  --card-hover-border: rgba(0, 224, 164, 0.2);
-  --card-hover-shadow: var(--shadow), var(--glow);
-  --cta-bg: rgba(0, 224, 164, 0.08);
-  --cta-border: rgba(0, 224, 164, 0.15);
-  --cta-hover-bg: rgba(0, 224, 164, 0.16);
-  --cta-hover-shadow: var(--glow-strong);
+  --card-hover-border: rgba(0, 224, 164, 0.25);
+  --card-hover-shadow: var(--shadow-elevated-hover);
+  --cta-bg: linear-gradient(175deg, rgba(0, 224, 164, 0.16), rgba(0, 224, 164, 0.06));
+  --cta-border: rgba(0, 224, 164, 0.2);
+  --cta-hover-bg: linear-gradient(175deg, rgba(0, 224, 164, 0.26), rgba(0, 224, 164, 0.12));
+  --cta-hover-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2), var(--glow-strong);
 
-  /* Precise Transition Times (150-250ms) */
   --transition: 200ms cubic-bezier(0.16, 1, 0.3, 1);
 
   --space-1: 4px;
@@ -64,29 +82,46 @@
   --primary: #b55fe6;
   --primary-2: #8b2fc9;
   --accent: #06b6d4;
-  --bg: #07050b;
-  --bg-2: #0f0b17;
-  --surface: #151121;
-  --surface-2: #1e1832;
-  --border: rgba(255, 255, 255, 0.05);
-  --border-strong: rgba(255, 255, 255, 0.1);
-  --shadow: inset 0 1px 0px rgba(255, 255, 255, 0.06),
-            0 1px 2px rgba(0, 0, 0, 0.15),
-            0 4px 12px rgba(0, 0, 0, 0.2),
-            0 12px 32px rgba(0, 0, 0, 0.25);
-            
-  --glow: 0 0 32px -8px rgba(181, 95, 230, 0.15);
-  --glow-strong: 0 0 40px -4px rgba(181, 95, 230, 0.28);
+  --bg: #050308;
+  --bg-2: #0b0714;
+  --surface-recessed: #0a0614;
+  --surface: #151024;
+  --surface-elevated: #1e1732;
+  --surface-2: #1e1732;
+  --surface-hover: #281f44;
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.12);
   
-  --surface-grad: linear-gradient(160deg, #161223, #0f0b17);
-  --surface-2-grad: linear-gradient(160deg, #201a35, #161223);
+  --shadow-elevated: inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
+                    0 2px 4px rgba(0, 0, 0, 0.3),
+                    0 8px 24px -4px rgba(0, 0, 0, 0.4);
+
+  --shadow-elevated-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.25),
+                          0 4px 8px rgba(0, 0, 0, 0.35),
+                          0 14px 36px -4px rgba(0, 0, 0, 0.5),
+                          var(--glow);
+
+  --shadow-recessed: inset 0 2px 4px 0 rgba(0, 0, 0, 0.5),
+                     inset 0 -1px 0 0 rgba(255, 255, 255, 0.06);
+
+  --shadow-recessed-focus: inset 0 2px 4px 0 rgba(0, 0, 0, 0.55),
+                           inset 0 -1px 0 0 rgba(255, 255, 255, 0.12),
+                           0 0 0 2px rgba(181, 95, 230, 0.3);
+
+  --shadow: var(--shadow-elevated);
+  --glow: 0 0 32px -8px rgba(181, 95, 230, 0.16);
+  --glow-strong: 0 0 40px -4px rgba(181, 95, 230, 0.3);
   
-  --card-hover-border: rgba(181, 95, 230, 0.35);
-  --card-hover-shadow: var(--shadow), var(--glow);
-  --cta-bg: rgba(181, 95, 230, 0.06);
-  --cta-border: rgba(181, 95, 230, 0.22);
-  --cta-hover-bg: rgba(181, 95, 230, 0.14);
-  --cta-hover-shadow: var(--glow-strong);
+  --surface-grad: linear-gradient(175deg, #1a142d, #110d20);
+  --surface-2-grad: linear-gradient(175deg, #231b3b, #171228);
+  --recessed-grad: linear-gradient(175deg, #07040e, #0d091a);
+  
+  --card-hover-border: rgba(181, 95, 230, 0.4);
+  --card-hover-shadow: var(--shadow-elevated-hover);
+  --cta-bg: linear-gradient(175deg, rgba(181, 95, 230, 0.14), rgba(181, 95, 230, 0.04));
+  --cta-border: rgba(181, 95, 230, 0.25);
+  --cta-hover-bg: linear-gradient(175deg, rgba(181, 95, 230, 0.24), rgba(181, 95, 230, 0.1));
+  --cta-hover-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2), var(--glow-strong);
 }
 
 * { box-sizing: border-box; }
@@ -235,12 +270,65 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(255, 255, 255, 0.08);
 }
 
-.timeline-date-text {
-  color: var(--muted) !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.08em !important;
-  white-space: nowrap;
+/* Hide number input up/down spinner controls */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Global Tactile Form Controls (Recessed Appearance) */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="date"],
+select,
+textarea {
+  background: var(--surface-recessed, #0a0f22);
+  box-shadow: var(--shadow-recessed);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  transition: box-shadow var(--transition), border-color var(--transition), background var(--transition);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input[type="date"]:focus,
+select:focus,
+textarea:focus {
+  box-shadow: var(--shadow-recessed-focus);
+  border-color: var(--primary);
+  outline: none;
+}
+
+/* Global Tactile Utilities */
+.tactile-elevated {
+  background: var(--surface-grad);
+  box-shadow: var(--shadow-elevated);
+  border: 1px solid var(--border);
+  transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+}
+
+.tactile-elevated:hover {
+  box-shadow: var(--shadow-elevated-hover);
+  border-color: var(--card-hover-border);
+  transform: translateY(-2px);
+}
+
+.tactile-recessed {
+  background: var(--surface-recessed);
+  box-shadow: var(--shadow-recessed);
+  border: 1px solid var(--border);
 }
 

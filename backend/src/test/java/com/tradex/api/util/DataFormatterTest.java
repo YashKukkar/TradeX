@@ -16,17 +16,5 @@ class DataFormatterTest {
         assertEquals("ab***@example.com", DataFormatter.maskEmail("abc@example.com"));
         assertEquals("ab***d@example.com", DataFormatter.maskEmail("abcd@example.com"));
     }
-
-    @Test
-    void testMaskPhoneNumber() {
-        assertNull(DataFormatter.maskPhoneNumber(null));
-        assertEquals("******7890", DataFormatter.maskPhoneNumber("1234567890"));
-    }
-
-    @Test
-    void testMaskAccountNumber() {
-        assertNull(DataFormatter.maskAccountNumber(null));
-        assertEquals("*******7890", DataFormatter.maskAccountNumber("B1234567890"));
-    }
 }
 

@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tradex.api.annotation.EvictDashboardCache;
 import java.time.LocalDateTime;
 
 @Service
@@ -30,6 +31,7 @@ public class TicketAssignmentService {
     private final TicketMapper ticketMapper;
 
     @Transactional
+    @EvictDashboardCache("tickets")
     public TicketDetailDTO assignTicket(Long ticketId, String permissionName, String adminEmail) {
         SupportTicket ticket = supportTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + ticketId));
@@ -59,6 +61,7 @@ public class TicketAssignmentService {
     }
 
     @Transactional
+    @EvictDashboardCache("tickets")
     public TicketDetailDTO claimTicket(Long ticketId, String adminEmail) {
         SupportTicket ticket = supportTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + ticketId));

@@ -32,5 +32,50 @@ public interface SupportTicketRepository extends JpaRepository<SupportTicket, Lo
             @Param("cutoff") LocalDateTime cutoff,
             @Param("now") LocalDateTime now
     );
+
+    long countByStatusIn(List<TicketStatus> statuses);
+    long countByStatusInAndResolvedAtBetween(List<TicketStatus> statuses, LocalDateTime start, LocalDateTime end);
+
+    interface EmployeeTicketResolvedProjection {
+        Long getEmployeeId();
+        Long getTicketCount();
+    }
+
+    interface EmployeeTicketPendingProjection {
+        Long getEmployeeId();
+        Long getTicketCount();
+    }
+
+    @Query("SELECT t.resolvedBy.id AS employeeId, COUNT(t) AS ticketCount FROM SupportTicket t " +
+           "WHERE t.status IN :statuses " +
+           "AND t.resolvedAt BETWEEN :start AND :end AND t.resolvedBy IS NOT NULL " +
+           "GROUP BY t.resolvedBy.id")
+    List<EmployeeTicketResolvedProjection> getEmployeeResolvedTicketsCount(
+            @Param("statuses") List<TicketStatus> statuses,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
+
+    @Query("SELECT t.assignedToUser.id AS employeeId, COUNT(t) AS ticketCount FROM SupportTicket t " +
+           "WHERE t.status IN :statuses " +
+           "AND t.assignedToUser IS NOT NULL " +
+           "GROUP BY t.assignedToUser.id")
+    List<EmployeeTicketPendingProjection> getEmployeePendingTicketsCount(
+            @Param("statuses") List<TicketStatus> statuses);
+
+    interface EmployeeResolutionTimeProjection {
+        Long getEmployeeId();
+        LocalDateTime getClaimedAt();
+        LocalDateTime getResolvedAt();
+    }
+
+    @Query("SELECT t.resolvedBy.id AS employeeId, t.claimedAt AS claimedAt, t.resolvedAt AS resolvedAt FROM SupportTicket t " +
+           "WHERE t.status IN :statuses " +
+           "AND t.resolvedAt BETWEEN :start AND :end " +
+           "AND t.resolvedBy IS NOT NULL " +
+           "AND t.claimedAt IS NOT NULL")
+    List<EmployeeResolutionTimeProjection> getEmployeeResolutionTimes(
+            @Param("statuses") List<TicketStatus> statuses,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
 }
 

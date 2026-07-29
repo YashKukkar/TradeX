@@ -47,6 +47,7 @@ public class DepositTransactionHandler implements TransactionHandler {
         tx.setBalanceAfter(target.getWithdrawableBalance());
         tx.setNotes("Deposit approved by admin");
         tx.setApprovedAt(LocalDateTime.now());
+        tx.setProcessedBy(actor);
         walletTransactionRepository.save(tx);
 
         // Audit Log
@@ -67,6 +68,7 @@ public class DepositTransactionHandler implements TransactionHandler {
         tx.setBalanceAfter(target.getWithdrawableBalance());
         tx.setNotes("Deposit rejected by admin: " + reason);
         tx.setApprovedAt(LocalDateTime.now());
+        tx.setProcessedBy(actor);
         walletTransactionRepository.save(tx);
 
         // Audit Log

@@ -7,13 +7,14 @@ import com.tradex.api.enums.Role;
 import com.tradex.api.repository.PointsTransactionRepository;
 import com.tradex.api.repository.TeamRepository;
 
+import java.util.HashSet;
+
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,19 +32,7 @@ public class UserMapper {
             return null;
         }
 
-        Set<String> effective = new HashSet<>();
-        if (user.getPermissions() != null) {
-            effective.addAll(user.getPermissions());
-        }
-        if (user.getTeams() != null && !user.getTeams().isEmpty()) {
-            for (String teamName : user.getTeams()) {
-                teamRepository.findByName(teamName).ifPresent(t -> {
-                    if (t.getPermissions() != null) {
-                        effective.addAll(t.getPermissions());
-                    }
-                });
-            }
-        }
+        Set<String> effective = getEffectivePermissions(user);
 
         Long pointsAcquired = 0L;
         if (user.getRole() == Role.USER) {
@@ -83,5 +72,22 @@ public class UserMapper {
                         : Collections.emptyList(),
                 new java.util.ArrayList<>(effective),
                 pointsAcquired);
+    }
+
+    public Set<String> getEffectivePermissions(User user) {
+        Set<String> effective = new HashSet<>();
+        if (user.getPermissions() != null) {
+            effective.addAll(user.getPermissions());
+        }
+        if (user.getTeams() != null && !user.getTeams().isEmpty()) {
+            for (String teamName : user.getTeams()) {
+                teamRepository.findByName(teamName).ifPresent(t -> {
+                    if (t.getPermissions() != null) {
+                        effective.addAll(t.getPermissions());
+                    }
+                });
+            }
+        }
+        return effective;
     }
 }

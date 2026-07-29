@@ -9,7 +9,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "wallet_transactions", indexes = {
-    @Index(name = "idx_wallet_tx_user_created", columnList = "user_id, created_at DESC")
+    @Index(name = "idx_wallet_tx_user_created", columnList = "user_id, created_at DESC"),
+    @Index(name = "idx_wallet_tx_type_status_created_at", columnList = "type, status, created_at"),
+    @Index(name = "idx_wallet_tx_processed_by_status", columnList = "processed_by_id, status")
 })
 @Getter
 @Setter
@@ -50,6 +52,10 @@ public class WalletTransaction {
 
     @Column(length = 255)
     private String notes;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "processed_by_id")
+    private User processedBy;
 
     public WalletTransaction(User user, BigDecimal amount, BigDecimal balanceAfter, WalletTransactionType type, WalletTransactionStatus status, String notes) {
         this.user = user;

@@ -35,9 +35,8 @@ public class AdminTicketController {
         return ResponseEntity.ok(supportTicketService.updateTicketStatus(id, request.status(), auth.getName()));
     }
 
-
-
-    public record AssignTicketRequest(String assignedToPermission) {}
+    public record AssignTicketRequest(String assignedToPermission) {
+    }
 
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EMPLOYEE')")
     @PatchMapping("/{id}/assign")

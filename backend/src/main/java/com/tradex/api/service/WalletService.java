@@ -11,6 +11,7 @@ import com.tradex.api.config.AppProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.tradex.api.annotation.EvictDashboardCache;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -132,6 +133,7 @@ public class WalletService {
     }
 
     @Transactional
+    @EvictDashboardCache("transactions")
     public WalletTransactionDTO approveTransaction(Long transactionId) {
         WalletTransaction tx = walletTransactionRepository.findByIdForUpdate(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));
@@ -158,6 +160,7 @@ public class WalletService {
     }
 
     @Transactional
+    @EvictDashboardCache("transactions")
     public WalletTransactionDTO rejectTransaction(Long transactionId, String reason) {
         WalletTransaction tx = walletTransactionRepository.findByIdForUpdate(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));

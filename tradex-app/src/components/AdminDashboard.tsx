@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../utils/api";
@@ -16,6 +16,9 @@ import { useToast } from "../context/ToastContext";
 import { useSeedTestData, useAdminTelemetry } from "../hooks/useDashboard";
 import type { UserProfile } from "../utils/dashboardHelpers";
 import { hasPermission, hasAnyPermission, isAdminRole } from "../utils/permissions";
+import DashboardFilters from "./DashboardFilters";
+import EmployeePerformanceTable from "./EmployeePerformanceTable";
+import overviewStyles from "./SuperAdminOverview.module.css";
 
 
 interface AdminDashboardProps {
@@ -35,11 +38,33 @@ export default function AdminDashboard({
   const [showDevTools, setShowDevTools] = useState(false);
   const { isOverlayActive } = useOverlay();
 
+  const [dateRange, setDateRange] = useState<{ startDate: string; endDate: string }>({
+    startDate: "",
+    endDate: "",
+  });
+
+  const handleTabChange = useCallback((tab: string) => {
+    setSearchParams({ tab });
+  }, [setSearchParams]);
+
+  const handleDateChange = useCallback((startDate: string, endDate: string) => {
+    setDateRange((prev) => {
+      if (prev.startDate === startDate && prev.endDate === endDate) return prev;
+      return { startDate, endDate };
+    });
+  }, []);
+
   // ── Queries & Mutations ──────────────────────────────────────────
   const { data: adminData, isLoading: adminLoading } = useAdminTelemetry(true, currentUser);
   const users = adminData?.usersList || [];
   const totalPoints = users.reduce((sum, u) => sum + (u.pointsBalance || 0), 0);
   const adminSettings = adminData?.settingsConfig;
+
+  const { data: dashboardMetrics, isLoading: metricsLoading } = useQuery<any>({
+    queryKey: ["dashboardMetrics", dateRange.startDate, dateRange.endDate],
+    queryFn: () => api(`/admin/dashboard/metrics?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`),
+    enabled: currentUser.role === "SUPER_ADMIN" && !!dateRange.startDate && !!dateRange.endDate,
+  });
 
   const { data: pendingTx = [] } = useQuery<any[]>({
     queryKey: ["pendingTransactions"],
@@ -71,11 +96,7 @@ export default function AdminDashboard({
         handleTabChange("tickets");
       }
     }
-  }, [currentUser, activeTab]);
-
-  const handleTabChange = (tab: string) => {
-    setSearchParams({ tab });
-  };
+  }, [currentUser, activeTab, handleTabChange]);
 
   return (
     <div className={styles.adminMainContent}>
@@ -164,86 +185,196 @@ export default function AdminDashboard({
       <div className={styles.adminTabContent}>
         {activeTab === "overview" && currentUser.role === "SUPER_ADMIN" && (
           <div className={styles.fadeInContainer}>
-            {/* Telemetry Row */}
-            <div className={styles.adminTelemetryRow}>
-              {(currentUser.role === "SUPER_ADMIN" || currentUser.permissions?.includes("MANAGE_USERS")) && (
-                <>
-                  <Card className={styles.adminTelemetryCard}>
-                    <div className={styles.adminTelemetryHeader}>
-                      <Card.Icon name="group" className={styles.telemetryIcon} />
-                      <span className={styles.telemetryLabel}>Platform Accounts</span>
-                    </div>
-                    <div className={styles.telemetryValue}>
-                      {adminLoading ? "..." : users.length}
-                    </div>
-                    <div className={styles.telemetryFooter}>Active registered users</div>
-                  </Card>
+            {/* Filters bar */}
+            <DashboardFilters onChange={handleDateChange} />
 
-                  <Card className={styles.adminTelemetryCard}>
-                    <div className={styles.adminTelemetryHeader}>
-                      <Card.Icon name="stars" color="var(--accent)" className={styles.telemetryIcon} />
-                      <span className={styles.telemetryLabel}>Minted Points Pool</span>
-                    </div>
-                    <div className={styles.telemetryValue} style={{ color: "var(--accent)" }}>
-                      {adminLoading ? "..." : totalPoints.toLocaleString()}
-                    </div>
-                    <div className={styles.telemetryFooter}>Total distributed points</div>
-                  </Card>
-                </>
-              )}
-
+            {/* Telemetry/Metrics Grid */}
+            <div className={overviewStyles.metricsGrid}>
+              {/* 1. Platform Overview Widget */}
               <Card className={styles.adminTelemetryCard}>
                 <div className={styles.adminTelemetryHeader}>
-                  <Card.Icon
-                    name={adminSettings?.emailVerificationEnabled ? "mark_email_read" : "mail_lock"}
-                    color={adminSettings?.emailVerificationEnabled ? "var(--primary)" : "var(--muted)"}
-                    className={styles.telemetryIcon}
-                  />
-                  <span className={styles.telemetryLabel}>Email Verification</span>
+                  <Card.Icon name="group" className={styles.telemetryIcon} color="var(--primary)" />
+                  <span className={styles.telemetryLabel}>Platform Overview</span>
                 </div>
-                <div
-                  className={styles.telemetryValue}
-                  style={
-                    adminSettings?.emailVerificationEnabled
-                      ? { color: "var(--primary)" }
-                      : { color: "var(--muted)" }
-                  }
-                >
-                  {adminLoading ? "..." : adminSettings?.emailVerificationEnabled ? "REQUIRED" : "OPTIONAL"}
+                <div className={styles.telemetryValue}>
+                  {metricsLoading ? "..." : (dashboardMetrics?.totalUsers ?? 0).toLocaleString()}
                 </div>
-                <div className={styles.telemetryFooter}>
-                  {adminSettings?.emailVerificationEnabled
-                    ? "Mandatory email check on signup"
-                    : "Email check is currently disabled"}
+                <div className={styles.telemetryFooter}>Total registered accounts</div>
+                <div className={overviewStyles.healthList} style={{ marginTop: "12px" }}>
+                  <div className={overviewStyles.cardSubMetric}>
+                    <span className={overviewStyles.cardSubMetricLabel}>New Registrations</span>
+                    <span className={overviewStyles.cardSubMetricValue} style={{ color: "var(--primary)" }}>
+                      {metricsLoading ? "..." : `+${dashboardMetrics?.newRegistrations ?? 0}`}
+                    </span>
+                  </div>
                 </div>
               </Card>
 
+              {/* 2. Money Flow Widget */}
+              <Card className={`${styles.adminTelemetryCard} ${overviewStyles.gridSpan2}`}>
+                <div className={styles.adminTelemetryHeader}>
+                  <Card.Icon name="account_balance_wallet" className={styles.telemetryIcon} color="var(--accent)" />
+                  <span className={styles.telemetryLabel}>Money Flow</span>
+                </div>
+                <div className={overviewStyles.cardSplitLayout}>
+                  <div className={overviewStyles.cardSplitCol}>
+                    <div className={overviewStyles.subSectionTitle} style={{ color: "#4caf50" }}>Deposits</div>
+                    <div className={overviewStyles.cardSubMetric}>
+                      <span className={overviewStyles.cardSubMetricLabel}>Completed</span>
+                      <span className={overviewStyles.cardSubMetricValue} style={{ color: "#4caf50" }}>
+                        {metricsLoading ? "..." : `₹${(dashboardMetrics?.totalDeposits ?? 0).toLocaleString()}`}
+                      </span>
+                    </div>
+                    <div className={overviewStyles.cardSubMetric}>
+                      <span className={overviewStyles.cardSubMetricLabel}>Volume Count</span>
+                      <span className={overviewStyles.cardSubMetricValue}>
+                        {metricsLoading ? "..." : `${dashboardMetrics?.totalDepositsCount ?? 0} successful`}
+                      </span>
+                    </div>
+                    <div className={overviewStyles.cardSubMetric}>
+                      <span className={overviewStyles.cardSubMetricLabel}>Pending Queue</span>
+                      <span className={overviewStyles.cardSubMetricValue} style={{ color: "#ff9800" }}>
+                        {metricsLoading ? "..." : `₹${(dashboardMetrics?.pendingDepositsAmount ?? 0).toLocaleString()}`}
+                      </span>
+                    </div>
+                  </div>
+                  <div className={overviewStyles.verticalDivider}></div>
+                  <div className={overviewStyles.cardSplitCol}>
+                    <div className={overviewStyles.subSectionTitle} style={{ color: "#ff5a6a" }}>Withdrawals</div>
+                    <div className={overviewStyles.cardSubMetric}>
+                      <span className={overviewStyles.cardSubMetricLabel}>Completed</span>
+                      <span className={overviewStyles.cardSubMetricValue} style={{ color: "#ff5a6a" }}>
+                        {metricsLoading ? "..." : `₹${(dashboardMetrics?.totalWithdrawals ?? 0).toLocaleString()}`}
+                      </span>
+                    </div>
+                    <div className={overviewStyles.cardSubMetric}>
+                      <span className={overviewStyles.cardSubMetricLabel}>Volume Count</span>
+                      <span className={overviewStyles.cardSubMetricValue}>
+                        {metricsLoading ? "..." : `${dashboardMetrics?.totalWithdrawalsCount ?? 0} successful`}
+                      </span>
+                    </div>
+                    <div className={overviewStyles.cardSubMetric}>
+                      <span className={overviewStyles.cardSubMetricLabel}>Pending Queue</span>
+                      <span className={overviewStyles.cardSubMetricValue} style={{ color: "#ff9800" }}>
+                        {metricsLoading ? "..." : `₹${(dashboardMetrics?.pendingWithdrawalsAmount ?? 0).toLocaleString()}`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              {/* 3. Support Operations Widget */}
               <Card className={styles.adminTelemetryCard}>
                 <div className={styles.adminTelemetryHeader}>
-                  <Card.Icon
-                    name={adminSettings?.phoneVerificationEnabled ? "phonelink_ring" : "phonelink_lock"}
-                    color={adminSettings?.phoneVerificationEnabled ? "var(--primary)" : "var(--muted)"}
-                    className={styles.telemetryIcon}
-                  />
-                  <span className={styles.telemetryLabel}>Phone Verification</span>
+                  <Card.Icon name="support_agent" className={styles.telemetryIcon} color="#f59e0b" />
+                  <span className={styles.telemetryLabel}>Support Operations</span>
                 </div>
-                <div
-                  className={styles.telemetryValue}
-                  style={
-                    adminSettings?.phoneVerificationEnabled
-                      ? { color: "var(--primary)" }
-                      : { color: "var(--muted)" }
-                  }
-                >
-                  {adminLoading ? "..." : adminSettings?.phoneVerificationEnabled ? "REQUIRED" : "OPTIONAL"}
+                <div className={styles.telemetryValue} style={{ color: "#f59e0b" }}>
+                  {metricsLoading ? "..." : dashboardMetrics?.openTickets ?? 0}
                 </div>
-                <div className={styles.telemetryFooter}>
-                  {adminSettings?.phoneVerificationEnabled
-                    ? "Mandatory SMS check on signup"
-                    : "SMS check is currently disabled"}
+                <div className={styles.telemetryFooter}>Active open tickets in queue</div>
+                <div className={overviewStyles.healthList} style={{ marginTop: "12px" }}>
+                  <div className={overviewStyles.cardSubMetric}>
+                    <span className={overviewStyles.cardSubMetricLabel}>Resolved (Period)</span>
+                    <span className={overviewStyles.cardSubMetricValue} style={{ color: "#4caf50" }}>
+                      {metricsLoading ? "..." : `${dashboardMetrics?.resolvedTickets ?? 0} tickets`}
+                    </span>
+                  </div>
+                </div>
+              </Card>
+
+              {/* 4. Platform Health Widget */}
+              <Card className={styles.adminTelemetryCard}>
+                <div className={styles.adminTelemetryHeader}>
+                  <Card.Icon name="health_and_safety" className={styles.telemetryIcon} color="var(--primary)" />
+                  <span className={styles.telemetryLabel}>Platform Health</span>
+                </div>
+                <div className={overviewStyles.healthList}>
+                  <div className={overviewStyles.healthItem}>
+                    <span className={overviewStyles.healthLabel}>
+                      <Icon name="stars" style={{ fontSize: "16px", color: "var(--accent)" }} />
+                      Minted Pool
+                    </span>
+                    <span className={overviewStyles.cardSubMetricValue} style={{ color: "var(--accent)" }}>
+                      {adminLoading ? "..." : totalPoints.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className={overviewStyles.healthItem}>
+                    <span className={overviewStyles.healthLabel}>
+                      <Icon name="email" style={{ fontSize: "16px" }} />
+                      Email Check
+                    </span>
+                    <span className={`${overviewStyles.badge} ${adminSettings?.emailVerificationEnabled ? overviewStyles.badgeSuccess : overviewStyles.badgeMuted}`}>
+                      {adminLoading ? "..." : adminSettings?.emailVerificationEnabled ? "MANDATORY" : "OPTIONAL"}
+                    </span>
+                  </div>
+                  <div className={overviewStyles.healthItem}>
+                    <span className={overviewStyles.healthLabel}>
+                      <Icon name="smartphone" style={{ fontSize: "16px" }} />
+                      SMS Check
+                    </span>
+                    <span className={`${overviewStyles.badge} ${adminSettings?.phoneVerificationEnabled ? overviewStyles.badgeSuccess : overviewStyles.badgeMuted}`}>
+                      {adminLoading ? "..." : adminSettings?.phoneVerificationEnabled ? "MANDATORY" : "OPTIONAL"}
+                    </span>
+                  </div>
+                </div>
+              </Card>
+
+              {/* 5. Attention Required Widget (Action Center) */}
+              <Card className={`${styles.adminTelemetryCard} ${overviewStyles.gridSpan2}`}>
+                <div className={styles.adminTelemetryHeader}>
+                  <Card.Icon name="notifications_active" className={styles.telemetryIcon} color="#ff9800" />
+                  <span className={styles.telemetryLabel}>Attention Required</span>
+                </div>
+                <div className={overviewStyles.attentionContainer}>
+                  {(!metricsLoading &&
+                    (dashboardMetrics?.pendingDepositsCount ?? 0) === 0 &&
+                    (dashboardMetrics?.pendingWithdrawalsCount ?? 0) === 0 &&
+                    (dashboardMetrics?.openTickets ?? 0) === 0) ? (
+                    <div className={overviewStyles.attentionClean}>
+                      <Icon name="check_circle" style={{ fontSize: "28px", color: "#4caf50", marginBottom: "8px", display: "block" }} />
+                      All queues are fully caught up! No actions required.
+                    </div>
+                  ) : (
+                    <>
+                      {(dashboardMetrics?.pendingDepositsCount ?? 0) > 0 && (
+                        <div className={overviewStyles.attentionAlert} onClick={() => handleTabChange("pending")}>
+                          <Icon name="pending_actions" style={{ color: "#ff9800" }} />
+                          <div className={overviewStyles.attentionText}>
+                            <strong>{(dashboardMetrics?.pendingDepositsCount ?? 0)} pending deposits</strong> require review (₹{(dashboardMetrics?.pendingDepositsAmount ?? 0).toLocaleString()})
+                          </div>
+                          <Icon name="chevron_right" className={overviewStyles.actionLinkIcon} />
+                        </div>
+                      )}
+                      {(dashboardMetrics?.pendingWithdrawalsCount ?? 0) > 0 && (
+                        <div className={overviewStyles.attentionAlert} onClick={() => handleTabChange("pending")}>
+                          <Icon name="hourglass_empty" style={{ color: "#ff9800" }} />
+                          <div className={overviewStyles.attentionText}>
+                            <strong>{(dashboardMetrics?.pendingWithdrawalsCount ?? 0)} pending withdrawals</strong> require review (₹{(dashboardMetrics?.pendingWithdrawalsAmount ?? 0).toLocaleString()})
+                          </div>
+                          <Icon name="chevron_right" className={overviewStyles.actionLinkIcon} />
+                        </div>
+                      )}
+                      {(dashboardMetrics?.openTickets ?? 0) > 0 && (
+                        <div className={overviewStyles.attentionAlert} onClick={() => handleTabChange("tickets")}>
+                          <Icon name="support_agent" style={{ color: "#ff9800" }} />
+                          <div className={overviewStyles.attentionText}>
+                            <strong>{(dashboardMetrics?.openTickets ?? 0)} support tickets</strong> are active and awaiting response
+                          </div>
+                          <Icon name="chevron_right" className={overviewStyles.actionLinkIcon} />
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               </Card>
             </div>
+
+            {/* Employee Performance section */}
+            <EmployeePerformanceTable
+              data={dashboardMetrics?.employeePerformance ?? []}
+              isLoading={metricsLoading}
+            />
 
             {/* Collapsible Developer Tools */}
             {currentUser.role === "SUPER_ADMIN" && (

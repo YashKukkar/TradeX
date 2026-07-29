@@ -23,9 +23,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.math.BigDecimal;
 import java.time.Instant;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +42,9 @@ public class AdminUserService {
     private final VerificationService verificationService;
     private final UserMapper userMapper;
     private final WalletBalanceManager walletBalanceManager;
-    private final ConcurrentHashMap<Long, Instant> passwordResetCooldowns = new ConcurrentHashMap<>();
+    private final Cache<Long, Instant> passwordResetCooldowns = Caffeine.newBuilder()
+            .expireAfterWrite(60, TimeUnit.SECONDS)
+            .build();
 
 
     private User loadTargetForUpdate(Long userId) {
@@ -133,17 +137,17 @@ public class AdminUserService {
     @AdminAudited(action = AdminAction.PASSWORD_RESET_EMAIL_SENT, details = "'Password reset email triggered by admin'")
     public void sendPasswordResetEmail(String adminEmail, Long userId) {
         Instant now = Instant.now();
-        Instant lastReset = passwordResetCooldowns.get(userId);
+        Instant lastReset = passwordResetCooldowns.getIfPresent(userId);
         if (lastReset != null && now.isBefore(lastReset.plusSeconds(60))) {
             throw new BadRequestException("Please wait at least 60 seconds between password reset requests for this user.");
         }
-
+ 
         User target = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
-
+ 
         target.setCredentialsExpired(true);
         verificationService.createVerificationToken(target, VerificationType.PASSWORD_RESET);
-
+ 
         passwordResetCooldowns.put(userId, now);
     }
 

@@ -1,0 +1,535 @@
+.filtersContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface-recessed);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-recessed);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+}
+
+.filterBtn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterBtn:hover {
+  background: var(--surface-elevated);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: var(--shadow-elevated);
+  color: var(--text);
+}
+
+.filterBtnActive {
+  background: var(--primary);
+  border-color: var(--primary);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.3), var(--glow);
+  color: #fff;
+}
+
+.filterBtnActive:hover {
+  background: var(--primary-hover, var(--primary));
+  border-color: var(--primary-hover, var(--primary));
+  color: #fff;
+}
+
+.customDateContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  .customDateContainer {
+    margin-left: 0;
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+.customDateContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 6px 14px;
+  border-radius: 10px;
+  margin-left: 8px;
+}
+
+.dateFieldGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dateLabel {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dateInput {
+  color-scheme: dark;
+  background: rgba(18, 18, 26, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+
+.dateInput:hover {
+  border-color: rgba(139, 92, 246, 0.4);
+  background: rgba(24, 24, 36, 0.85);
+}
+
+.dateInput:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+  background: rgba(28, 28, 42, 0.95);
+}
+
+/* Metrics Grid styling */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+/* Performance Section */
+.perfSection {
+  margin-top: 32px;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.perfHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.perfTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.perfIcon {
+  color: var(--accent);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.perfTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.perfTable th {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  font-weight: 600;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.perfTable td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text);
+}
+
+.perfTable tr:last-child td {
+  border-bottom: none;
+}
+
+.perfTable tr:hover td {
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.employeeRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.badgePending {
+  background: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
+}
+
+.badgeSuccess {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.badgeMuted {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+}
+
+.employeeColWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.permTagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.permTag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
+
+.tag_manage_deposits {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.tag_manage_withdrawals {
+  background: rgba(255, 90, 106, 0.1);
+  color: #ff5a6a;
+  border: 1px solid rgba(255, 90, 106, 0.2);
+}
+
+.tag_manage_users {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.tag_manage_points {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.tag_manage_settings {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.tagNone {
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--muted);
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.naCell {
+  color: var(--muted);
+  opacity: 0.4;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+/* Grouped Operations Cards */
+.cardSplitLayout {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+  position: relative;
+}
+
+.cardSplitCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.verticalDivider {
+  width: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  align-self: stretch;
+}
+
+.subSectionTitle {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.cardSubMetric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+}
+
+.cardSubMetric:last-child {
+  border-bottom: none;
+}
+
+.cardSubMetricLabel {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.cardSubMetricValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.healthList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.healthItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.healthLabel {
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.attentionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.attentionAlert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255, 152, 0, 0.06);
+  border: 1px solid rgba(255, 152, 0, 0.15);
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: var(--text);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.attentionAlert:hover {
+  background: rgba(255, 152, 0, 0.1);
+  border-color: rgba(255, 152, 0, 0.3);
+}
+
+.attentionText {
+  flex-grow: 1;
+}
+
+.attentionClean {
+  text-align: center;
+  padding: 20px 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.actionLinkIcon {
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.attentionAlert:hover .actionLinkIcon {
+  color: #ff9800;
+  transform: translateX(2px);
+  transition: transform 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .metricsGrid {
+    grid-template-columns: 1fr !important;
+  }
+  .cardSplitLayout {
+    flex-direction: column;
+  }
+  .verticalDivider {
+    width: 100%;
+    height: 1px;
+  }
+  .gridSpan2 {
+    grid-column: span 1 !important;
+  }
+}
+
+.gridSpan2 {
+  grid-column: span 2;
+}
+
+.durationBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(59, 130, 246, 0.08);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.tableGroupHeader {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 8px 12px !important;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.tableColDivider {
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.metricPill {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.platformHeroHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.platformTitle {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.platformTitleIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(139, 92, 246, 0.12);
+  color: #8b5cf6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.platformHeroBody {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 6px 0 10px;
+}
+
+.platformHeroValue {
+  font-family: 'Outfit', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff 0%, #c084fc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+}
+
+.growthPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13.5px;
+  font-weight: 700;
+  background: rgba(76, 175, 80, 0.14);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.15), 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+
+
+
+

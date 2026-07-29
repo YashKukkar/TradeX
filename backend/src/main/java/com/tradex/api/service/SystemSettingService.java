@@ -3,9 +3,10 @@ package com.tradex.api.service;
 import com.tradex.api.dto.SystemSettingDTO;
 import com.tradex.api.entity.SystemSetting;
 import com.tradex.api.repository.SystemSettingRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,31 +18,28 @@ public class SystemSettingService {
 
     private static final Long SETTINGS_ID = 1L;
     private final SystemSettingRepository systemSettingRepository;
-    private SystemSetting cachedSetting;
 
-    @PostConstruct
+    @CacheEvict(value = "systemSettings", allEntries = true)
+    public void refreshCache() {
+        log.info("Evicted system settings cache");
+    }
+
     public void init() {
         refreshCache();
     }
 
-    public synchronized void refreshCache() {
-        cachedSetting = systemSettingRepository.findById(SETTINGS_ID).orElseGet(() -> {
+    @Transactional(readOnly = true)
+    @Cacheable(value = "systemSettings")
+    public SystemSetting getSettings() {
+        return systemSettingRepository.findById(SETTINGS_ID).orElseGet(() -> {
             log.info("Creating default system settings");
             SystemSetting defaultSettings = new SystemSetting();
             defaultSettings.setId(SETTINGS_ID);
             return systemSettingRepository.save(defaultSettings);
         });
-        log.info("Loaded system settings cache");
     }
 
-    public synchronized SystemSetting getSettings() {
-        if (cachedSetting == null) {
-            refreshCache();
-        }
-        return cachedSetting;
-    }
-
-    public synchronized SystemSettingDTO getSettingsDTO() {
+    public SystemSettingDTO getSettingsDTO() {
         return toDTO(getSettings());
     }
 
@@ -92,7 +90,8 @@ public class SystemSettingService {
     }
 
     @Transactional
-    public synchronized SystemSettingDTO updateSettings(SystemSettingDTO dto) {
+    @CacheEvict(value = "systemSettings", allEntries = true)
+    public SystemSettingDTO updateSettings(SystemSettingDTO dto) {
         SystemSetting setting = systemSettingRepository.findById(SETTINGS_ID).orElseGet(() -> {
             SystemSetting s = new SystemSetting();
             s.setId(SETTINGS_ID);
@@ -120,7 +119,7 @@ public class SystemSettingService {
         setting.setSmtpHost(dto.email().smtpHost());
         setting.setSmtpPort(dto.email().smtpPort());
         setting.setSmtpUsername(dto.email().smtpUsername());
-        
+
         String newPassword = dto.email().smtpPassword();
         if (newPassword != null && !newPassword.equals("********")) {
             setting.setSmtpPassword(newPassword);
@@ -136,9 +135,7 @@ public class SystemSettingService {
         setting.setAppCurrency(dto.general().appCurrency());
 
         SystemSetting saved = systemSettingRepository.save(setting);
-        cachedSetting = saved;
-        log.info("Updated system settings cache");
+        log.info("Updated system settings and evicted systemSettings cache");
         return toDTO(saved);
     }
 }
-

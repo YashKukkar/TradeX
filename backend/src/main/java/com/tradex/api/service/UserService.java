@@ -47,7 +47,6 @@ public class UserService {
     private final VerificationService verificationService;
     private final JwtUtil jwtUtil;
     private final UserMapper userMapper;
-    private final com.tradex.api.repository.TeamRepository teamRepository;
 
     // ── User Retrieval & Profiling ───────────────────────────────────────────
 
@@ -162,19 +161,7 @@ public class UserService {
     }
 
     public AuthResponse buildAuthResponse(User user) {
-        Set<String> effective = new HashSet<>();
-        if (user.getPermissions() != null) {
-            effective.addAll(user.getPermissions());
-        }
-        if (user.getTeams() != null && !user.getTeams().isEmpty()) {
-            for (String teamName : user.getTeams()) {
-                teamRepository.findByName(teamName).ifPresent(t -> {
-                    if (t.getPermissions() != null) {
-                        effective.addAll(t.getPermissions());
-                    }
-                });
-            }
-        }
+        Set<String> effective = userMapper.getEffectivePermissions(user);
         List<String> permissionNames = new ArrayList<>(effective);
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name(), permissionNames);
         return new AuthResponse(token, user.getEmail());
