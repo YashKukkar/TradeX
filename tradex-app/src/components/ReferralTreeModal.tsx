@@ -1,5 +1,5 @@
 import React from "react";
-import type { UserInfo } from "../utils/dashboardHelpers";
+import { getDisplayName, type UserInfo } from "../utils/dashboardHelpers";
 import styles from "../AdminUsers.module.css";
 import Modal from "./Modal";
 
@@ -27,7 +27,7 @@ export default function ReferralTreeModal({
       isOpen={true}
       onClose={closeModal}
       title="Downstream Network Topology"
-      subtitle={selectedUser.email}
+      subtitle={selectedUser.fullName ? `${selectedUser.fullName} (${selectedUser.email})` : selectedUser.email}
       size="lg"
       closeBtnRef={closeBtnRef}
     >
@@ -70,9 +70,9 @@ export default function ReferralTreeModal({
                     {depthLabel}
                   </span>
                   <div className={styles.treeInfo}>
-                    <div className={styles.treeEmail}>{n.email}</div>
+                    <div className={styles.treeEmail}>{n.fullName || getDisplayName(n.email)}</div>
                     <div className={styles.treeMeta}>
-                      Code: {n.referralCode} · Points:{" "}
+                      Email: {n.email} · Code: {n.referralCode} · Points:{" "}
                       {(n.pointsBalance || 0).toLocaleString()}
                       {n.phoneNumber && ` · Phone: ${n.phoneNumber}`}
                       {n.accountNumber && ` · Account: ${n.accountNumber}`}

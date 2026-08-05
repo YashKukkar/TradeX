@@ -8,6 +8,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5173";
 
 function SignupForm() {
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -28,11 +29,20 @@ function SignupForm() {
 
   useEffect(() => {
     const ref = searchParams.get("ref");
-    if (ref) setReferralCode(ref);
-  }, [searchParams]);
+    if (ref && ref !== referralCode) {
+      setReferralCode(ref);
+    }
+  }, [searchParams, referralCode]);
 
   useEffect(() => {
     const errs: Record<string, string> = {};
+    if (fullName) {
+      if (fullName.trim().length < 2) {
+        errs.fullName = "Min. 2 characters";
+      } else if (fullName.trim().length > 100) {
+        errs.fullName = "Max. 100 characters";
+      }
+    }
     if (email) {
       if (!/\S+@\S+\.\S+/.test(email)) {
         errs.email = "Invalid format";
@@ -64,8 +74,13 @@ function SignupForm() {
         errs.referralCode = "2-10 uppercase alphanumeric";
       }
     }
-    setErrors(errs);
-  }, [email, password, confirmPassword, localPhoneNumber, countryCode, referralCode]);
+    setErrors((prev) => {
+      if (JSON.stringify(prev) === JSON.stringify(errs)) {
+        return prev;
+      }
+      return errs;
+    });
+  }, [fullName, email, password, confirmPassword, localPhoneNumber, countryCode, referralCode]);
 
   const triggerShake = () => {
     setShake(true);
@@ -82,6 +97,13 @@ function SignupForm() {
       return;
     }
 
+    if (!fullName || fullName.trim().length < 2) {
+      setIsError(true);
+      setMessage("Full Name is required (minimum 2 characters).");
+      triggerShake();
+      return;
+    }
+
     const localDigits = localPhoneNumber.replace(/\D/g, "");
     let combinedPhone: string | null = null;
     if (localDigits.length > 0) {
@@ -94,7 +116,7 @@ function SignupForm() {
       const res = await fetch(`${API_URL}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, referralCode, phoneNumber: combinedPhone, accountNumber }),
+        body: JSON.stringify({ email, password, fullName, referralCode, phoneNumber: combinedPhone, accountNumber }),
         credentials: "include"
       });
 
@@ -104,7 +126,7 @@ function SignupForm() {
         setIsError(false);
         setMessage("Account created! Redirecting…");
         setIsRedirecting(true);
-        setTimeout(() => { window.location.href = `${APP_URL}/dashboard`; }, 1500);
+        setTimeout(() => { window.location.href = `${APP_URL}/dashboard?token=${encodeURIComponent(data.token)}`; }, 1500);
       } else {
         const errorText = await res.text();
         setIsError(true);
@@ -140,6 +162,20 @@ function SignupForm() {
           <p className={styles.subtitle}>Start trading in minutes. No hidden fees.</p>
           <form onSubmit={handleSignup} className={styles.form}>
           <div className={styles.formFields}>
+            <div className={styles.fieldGroup}>
+              <div className={styles.labelHeader}>
+                <label className={styles.label}>Full Name</label>
+                {errors.fullName && <span className={styles.errorLabel}>{errors.fullName}</span>}
+              </div>
+              <input
+                type="text"
+                placeholder="e.g. Alex Morgan (First / Given name first)"
+                value={fullName}
+                onChange={(e) => { setFullName(e.target.value); setMessage(""); }}
+                required
+                className={`${styles.input} ${errors.fullName ? styles.inputInvalid : ""}`}
+              />
+            </div>
             <div className={styles.fieldGroup}>
               <div className={styles.labelHeader}>
                 <label className={styles.label}>Email Address</label>

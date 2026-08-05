@@ -185,6 +185,7 @@ public class ReferralService {
                 return;
             } catch (ResourceNotFoundException e) {
                 if (i == maxRetries - 1) {
+                    log.error("Failed to process referral rewards for user ID {} due to User not found", newUserId, e);
                     throw e;
                 }
                 log.info("User {} not found in async thread yet. Retrying in 100ms... (Attempt {}/{})", newUserId,
@@ -195,6 +196,9 @@ public class ReferralService {
                     Thread.currentThread().interrupt();
                     throw new RuntimeException(ie);
                 }
+            } catch (Exception e) {
+                log.error("Failed to process referral rewards for user ID {} due to unexpected error", newUserId, e);
+                throw e;
             }
         }
     }

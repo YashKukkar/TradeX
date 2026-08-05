@@ -39,20 +39,14 @@ public class AdminSeeder {
             User admin = new User();
             admin.setEmail(adminEmail);
             admin.setPassword(passwordEncoder.encode(adminPassword));
+            admin.setFullName("Super Admin");
             admin.setRole(Role.SUPER_ADMIN);
             admin.setEmailVerified(true);
             admin.setPhoneVerified(true);
 
             userRepository.save(admin);
         } else {
-            userRepository.findByEmail(adminEmail).ifPresent(admin -> {
-                admin.setPassword(passwordEncoder.encode(adminPassword));
-                admin.setRole(Role.SUPER_ADMIN);
-                admin.setEmailVerified(true);
-                admin.setPhoneVerified(true);
-                userRepository.save(admin);
-                log.info("Updated existing admin role to SUPER_ADMIN, password, and verification status");
-            });
+            log.info("Super admin user already exists. Skipping super admin credentials seeding.");
         }
 
         // Seed default teams
@@ -91,11 +85,24 @@ public class AdminSeeder {
     }
 
     private void seedEmployee(String email, String password, Set<Permission> permissions, Set<String> teams) {
+        String empName;
+        if (email.startsWith("e1@")) {
+            empName = "Karan Malhotra";
+        } else if (email.startsWith("e2@")) {
+            empName = "Meera Joshi";
+        } else if (email.startsWith("e3@")) {
+            empName = "Rohan Deshmukh";
+        } else {
+            String prefix = email.split("@")[0];
+            empName = "Employee " + prefix.substring(1).toUpperCase();
+        }
+
         if (!userRepository.existsByEmail(email)) {
             log.info("Seeding default employee user: {}", email);
             User emp = new User();
             emp.setEmail(email);
             emp.setPassword(passwordEncoder.encode(password));
+            emp.setFullName(empName);
             emp.setRole(Role.EMPLOYEE);
             emp.setEmailVerified(true);
             emp.setPhoneVerified(true);
@@ -104,8 +111,10 @@ public class AdminSeeder {
 
             userRepository.save(emp);
         } else {
+            final String finalEmpName = empName;
             userRepository.findByEmail(email).ifPresent(emp -> {
                 emp.setPassword(passwordEncoder.encode(password));
+                emp.setFullName(finalEmpName);
                 emp.setRole(Role.EMPLOYEE);
                 emp.setEmailVerified(true);
                 emp.setPhoneVerified(true);

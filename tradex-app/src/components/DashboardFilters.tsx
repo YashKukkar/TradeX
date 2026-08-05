@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import Icon from "./Icon";
+import ActionButton from "./ActionButton";
 import styles from "./SuperAdminOverview.module.css";
+
 
 interface DashboardFiltersProps {
   onChange: (startDate: string, endDate: string) => void;
+  onExport?: () => void;
+  isExporting?: boolean;
 }
 
 export function getStartDate(filterType: string, customStart?: string): Date {
@@ -57,7 +61,7 @@ export function toLocalISOString(date: Date): string {
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 }
 
-export default function DashboardFilters({ onChange }: DashboardFiltersProps) {
+export default function DashboardFilters({ onChange, onExport, isExporting }: DashboardFiltersProps) {
   const [filterType, setFilterType] = useState<string>("today");
 
   const todayStr = new Date().toISOString().split("T")[0];
@@ -118,7 +122,12 @@ export default function DashboardFilters({ onChange }: DashboardFiltersProps) {
               type="date"
               value={customStart}
               max={customEnd}
-              onChange={(e) => setCustomStart(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (!val || !customEnd || val <= customEnd) {
+                  setCustomStart(val);
+                }
+              }}
               className={styles.dateInput}
             />
           </div>
@@ -129,12 +138,35 @@ export default function DashboardFilters({ onChange }: DashboardFiltersProps) {
               type="date"
               value={customEnd}
               min={customStart}
-              onChange={(e) => setCustomEnd(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (!val || !customStart || val >= customStart) {
+                  setCustomEnd(val);
+                }
+              }}
               className={styles.dateInput}
             />
           </div>
         </div>
       )}
+
+
+
+      {onExport && (
+        <ActionButton
+          iconName="download"
+          loading={!!isExporting}
+          loadingText="Exporting..."
+          onClick={onExport}
+          className={styles.filterBtn}
+          style={{ marginLeft: "auto" }}
+          title="Export Analytics CSV"
+        >
+          Export CSV
+        </ActionButton>
+      )}
+
     </div>
   );
 }
+

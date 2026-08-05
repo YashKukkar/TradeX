@@ -8,7 +8,7 @@
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-size: 14px;
   font-weight: 600;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 16px 36px var(--clr-black-a40);
   backdrop-filter: blur(12px);
   z-index: 9999;
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -16,8 +16,8 @@
   width: auto;
   min-width: 280px;
   box-sizing: border-box;
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--clr-white);
+  border: 1px solid var(--clr-white-a10);
   transition: all 0.2s ease;
 }
 
@@ -45,7 +45,7 @@
 .closeBtn {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--clr-white-a50);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -57,46 +57,46 @@
 }
 
 .closeBtn:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--clr-white);
+  background: var(--clr-white-a08);
 }
 
 /* Variants */
 .success {
-  background: rgba(11, 23, 20, 0.95);
-  border: 1px solid rgba(0, 224, 164, 0.25);
+  background: var(--clr-scene-teal);
+  border: 1px solid var(--clr-teal-a25);
 }
 .success .icon {
-  color: #00e0a4;
+  color: var(--clr-teal);
 }
 
 .error {
-  background: rgba(28, 12, 16, 0.95);
-  border: 1px solid rgba(255, 90, 106, 0.25);
+  background: var(--clr-scene-red);
+  border: 1px solid var(--clr-red-a25);
 }
 .error .icon {
-  color: #ff5a6a;
+  color: var(--clr-red-alt);
 }
 
 .warning {
-  background: rgba(26, 19, 10, 0.95);
-  border: 1px solid rgba(245, 158, 11, 0.25);
+  background: var(--clr-scene-amber);
+  border: 1px solid var(--clr-amber-a25);
 }
 .warning .icon {
-  color: #f59e0b;
+  color: var(--clr-amber);
 }
 
 .info {
-  background: rgba(13, 19, 36, 0.95);
-  border: 1px solid rgba(96, 130, 255, 0.25);
+  background: var(--clr-scene-blue);
+  border: 1px solid var(--clr-blue-a20);
 }
 .info .icon {
-  color: #6082ff;
+  color: var(--clr-blue);
 }
 
 .loading {
-  background: rgba(20, 20, 20, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--clr-scene-dark);
+  border: 1px solid var(--clr-white-a15);
 }
 .loading .icon {
   color: var(--muted);

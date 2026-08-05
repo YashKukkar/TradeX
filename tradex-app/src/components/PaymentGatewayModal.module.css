@@ -38,7 +38,7 @@
   width: 42px;
   height: 42px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--clr-white-a05);
   margin-right: 14px;
 }
 
@@ -134,7 +134,7 @@
   border-radius: 12px;
   width: 100%;
   max-width: 288px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 25px var(--clr-black-a20);
 }
 
 .qrImage {
@@ -161,7 +161,7 @@
   width: 100%;
   padding: 12px;
   background: var(--primary);
-  color: #0b1020;
+  color: lch(7% 12 268);
   border: none;
   border-radius: 10px;
   font-size: 13.5px;
@@ -173,7 +173,7 @@
 
 .upiIntentBtn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 224, 164, 0.15);
+  box-shadow: 0 4px 12px var(--clr-teal-a15);
 }
 
 @media (max-width: 768px) {
@@ -253,7 +253,7 @@
   outline: none;
   border-color: var(--primary);
   background: var(--surface-2);
-  box-shadow: 0 0 0 2px rgba(0, 224, 164, 0.15);
+  box-shadow: 0 0 0 2px var(--clr-teal-a15);
 }
 
 .row {
@@ -282,14 +282,14 @@
 }
 
 .backBtn:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--clr-white-a05);
   color: var(--text);
 }
 
 .submitBtn {
   flex: 2;
   background: var(--primary);
-  color: #05231c;
+  color: var(--clr-teal-dark);
   border: none;
   padding: 12px;
   border-radius: 10px;
@@ -301,13 +301,13 @@
 
 .submitBtn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 224, 164, 0.15);
+  box-shadow: 0 4px 12px var(--clr-teal-a15);
 }
 
 .error {
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #ef4444;
+  background: var(--clr-red-a08);
+  border: 1px solid var(--clr-red-a20);
+  color: var(--clr-red);
   padding: 8px 12px;
   border-radius: 8px;
   font-size: 12px;
@@ -326,7 +326,7 @@
 .otpLogo {
   font-size: 36px;
   color: var(--primary);
-  background: rgba(0, 224, 164, 0.08);
+  background: var(--clr-teal-a08);
   padding: 10px;
   border-radius: 50%;
   margin-bottom: 4px;
@@ -373,7 +373,7 @@
 .nbLogo {
   font-size: 36px;
   color: var(--accent);
-  background: rgba(255, 176, 32, 0.08);
+  background: var(--clr-amber-a08);
   padding: 10px;
   border-radius: 50%;
 }
@@ -394,9 +394,9 @@
 .nbSimulatorPill {
   font-size: 10px;
   font-weight: 700;
-  background: rgba(255, 176, 32, 0.1);
+  background: var(--clr-amber-a10);
   color: var(--accent);
-  border: 1px dashed rgba(255, 176, 32, 0.3);
+  border: 1px dashed var(--clr-amber-a30);
   padding: 4px 10px;
   border-radius: 20px;
   text-transform: uppercase;
@@ -455,12 +455,12 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: rgba(0, 224, 164, 0.1);
-  border: 1px solid rgba(0, 224, 164, 0.3);
+  background: var(--clr-teal-a10);
+  border: 1px solid var(--clr-teal-a30);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 15px rgba(0, 224, 164, 0.2);
+  box-shadow: 0 0 15px var(--clr-teal-a20);
 }
 
 .checkIcon {
@@ -486,7 +486,7 @@
 .doneBtn {
   width: 100%;
   background: var(--primary);
-  color: #05231c;
+  color: var(--clr-teal-dark);
   border: none;
   padding: 12px;
   border-radius: 10px;
@@ -499,7 +499,7 @@
 
 .doneBtn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 224, 164, 0.15);
+  box-shadow: 0 4px 12px var(--clr-teal-a15);
 }
 
 .errorView {
@@ -515,8 +515,8 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: rgba(255, 90, 106, 0.1);
-  border: 1px solid rgba(255, 90, 106, 0.3);
+  background: var(--clr-red-alt-a10);
+  border: 1px solid var(--clr-red-a30);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -10,12 +10,14 @@ import com.tradex.api.repository.AdminAuditLogRepository;
 import com.tradex.api.repository.WalletTransactionRepository;
 import com.tradex.api.service.WalletBalanceManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class WithdrawalTransactionHandler implements TransactionHandler {
 
     private final WalletTransactionRepository walletTransactionRepository;
@@ -35,6 +37,9 @@ public class WithdrawalTransactionHandler implements TransactionHandler {
         tx.setApprovedAt(LocalDateTime.now());
         tx.setProcessedBy(actor);
         walletTransactionRepository.save(tx);
+
+        log.info("Withdrawal transaction ID {} approved for user: {} by actor: {}, amount: {}",
+                tx.getId(), target.getEmail(), actor.getEmail(), tx.getAmount());
 
         // Audit Log
         AdminAuditLog auditLog = new AdminAuditLog(
@@ -57,6 +62,9 @@ public class WithdrawalTransactionHandler implements TransactionHandler {
         tx.setApprovedAt(LocalDateTime.now());
         tx.setProcessedBy(actor);
         walletTransactionRepository.save(tx);
+
+        log.info("Withdrawal transaction ID {} rejected for user: {} by actor: {}, amount: {}, reason: {}",
+                tx.getId(), target.getEmail(), actor.getEmail(), tx.getAmount(), reason);
 
         // Audit Log
         AdminAuditLog auditLog = new AdminAuditLog(

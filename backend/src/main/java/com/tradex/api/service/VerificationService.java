@@ -135,17 +135,22 @@ public class VerificationService {
 
         VerificationToken token = verificationTokenRepository
                 .findByUserAndTypeForUpdate(user, type)
-                .orElseThrow(() -> new BadRequestException("No active verification token found"));
+                .orElseGet(() -> {
+                    log.warn("Verification failed for user {}: No active verification token found of type {}", user.getEmail(), type);
+                    throw new BadRequestException("No active verification token found");
+                });
 
         // Expire token automatically on check
         if (token.getExpiryTime().isBefore(LocalDateTime.now())) {
             verificationTokenRepository.delete(token);
+            log.warn("Verification failed for user {}: Token of type {} expired at {}", user.getEmail(), type, token.getExpiryTime());
             throw new BadRequestException("Verification token expired");
         }
 
         // Rate limit verification attempts
         if (token.getAttempts() >= appProperties.getOtp().getMaxAttempts()) {
             verificationTokenRepository.delete(token);
+            log.warn("Verification failed for user {}: Token of type {} blocked due to too many attempts", user.getEmail(), type);
             throw new BadRequestException("Verification token blocked");
         }
 
@@ -156,9 +161,13 @@ public class VerificationService {
 
             if (token.getAttempts() >= appProperties.getOtp().getMaxAttempts()) {
                 verificationTokenRepository.delete(token);
+                log.warn("Verification failed for user {}: Token of type {} blocked after reaching max attempts ({}/{})",
+                        user.getEmail(), type, token.getAttempts(), appProperties.getOtp().getMaxAttempts());
                 throw new BadRequestException("Verification token blocked");
             }
 
+            log.warn("Verification failed for user {}: Invalid code entered for type {}. Attempt {}/{}",
+                    user.getEmail(), type, token.getAttempts(), appProperties.getOtp().getMaxAttempts());
             throw new BadRequestException("Invalid verification code");
         }
 

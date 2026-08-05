@@ -30,6 +30,7 @@ public class UserSeeder {
 
     public record SeedUserConfig(
             String email,
+            String fullName,
             Long points,
             String referralCode,
             int parentIndex,
@@ -43,16 +44,16 @@ public class UserSeeder {
     ) {}
 
     public static final List<SeedUserConfig> SEED_USER_CONFIGS = List.of(
-            // email,       points, refCode,     parentIdx, daysAgo, hour, min,  phone,            account,    withdrawable,              bonus
-            new SeedUserConfig("u1@test.com", 1800L, "U1REFCODE", -1, 10,  9, 14, "+919999999901", "ACCU101",
+            // email,       fullName,       points, refCode,     parentIdx, daysAgo, hour, min,  phone,            account,    withdrawable,              bonus
+            new SeedUserConfig("u1@test.com", "Aarav Sharma", 1800L, "U1REFCODE", -1, 10,  9, 14, "+919999999901", "ACCU101",
                     new BigDecimal("12500.00"), new BigDecimal("800.00")),
-            new SeedUserConfig("u2@test.com", 1800L, "U2REFCODE",  0,  8, 14, 33, "+919999999902", "ACCU102",
+            new SeedUserConfig("u2@test.com", "Vihaan Patel", 1800L, "U2REFCODE",  0,  8, 14, 33, "+919999999902", "ACCU102",
                     new BigDecimal("4750.00"),  new BigDecimal("200.00")),
-            new SeedUserConfig("u3@test.com", 1700L, "U3REFCODE",  1,  5, 11,  5, "+919999999903", "ACCU103",
+            new SeedUserConfig("u3@test.com", "Aditya Verma", 1700L, "U3REFCODE",  1,  5, 11,  5, "+919999999903", "ACCU103",
                     new BigDecimal("2000.00"),  BigDecimal.ZERO),
-            new SeedUserConfig("u4@test.com", 1500L, "U4REFCODE",  2,  2, 18, 48, "+919999999904", "ACCU104",
+            new SeedUserConfig("u4@test.com", "Dia Sen", 1500L, "U4REFCODE",  2,  2, 18, 48, "+919999999904", "ACCU104",
                     new BigDecimal("500.00"),   BigDecimal.ZERO),
-            new SeedUserConfig("u5@test.com", 1000L, "U5REFCODE",  3,  1, 10, 21, "+919999999905", "ACCU105",
+            new SeedUserConfig("u5@test.com", "Ananya Rao", 1000L, "U5REFCODE",  3,  1, 10, 21, "+919999999905", "ACCU105",
                     BigDecimal.ZERO, BigDecimal.ZERO)
     );
 
@@ -72,9 +73,12 @@ public class UserSeeder {
                     .withSecond(0)
                     .withNano(0);
 
+            String computedName = config.fullName();
+
             User user = User.builder()
                     .email(config.email())
                     .password(encodedPassword)
+                    .fullName(computedName)
                     .pointsBalance(config.points())
                     .withdrawableBalance(config.withdrawableBalance())
                     .bonusBalance(config.bonusBalance())
@@ -88,14 +92,11 @@ public class UserSeeder {
                     .build();
 
             if (config.accountNumber() != null) {
-                String prefix = config.email().split("@")[0];
-                String displayHolderName = prefix.substring(0, 1).toUpperCase() + prefix.substring(1) + " User";
-
                 BankDetail bank = BankDetail.builder()
                         .user(user)
                         .accountNumber(config.accountNumber())
                         .ifscCode("TEMP0123456")
-                        .holderName(displayHolderName)
+                        .holderName(computedName)
                         .bankName("Default Seeder Bank")
                         .isPrimary(true)
                         .build();

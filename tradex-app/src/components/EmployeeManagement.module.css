@@ -24,12 +24,12 @@
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(181, 95, 230, 0.25);
+  box-shadow: 0 4px 12px var(--clr-purple-a25);
   transition: all 0.2s ease;
 }
 
 .addBtn:hover {
-  background: var(--primary-hover, #9c3cd6);
+  background: var(--primary-hover, var(--clr-purple));
   transform: translateY(-1px);
 }
 
@@ -90,9 +90,9 @@
 
 /* Table Badge Tags */
 .teamTag {
-  background: rgba(6, 182, 212, 0.12);
+  background: var(--clr-cyan-a12);
   color: var(--accent);
-  border: 1px solid rgba(6, 182, 212, 0.25);
+  border: 1px solid var(--clr-cyan-a25);
   border-radius: 4px;
   padding: 2px 6px;
   font-size: 11px;
@@ -106,9 +106,9 @@
 }
 
 .permTag {
-  background: rgba(181, 95, 230, 0.1);
+  background: var(--clr-purple-a10);
   color: var(--primary);
-  border: 1px solid rgba(181, 95, 230, 0.2);
+  border: 1px solid var(--clr-purple-a20);
   border-radius: 4px;
   padding: 1px 5px;
   font-size: 10.5px;
@@ -295,5 +295,5 @@
 }
 
 .submitBtn:hover {
-  background: var(--primary-hover, #9c3cd6);
+  background: var(--primary-hover, var(--clr-purple));
 }

@@ -14,7 +14,7 @@
 .filterBtn {
   background: var(--surface);
   border: 1px solid var(--border);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 0 var(--clr-white-a08);
   color: var(--muted);
   padding: 8px 16px;
   border-radius: 8px;
@@ -26,7 +26,7 @@
 
 .filterBtn:hover {
   background: var(--surface-elevated);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--clr-white-a15);
   box-shadow: var(--shadow-elevated);
   color: var(--text);
 }
@@ -63,8 +63,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--clr-white-a02);
+  border: 1px solid var(--clr-white-a08);
   padding: 6px 14px;
   border-radius: 10px;
   margin-left: 8px;
@@ -86,8 +86,8 @@
 
 .dateInput {
   color-scheme: dark;
-  background: rgba(18, 18, 26, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: lch(7% 4 268 / 0.7);
+  border: 1px solid var(--clr-white-a12);
   color: #fff;
   padding: 6px 12px;
   border-radius: 8px;
@@ -101,14 +101,14 @@
 }
 
 .dateInput:hover {
-  border-color: rgba(139, 92, 246, 0.4);
-  background: rgba(24, 24, 36, 0.85);
+  border-color: var(--clr-indigo-a40);
+  background: lch(9% 6 268 / 0.85);
 }
 
 .dateInput:focus {
-  border-color: #8b5cf6;
-  box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
-  background: rgba(28, 28, 42, 0.95);
+  border-color: var(--clr-indigo);
+  box-shadow: 0 0 12px var(--clr-indigo-a30);
+  background: lch(11% 8 268 / 0.95);
 }
 
 /* Metrics Grid styling */
@@ -122,8 +122,8 @@
 /* Performance Section */
 .perfSection {
   margin-top: 32px;
-  background: rgba(255, 255, 255, 0.01);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--clr-white-a01);
+  border: 1px solid var(--clr-white-a05);
   border-radius: 16px;
   padding: 24px;
 }
@@ -149,7 +149,7 @@
 .tableWrapper {
   overflow-x: auto;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--clr-white-a05);
 }
 
 .perfTable {
@@ -160,16 +160,16 @@
 }
 
 .perfTable th {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--clr-white-a03);
   color: var(--muted);
   font-weight: 600;
   padding: 14px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--clr-white-a08);
 }
 
 .perfTable td {
   padding: 14px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--clr-white-a05);
   color: var(--text);
 }
 
@@ -178,7 +178,7 @@
 }
 
 .perfTable tr:hover td {
-  background: rgba(255, 255, 255, 0.01);
+  background: var(--clr-white-a01);
 }
 
 .employeeRow {
@@ -211,17 +211,17 @@
 }
 
 .badgePending {
-  background: rgba(255, 152, 0, 0.1);
-  color: #ff9800;
+  background: var(--clr-orange-a10);
+  color: var(--clr-orange);
 }
 
 .badgeSuccess {
-  background: rgba(76, 175, 80, 0.1);
-  color: #4caf50;
+  background: var(--clr-green-a10);
+  color: var(--clr-green);
 }
 
 .badgeMuted {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--clr-white-a05);
   color: var(--muted);
 }
 
@@ -244,45 +244,45 @@
   text-transform: uppercase;
   padding: 2px 6px;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--clr-white-a04);
   color: var(--muted);
   letter-spacing: 0.5px;
 }
 
 .tag_manage_deposits {
-  background: rgba(76, 175, 80, 0.1);
-  color: #4caf50;
-  border: 1px solid rgba(76, 175, 80, 0.2);
+  background: var(--clr-green-a10);
+  color: var(--clr-green);
+  border: 1px solid var(--clr-green-a20);
 }
 
 .tag_manage_withdrawals {
-  background: rgba(255, 90, 106, 0.1);
-  color: #ff5a6a;
-  border: 1px solid rgba(255, 90, 106, 0.2);
+  background: var(--clr-red-alt-a10);
+  color: var(--clr-red-alt);
+  border: 1px solid var(--clr-red-a20);
 }
 
 .tag_manage_users {
-  background: rgba(139, 92, 246, 0.1);
-  color: #8b5cf6;
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  background: var(--clr-indigo-a10);
+  color: var(--clr-indigo);
+  border: 1px solid var(--clr-indigo-a20);
 }
 
 .tag_manage_points {
-  background: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  background: var(--clr-amber-a10);
+  color: var(--clr-amber);
+  border: 1px solid var(--clr-amber-a20);
 }
 
 .tag_manage_settings {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  background: var(--clr-sky-a10);
+  color: var(--clr-sky);
+  border: 1px solid var(--clr-sky-a20);
 }
 
 .tagNone {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--clr-white-a02);
   color: var(--muted);
-  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border: 1px dashed var(--clr-white-a08);
 }
 
 .naCell {
@@ -310,7 +310,7 @@
 
 .verticalDivider {
   width: 1px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--clr-white-a08);
   align-self: stretch;
 }
 
@@ -328,7 +328,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 6px 0;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+  border-bottom: 1px dashed var(--clr-white-a05);
 }
 
 .cardSubMetric:last-child {
@@ -379,8 +379,8 @@
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  background: rgba(255, 152, 0, 0.06);
-  border: 1px solid rgba(255, 152, 0, 0.15);
+  background: var(--clr-orange-a06);
+  border: 1px solid var(--clr-orange-a15);
   border-radius: 8px;
   font-size: 12.5px;
   color: var(--text);
@@ -389,8 +389,8 @@
 }
 
 .attentionAlert:hover {
-  background: rgba(255, 152, 0, 0.1);
-  border-color: rgba(255, 152, 0, 0.3);
+  background: var(--clr-orange-a10);
+  border-color: var(--clr-orange-a30);
 }
 
 .attentionText {
@@ -410,7 +410,7 @@
 }
 
 .attentionAlert:hover .actionLinkIcon {
-  color: #ff9800;
+  color: var(--clr-orange);
   transform: translateX(2px);
   transition: transform 0.2s ease;
 }
@@ -443,9 +443,9 @@
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
-  background: rgba(59, 130, 246, 0.08);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  background: var(--clr-sky-a08);
+  color: var(--clr-sky);
+  border: 1px solid var(--clr-sky-a20);
 }
 
 .tableGroupHeader {
@@ -455,11 +455,11 @@
   text-transform: uppercase;
   letter-spacing: 0.8px;
   padding: 8px 12px !important;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--clr-white-a02);
 }
 
 .tableColDivider {
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 1px solid var(--clr-white-a06);
 }
 
 .metricPill {
@@ -489,12 +489,12 @@
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: rgba(139, 92, 246, 0.12);
-  color: #8b5cf6;
+  background: var(--clr-indigo-a12);
+  color: var(--clr-indigo);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(139, 92, 246, 0.25);
+  border: 1px solid var(--clr-indigo-a25);
 }
 
 .platformHeroBody {
@@ -508,7 +508,7 @@
   font-family: 'Outfit', sans-serif;
   font-size: 32px;
   font-weight: 800;
-  background: linear-gradient(135deg, #ffffff 0%, #c084fc 100%);
+  background: linear-gradient(135deg, var(--clr-white) 0%, #c084fc 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -523,10 +523,10 @@
   border-radius: 20px;
   font-size: 13.5px;
   font-weight: 700;
-  background: rgba(76, 175, 80, 0.14);
-  color: #4caf50;
-  border: 1px solid rgba(76, 175, 80, 0.3);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.15), 0 2px 6px rgba(0, 0, 0, 0.2);
+  background: var(--clr-green-a14);
+  color: var(--clr-green);
+  border: 1px solid var(--clr-green-a30);
+  box-shadow: inset 0 1px 0 0 var(--clr-white-a15), 0 2px 6px var(--clr-black-a20);
 }
 
 

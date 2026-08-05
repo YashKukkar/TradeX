@@ -1,4 +1,5 @@
 package com.tradex.api.service;
+
 import com.tradex.api.mapper.UserMapper;
 import com.tradex.api.dto.AddBankAccountRequest;
 import com.tradex.api.dto.AuthRequest;
@@ -33,6 +34,14 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import java.util.List;
 
+/**
+ * Service handling user account lifecycle, authentication, profile updates, and bank details.
+ * 
+ * COMPLIANCE & AUDIT POLICY:
+ * Account records with financial transaction histories MUST NOT be physically deleted from the database
+ * to satisfy financial regulations and audit trail integrity. To delete a user/employee, use a soft-delete
+ * by disabling/locking the account (i.e. setting enabled=false, locked=true) instead of executing SQL DELETEs.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -116,19 +125,26 @@ public class UserService {
     @Transactional(readOnly = true)
     public AuthResponse login(AuthRequest request) {
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+                .orElseGet(() -> {
+                    log.warn("Failed login attempt: User not found for email {}", request.email());
+                    throw new BadCredentialsException("Invalid email or password");
+                });
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            log.warn("Failed login attempt: Incorrect password for email {}", request.email());
             throw new BadCredentialsException("Invalid email or password");
         }
 
         if (user.isLocked()) {
+            log.warn("Failed login attempt: Account locked for email {}", user.getEmail());
             throw new ForbiddenException("Your account has been locked. Please contact support.");
         }
         if (!user.isEnabled()) {
+            log.warn("Failed login attempt: Account disabled for email {}", user.getEmail());
             throw new ForbiddenException("Your account has been disabled. Please contact support.");
         }
         if (user.isCredentialsExpired()) {
+            log.warn("Failed login attempt: Credentials expired for email {}", user.getEmail());
             throw new ForbiddenException("Your login credentials have expired. Please reset your password.");
         }
 
@@ -156,6 +172,7 @@ public class UserService {
     public void validateEmailVerification(User user) {
         SystemSetting settings = systemSettingService.getSettings();
         if (settings.isEmailVerificationEnabled() && !user.isEmailVerified()) {
+            log.warn("Failed login attempt: Email verification pending for email {}", user.getEmail());
             throw new ForbiddenException("Email verification required");
         }
     }
@@ -171,6 +188,7 @@ public class UserService {
         User user = new User();
         user.setEmail(request.email().trim().toLowerCase());
         user.setPassword(passwordEncoder.encode(request.password()));
+        user.setFullName(request.fullName());
         user.setReferralCode(referralService.generateUniqueReferralCode());
         user.setPhoneNumber(clean(request.phoneNumber()));
         user.setEmailVerified(false);
@@ -183,7 +201,7 @@ public class UserService {
                     .user(user)
                     .accountNumber(acc)
                     .ifscCode("TEMP0123456")
-                    .holderName(clean(request.email()))
+                    .holderName(request.fullName())
                     .bankName("Default Partner Bank")
                     .isPrimary(true)
                     .build();
@@ -217,15 +235,15 @@ public class UserService {
                     if (user.getId() != null && referrer.getReferralPath() != null) {
                         String searchToken = "." + user.getId() + ".";
                         if (referrer.getReferralPath().contains(searchToken)) {
-                            log.warn("Circular referral assignment detected! Referrer {} is already referred by User {}",
-                                     referrer.getEmail(), user.getEmail());
+                            log.warn(
+                                    "Circular referral assignment detected! Referrer {} is already referred by User {}",
+                                    referrer.getEmail(), user.getEmail());
                             return;
                         }
                     }
                     user.setReferredBy(referrer);
                 },
-                () -> log.warn("Invalid referral code used: {}", normalizedCode)
-        );
+                () -> log.warn("Invalid referral code used: {}", normalizedCode));
     }
 
     private void createWelcomeTransactionIfEligible(User user) {
@@ -238,8 +256,7 @@ public class UserService {
                 user.getPointsBalance(),
                 user.getPointsBalance(),
                 PointsTransactionType.WELCOME_BONUS,
-                "Welcome bonus for registration"
-        );
+                "Welcome bonus for registration");
         pointsTransactionRepository.save(tx);
     }
 
@@ -256,8 +273,7 @@ public class UserService {
                         public void afterCommit() {
                             referralService.processReferralRewardsAsync(userId);
                         }
-                    }
-            );
+                    });
         } else {
             referralService.processReferralRewardsAsync(userId);
         }
@@ -290,6 +306,12 @@ public class UserService {
         if (newPhone != null && !newPhone.equals(user.getPhoneNumber())) {
             user.setPhoneNumber(newPhone);
             user.setPhoneVerified(false);
+        }
+
+        String newName = request.fullName();
+        if (newName != null && !newName.equals(user.getFullName())) {
+            // Future design consideration: if (user.isKycVerified()) throw new ForbiddenException("Cannot update name after KYC verification");
+            user.setFullName(newName);
         }
 
         User saved = userRepository.save(user);
@@ -365,7 +387,9 @@ public class UserService {
         }
 
         if (toDelete.isPrimary() && user.getBankDetails().size() > 1) {
-            throw new AppException.BadRequestException("Cannot delete primary bank account. Please set another account as primary first.");
+            log.warn("Failed bank account deletion: Attempted to delete primary bank account for user {}", email);
+            throw new AppException.BadRequestException(
+                    "Cannot delete primary bank account. Please set another account as primary first.");
         }
 
         user.getBankDetails().remove(toDelete);
@@ -385,6 +409,7 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            log.warn("Failed password change attempt: Incorrect current password for user {}", email);
             throw new AppException.BadRequestException("Incorrect current password");
         }
 

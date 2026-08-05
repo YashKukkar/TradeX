@@ -3,7 +3,7 @@
 /* Tabs */
 .tabBar {
   display: flex;
-  background: rgba(0, 0, 0, 0.15);
+  background: var(--clr-black-a15);
   border-bottom: 1px solid var(--border);
   padding: 0 var(--space-4);
 }
@@ -99,13 +99,13 @@
 }
 
 .roleUser {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--clr-white-a08);
   color: var(--muted);
 }
 
 .roleAdmin {
-  background: rgba(0, 224, 164, 0.15);
-  color: #00e0a4;
+  background: var(--clr-teal-a15);
+  color: var(--clr-teal);
 }
 
 .commentTime {
@@ -220,7 +220,7 @@
   position: absolute;
   top: 2px;
   right: 2px;
-  background: rgba(255, 90, 106, 0.8);
+  background: var(--clr-red-a80);
   border: none;
   color: white;
   width: 16px;
@@ -251,7 +251,7 @@
 
 .sendBtn:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 224, 164, 0.2);
+  box-shadow: 0 4px 12px var(--clr-teal-a20);
 }
 
 .sendBtn:disabled {
@@ -284,7 +284,7 @@
   justify-content: space-between;
   align-items: center;
   padding: var(--space-3) 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--clr-white-a03);
 }
 
 .infoRow:last-child {
@@ -399,7 +399,7 @@
 
 .saveNotesBtn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 224, 164, 0.25);
+  box-shadow: 0 4px 12px var(--clr-teal-a25);
 }
 
 /* Animations */
@@ -477,7 +477,7 @@
 }
 
 .reopenBtn:hover:not(:disabled) {
-  background: rgba(181, 95, 230, 0.1);
+  background: var(--clr-purple-a10);
   transform: translateY(-1px);
 }
 
@@ -498,7 +498,7 @@
 
 .closeTicketBtn:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 224, 164, 0.25);
+  box-shadow: 0 4px 12px var(--clr-teal-a25);
 }
 
 .claimBtn {
@@ -520,7 +520,7 @@
 .claimBtn:hover:not(:disabled) {
   opacity: 0.95;
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0, 224, 164, 0.2);
+  box-shadow: 0 4px 10px var(--clr-teal-a20);
 }
 
 .claimBtn:disabled {
@@ -568,7 +568,7 @@
 .saveNotesBtn:hover:not(:disabled) {
   opacity: 0.95;
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0, 224, 164, 0.2);
+  box-shadow: 0 4px 10px var(--clr-teal-a20);
 }
 
 .saveNotesBtn:disabled {
@@ -592,7 +592,7 @@
   bottom: 12px;
   left: 26px; /* center of avatar circle (8px padding + 18px radius) */
   width: 2px;
-  background: linear-gradient(to bottom, var(--border) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.01) 100%);
+  background: linear-gradient(to bottom, var(--border) 0%, var(--clr-white-a08) 50%, var(--clr-white-a01) 100%);
   z-index: 0;
 }
 
@@ -619,17 +619,17 @@
   font-size: 12px;
   font-weight: 800;
   color: #fff !important;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--clr-white-a12);
+  box-shadow: 0 2px 8px var(--clr-black-a20);
   flex-shrink: 0;
   z-index: 2;
   transition: transform 0.2s ease;
-  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+  background: linear-gradient(135deg, var(--clr-white-a08), var(--clr-white-a02));
 }
 
 .avatarAdmin {
-  border-color: rgba(0, 224, 164, 0.35);
-  box-shadow: 0 0 10px rgba(0, 224, 164, 0.25), 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-color: var(--clr-teal-a35);
+  box-shadow: 0 0 10px var(--clr-teal-a25), 0 2px 8px var(--clr-black-a20);
 }
 
 .postContent {
@@ -660,15 +660,15 @@
   padding: 1px 6px;
   border-radius: 4px;
   letter-spacing: 0.05em;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--clr-white-a04);
   border: 1px solid var(--border);
   color: var(--muted);
 }
 
 .roleAdmin {
-  background: rgba(0, 224, 164, 0.05) !important;
-  border-color: rgba(0, 224, 164, 0.2) !important;
-  color: #00e0a4 !important;
+  background: var(--clr-teal-a06) !important;
+  border-color: var(--clr-teal-a20) !important;
+  color: var(--clr-teal) !important;
 }
 
 .postTime {
@@ -681,7 +681,7 @@
   padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid var(--border);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px var(--clr-black-a08);
   width: fit-content;
   max-width: 85%;
   position: relative;
@@ -693,9 +693,9 @@
 }
 
 .bubbleAdmin {
-  background: linear-gradient(135deg, rgba(0, 224, 164, 0.035), rgba(0, 224, 164, 0.01));
-  border-color: rgba(0, 224, 164, 0.18);
-  border-left: 3px solid #00e0a4;
+  background: linear-gradient(135deg, var(--clr-teal-a06), rgba(0, 224, 164, 0.01));
+  border-color: var(--clr-teal-a18);
+  border-left: 3px solid var(--clr-teal);
 }
 
 .hoverTime {
@@ -761,7 +761,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  border-top: 1px solid var(--clr-white-a03);
   padding: 6px 8px 0 8px;
   margin-top: 4px;
 }
@@ -781,7 +781,7 @@
 }
 
 .attachButtonLabel:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--clr-white-a05);
   color: var(--text);
 }
 

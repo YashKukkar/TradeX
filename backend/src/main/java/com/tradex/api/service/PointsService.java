@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +33,20 @@ public class PointsService {
 
     @Transactional
     public WalletTransactionDTO convertPoints(String email, Long points) {
+        return convertPoints(email, points, null);
+    }
+
+    @Transactional
+    public WalletTransactionDTO convertPoints(String email, Long points, String idempotencyKey) {
+        if (idempotencyKey != null && !idempotencyKey.isBlank()) {
+            Optional<WalletTransaction> existing = walletTransactionRepository.findByIdempotencyKey(idempotencyKey);
+            if (existing.isPresent()) {
+                log.info("Duplicate points conversion request detected for key {}. Returning cached transaction.",
+                        idempotencyKey);
+                return new WalletTransactionDTO(existing.get());
+            }
+        }
+
         if (points == null || points <= 0) {
             throw new BadRequestException("Points to convert must be greater than zero");
         }
@@ -83,14 +98,14 @@ public class PointsService {
                 WalletTransactionStatus.SUCCESS,
                 "Converted " + points + " TradeX Points into bonus cash");
         walletTx.setApprovedAt(java.time.LocalDateTime.now());
+        walletTx.setIdempotencyKey(idempotencyKey);
         walletTransactionRepository.save(walletTx);
 
         AdminAuditLog auditLog = new AdminAuditLog(
                 user,
                 user,
                 AdminAction.POINTS_CONVERSION,
-                "Converted " + points + " points to ₹" + cashAwarded.setScale(2, RoundingMode.HALF_UP) + " bonus cash"
-        );
+                "Converted " + points + " points to ₹" + cashAwarded.setScale(2, RoundingMode.HALF_UP) + " bonus cash");
         adminAuditLogRepository.save(auditLog);
 
         log.info("Converted {} points to {} bonus cash for user {}", points, cashAwarded, email);

@@ -38,6 +38,7 @@ public class EmployeeService {
     @AdminAudited(action = AdminAction.CREATE_EMPLOYEE, details = "'Created employee account for ' + #request.email")
     public UserDTO createEmployee(CreateEmployeeRequest request) {
         if (userRepository.findByEmail(request.email().trim().toLowerCase()).isPresent()) {
+            log.warn("Failed employee creation: Email {} already exists", request.email());
             throw new BadRequestException("An account with this email already exists.");
         }
 
@@ -79,6 +80,7 @@ public class EmployeeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found: " + employeeId));
 
         if (employee.getRole() != Role.EMPLOYEE) {
+            log.warn("Failed updating employee permissions: User ID {} is not an employee (role: {})", employeeId, employee.getRole());
             throw new BadRequestException("Cannot update permissions for non-employee user.");
         }
 
@@ -96,6 +98,7 @@ public class EmployeeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found: " + employeeId));
 
         if (employee.getRole() != Role.EMPLOYEE) {
+            log.warn("Failed disabling employee: User ID {} is not an employee (role: {})", employeeId, employee.getRole());
             throw new BadRequestException("Cannot delete non-employee user via this endpoint.");
         }
 

@@ -10,7 +10,6 @@ import com.tradex.api.repository.TeamRepository;
 import java.util.HashSet;
 
 import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.ZoneId;
@@ -21,11 +20,13 @@ import java.util.stream.Collectors;
 @Component
 public class UserMapper {
 
-    @Autowired
-    private TeamRepository teamRepository;
+    private final TeamRepository teamRepository;
+    private final PointsTransactionRepository pointsTransactionRepository;
 
-    @Autowired
-    private PointsTransactionRepository pointsTransactionRepository;
+    public UserMapper(TeamRepository teamRepository, PointsTransactionRepository pointsTransactionRepository) {
+        this.teamRepository = teamRepository;
+        this.pointsTransactionRepository = pointsTransactionRepository;
+    }
 
     public UserDTO toDTO(User user) {
         if (user == null) {
@@ -42,6 +43,8 @@ public class UserMapper {
         return new UserDTO(
                 user.getId(),
                 user.getEmail(),
+                user.getFullName(),
+                user.getFirstName(),
                 (user.getRole() == Role.USER) ? user.getReferralCode() : null,
                 (user.getRole() == Role.USER) ? user.getPointsBalance() : null,
                 (user.getRole() == Role.USER) ? user.getReferralPath() : null,

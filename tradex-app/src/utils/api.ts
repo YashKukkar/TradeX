@@ -1,6 +1,31 @@
 import axios from "axios";
 import { config } from "../config";
 
+export const safeStorage = {
+  getItem(key: string): string | null {
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      console.warn("localStorage.getItem blocked:", e);
+      return null;
+    }
+  },
+  setItem(key: string, value: string): void {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      console.warn("localStorage.setItem blocked:", e);
+    }
+  },
+  clear(): void {
+    try {
+      localStorage.clear();
+    } catch (e) {
+      console.warn("localStorage.clear blocked:", e);
+    }
+  }
+};
+
 const axiosInstance = axios.create({
   baseURL: config.apiUrl,
   withCredentials: true,
@@ -10,7 +35,7 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((req) => {
-  const token = localStorage.getItem("token");
+  const token = safeStorage.getItem("token");
   if (token) {
     req.headers.Authorization = `Bearer ${token}`;
   }
@@ -71,3 +96,19 @@ export const api = async (endpoint: string, options: any = {}): Promise<any> => 
   }
   return axiosInstance.get(url, { headers: options.headers });
 };
+
+export const apiDownload = async (endpoint: string, defaultFilename: string): Promise<void> => {
+  const url = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const responseData: any = await axiosInstance.get(url, { responseType: "blob" });
+  
+  const blob = responseData instanceof Blob ? responseData : new Blob([responseData], { type: "text/csv" });
+  const downloadUrl = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = downloadUrl;
+  link.setAttribute("download", defaultFilename);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(downloadUrl);
+};
+

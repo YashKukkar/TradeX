@@ -50,6 +50,9 @@ public class DepositTransactionHandler implements TransactionHandler {
         tx.setProcessedBy(actor);
         walletTransactionRepository.save(tx);
 
+        log.info("Deposit transaction ID {} approved for user: {} by actor: {}, amount: {}",
+                tx.getId(), target.getEmail(), actor.getEmail(), tx.getAmount());
+
         // Audit Log
         AdminAuditLog auditLog = new AdminAuditLog(
                 actor,
@@ -70,6 +73,9 @@ public class DepositTransactionHandler implements TransactionHandler {
         tx.setApprovedAt(LocalDateTime.now());
         tx.setProcessedBy(actor);
         walletTransactionRepository.save(tx);
+
+        log.info("Deposit transaction ID {} rejected for user: {} by actor: {}, amount: {}, reason: {}",
+                tx.getId(), target.getEmail(), actor.getEmail(), tx.getAmount(), reason);
 
         // Audit Log
         AdminAuditLog auditLog = new AdminAuditLog(

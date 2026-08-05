@@ -9,6 +9,8 @@ export interface BankDetail {
 
 export interface UserProfile {
   email: string;
+  fullName?: string;
+  firstName?: string;
   referralCode: string;
   pointsBalance: number;
   role: string;
@@ -38,6 +40,8 @@ export interface WalletTransaction {
 export interface UserInfo {
   id: number;
   email: string;
+  fullName?: string;
+  firstName?: string;
   referralCode: string;
   pointsBalance: number;
   pointsAcquired?: number;

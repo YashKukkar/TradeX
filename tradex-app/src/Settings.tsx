@@ -6,6 +6,7 @@ import localStyles from "./components/Settings.module.css";
 import DashboardSkeleton from "./components/DashboardSkeleton";
 import { getDisplayName, formatDate } from "./utils/dashboardHelpers";
 import { isAdminRole } from "./utils/permissions";
+import { safeStorage } from "./utils/api";
 import {
   useCurrentUser,
   useUpdateProfile,
@@ -77,6 +78,7 @@ export default function Settings() {
   const isAdmin = isAdminRole(user);
 
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [fullNameState, setFullNameState] = useState("");
   const [bankName, setBankName] = useState("");
   const [holderName, setHolderName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
@@ -93,12 +95,13 @@ export default function Settings() {
   useEffect(() => {
     if (user) {
       setPhoneNumber(user.phoneNumber || "");
+      setFullNameState(user.fullName || "");
     }
   }, [user]);
 
   useEffect(() => {
     if (userError) {
-      localStorage.clear();
+      safeStorage.clear();
       navigate("/login");
     }
   }, [userError, navigate]);
@@ -119,8 +122,8 @@ export default function Settings() {
 
   const updateProfileMutation = useUpdateProfile(
     () => {
-      setSuccessMsg("Phone number updated successfully!");
-      showToast("Phone number updated successfully!", "success");
+      setSuccessMsg("Profile updated successfully!");
+      showToast("Profile updated successfully!", "success");
       setTimeout(clearMessages, 3000);
     },
     (err) => {
@@ -191,14 +194,21 @@ export default function Settings() {
     navigate("/login");
   });
 
-  const handleUpdatePhone = (e: React.FormEvent) => {
+  const handleUpdateProfile = (e: React.FormEvent) => {
     e.preventDefault();
     clearMessages();
     if (!phoneNumber.trim()) {
       setErrorMsg("Phone number cannot be empty");
       return;
     }
-    updateProfileMutation.mutate({ phoneNumber: phoneNumber.trim() });
+    if (!fullNameState.trim() || fullNameState.trim().length < 2) {
+      setErrorMsg("Full name must be at least 2 characters");
+      return;
+    }
+    updateProfileMutation.mutate({
+      phoneNumber: phoneNumber.trim(),
+      fullName: fullNameState.trim()
+    });
   };
 
   const handleAddBank = (e: React.FormEvent) => {
@@ -244,7 +254,15 @@ export default function Settings() {
   }
 
   const email = user?.email || "";
-  const displayName = user ? getDisplayName(user.email) : "";
+  const displayName = user?.fullName || (user ? getDisplayName(user.email) : "");
+
+  const getInitials = (name: string): string => {
+    if (!name) return "U";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  };
+
   const memberSince = user?.createdAt ? formatDate(user.createdAt) : "";
 
   return (
@@ -281,7 +299,7 @@ export default function Settings() {
             aria-expanded={menuOpen}
           >
             <div className={`${dashboardStyles.avatar} ${isAdmin ? dashboardStyles.adminAvatar : ""}`}>
-              {isAdmin ? "⚡" : (displayName.charAt(0) || "U")}
+              {isAdmin ? "⚡" : getInitials(displayName)}
             </div>
             <span className={dashboardStyles.userName}>{displayName || "Loading..."}</span>
             <span className={dashboardStyles.chevron}>
@@ -515,23 +533,38 @@ export default function Settings() {
                   <h3 className={localStyles.sectionTitle}>Profile Information</h3>
                 </div>
 
-                <form onSubmit={handleUpdatePhone} className={localStyles.formGroup}>
-                  <label className={localStyles.label}>Phone Number</label>
-                  <div className={localStyles.inputRow}>
+                <form onSubmit={handleUpdateProfile} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                  <div>
+                    <label className={localStyles.fieldLabel} style={{ display: "block", marginBottom: "6px", fontSize: "13px", fontWeight: "600" }}>Full Name</label>
                     <input
                       type="text"
                       className={localStyles.inputField}
+                      style={{ width: "100%" }}
+                      placeholder="e.g. Alex Morgan"
+                      value={fullNameState}
+                      onChange={(e) => setFullNameState(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className={localStyles.fieldLabel} style={{ display: "block", marginBottom: "6px", fontSize: "13px", fontWeight: "600" }}>Phone Number</label>
+                    <input
+                      type="text"
+                      className={localStyles.inputField}
+                      style={{ width: "100%" }}
                       placeholder="+919876543210"
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
                     />
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
                     <button
                       type="submit"
                       className={localStyles.primaryBtn}
+                      style={{ height: "38px" }}
                       disabled={updateProfileMutation.isPending}
                     >
                       <Icon name="save" style={{ fontSize: "16px" }} />
-                      Save
+                      Save Changes
                     </button>
                   </div>
                 </form>

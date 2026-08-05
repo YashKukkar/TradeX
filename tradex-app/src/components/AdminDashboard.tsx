@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../utils/api";
+import { api, apiDownload } from "../utils/api";
 import { useOverlay, getPollingInterval } from "../context/OverlayContext";
 import Icon from "./Icon";
 import Card from "./Card";
@@ -19,6 +19,7 @@ import { hasPermission, hasAnyPermission, isAdminRole } from "../utils/permissio
 import DashboardFilters from "./DashboardFilters";
 import EmployeePerformanceTable from "./EmployeePerformanceTable";
 import overviewStyles from "./SuperAdminOverview.module.css";
+import LoadingDots from "./LoadingDots";
 
 
 interface AdminDashboardProps {
@@ -37,6 +38,7 @@ export default function AdminDashboard({
   const { showToast } = useToast();
   const [showDevTools, setShowDevTools] = useState(false);
   const { isOverlayActive } = useOverlay();
+  const [isExporting, setIsExporting] = useState(false);
 
   const [dateRange, setDateRange] = useState<{ startDate: string; endDate: string }>({
     startDate: "",
@@ -53,6 +55,25 @@ export default function AdminDashboard({
       return { startDate, endDate };
     });
   }, []);
+
+  const handleExportAnalytics = async () => {
+    if (isExporting) return;
+    setIsExporting(true);
+    try {
+      const startStr = dateRange.startDate.split("T")[0] || "start";
+      const endStr = dateRange.endDate.split("T")[0] || "end";
+      const defaultFilename = `tradex-analytics-${startStr}_to_${endStr}.csv`;
+      await apiDownload(
+        `/admin/dashboard/export?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`,
+        defaultFilename
+      );
+      showToast("Analytics report downloaded successfully!", "success");
+    } catch (err: any) {
+      showToast(err.message || "Failed to download analytics report", "error");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   // ── Queries & Mutations ──────────────────────────────────────────
   const { data: adminData, isLoading: adminLoading } = useAdminTelemetry(true, currentUser);
@@ -101,6 +122,7 @@ export default function AdminDashboard({
   return (
     <div className={styles.adminMainContent}>
 
+
       {/* Greeting and Console Active Badge */}
       <div className={styles.greeting}>
         <div className={styles.adminTitleRow}>
@@ -138,7 +160,9 @@ export default function AdminDashboard({
             <Icon name="pending_actions" className={styles.adminTabIcon} />
             Pending Requests
             {pendingTx.length > 0 && (
-              <span className={styles.adminTabBadge}>{pendingTx.length}</span>
+              <span className={styles.adminTabBadge}>
+                {pendingTx.length > 99 ? "99+" : pendingTx.length}
+              </span>
             )}
           </button>
         )}
@@ -186,25 +210,25 @@ export default function AdminDashboard({
         {activeTab === "overview" && currentUser.role === "SUPER_ADMIN" && (
           <div className={styles.fadeInContainer}>
             {/* Filters bar */}
-            <DashboardFilters onChange={handleDateChange} />
+            <DashboardFilters onChange={handleDateChange} onExport={handleExportAnalytics} isExporting={isExporting} />
+
 
             {/* Telemetry/Metrics Grid */}
             <div className={overviewStyles.metricsGrid}>
-              {/* 1. Platform Overview Widget */}
               <Card className={styles.adminTelemetryCard}>
                 <div className={styles.adminTelemetryHeader}>
                   <Card.Icon name="group" className={styles.telemetryIcon} color="var(--primary)" />
                   <span className={styles.telemetryLabel}>Platform Overview</span>
                 </div>
                 <div className={styles.telemetryValue}>
-                  {metricsLoading ? "..." : (dashboardMetrics?.totalUsers ?? 0).toLocaleString()}
+                  {metricsLoading ? <LoadingDots /> : (dashboardMetrics?.totalUsers ?? 0).toLocaleString()}
                 </div>
                 <div className={styles.telemetryFooter}>Total registered accounts</div>
                 <div className={overviewStyles.healthList} style={{ marginTop: "12px" }}>
                   <div className={overviewStyles.cardSubMetric}>
                     <span className={overviewStyles.cardSubMetricLabel}>New Registrations</span>
                     <span className={overviewStyles.cardSubMetricValue} style={{ color: "var(--primary)" }}>
-                      {metricsLoading ? "..." : `+${dashboardMetrics?.newRegistrations ?? 0}`}
+                      {metricsLoading ? <LoadingDots /> : `+${dashboardMetrics?.newRegistrations ?? 0}`}
                     </span>
                   </div>
                 </div>
@@ -222,19 +246,19 @@ export default function AdminDashboard({
                     <div className={overviewStyles.cardSubMetric}>
                       <span className={overviewStyles.cardSubMetricLabel}>Completed</span>
                       <span className={overviewStyles.cardSubMetricValue} style={{ color: "#4caf50" }}>
-                        {metricsLoading ? "..." : `₹${(dashboardMetrics?.totalDeposits ?? 0).toLocaleString()}`}
+                        {metricsLoading ? <LoadingDots /> : `₹${(dashboardMetrics?.totalDeposits ?? 0).toLocaleString()}`}
                       </span>
                     </div>
                     <div className={overviewStyles.cardSubMetric}>
                       <span className={overviewStyles.cardSubMetricLabel}>Volume Count</span>
                       <span className={overviewStyles.cardSubMetricValue}>
-                        {metricsLoading ? "..." : `${dashboardMetrics?.totalDepositsCount ?? 0} successful`}
+                        {metricsLoading ? <LoadingDots /> : `${dashboardMetrics?.totalDepositsCount ?? 0} successful`}
                       </span>
                     </div>
                     <div className={overviewStyles.cardSubMetric}>
                       <span className={overviewStyles.cardSubMetricLabel}>Pending Queue</span>
                       <span className={overviewStyles.cardSubMetricValue} style={{ color: "#ff9800" }}>
-                        {metricsLoading ? "..." : `₹${(dashboardMetrics?.pendingDepositsAmount ?? 0).toLocaleString()}`}
+                        {metricsLoading ? <LoadingDots /> : `₹${(dashboardMetrics?.pendingDepositsAmount ?? 0).toLocaleString()}`}
                       </span>
                     </div>
                   </div>
@@ -244,19 +268,19 @@ export default function AdminDashboard({
                     <div className={overviewStyles.cardSubMetric}>
                       <span className={overviewStyles.cardSubMetricLabel}>Completed</span>
                       <span className={overviewStyles.cardSubMetricValue} style={{ color: "#ff5a6a" }}>
-                        {metricsLoading ? "..." : `₹${(dashboardMetrics?.totalWithdrawals ?? 0).toLocaleString()}`}
+                        {metricsLoading ? <LoadingDots /> : `₹${(dashboardMetrics?.totalWithdrawals ?? 0).toLocaleString()}`}
                       </span>
                     </div>
                     <div className={overviewStyles.cardSubMetric}>
                       <span className={overviewStyles.cardSubMetricLabel}>Volume Count</span>
                       <span className={overviewStyles.cardSubMetricValue}>
-                        {metricsLoading ? "..." : `${dashboardMetrics?.totalWithdrawalsCount ?? 0} successful`}
+                        {metricsLoading ? <LoadingDots /> : `${dashboardMetrics?.totalWithdrawalsCount ?? 0} successful`}
                       </span>
                     </div>
                     <div className={overviewStyles.cardSubMetric}>
                       <span className={overviewStyles.cardSubMetricLabel}>Pending Queue</span>
                       <span className={overviewStyles.cardSubMetricValue} style={{ color: "#ff9800" }}>
-                        {metricsLoading ? "..." : `₹${(dashboardMetrics?.pendingWithdrawalsAmount ?? 0).toLocaleString()}`}
+                        {metricsLoading ? <LoadingDots /> : `₹${(dashboardMetrics?.pendingWithdrawalsAmount ?? 0).toLocaleString()}`}
                       </span>
                     </div>
                   </div>
@@ -270,14 +294,14 @@ export default function AdminDashboard({
                   <span className={styles.telemetryLabel}>Support Operations</span>
                 </div>
                 <div className={styles.telemetryValue} style={{ color: "#f59e0b" }}>
-                  {metricsLoading ? "..." : dashboardMetrics?.openTickets ?? 0}
+                  {metricsLoading ? <LoadingDots /> : dashboardMetrics?.openTickets ?? 0}
                 </div>
                 <div className={styles.telemetryFooter}>Active open tickets in queue</div>
                 <div className={overviewStyles.healthList} style={{ marginTop: "12px" }}>
                   <div className={overviewStyles.cardSubMetric}>
                     <span className={overviewStyles.cardSubMetricLabel}>Resolved (Period)</span>
                     <span className={overviewStyles.cardSubMetricValue} style={{ color: "#4caf50" }}>
-                      {metricsLoading ? "..." : `${dashboardMetrics?.resolvedTickets ?? 0} tickets`}
+                      {metricsLoading ? <LoadingDots /> : `${dashboardMetrics?.resolvedTickets ?? 0} tickets`}
                     </span>
                   </div>
                 </div>
@@ -296,7 +320,7 @@ export default function AdminDashboard({
                       Minted Pool
                     </span>
                     <span className={overviewStyles.cardSubMetricValue} style={{ color: "var(--accent)" }}>
-                      {adminLoading ? "..." : totalPoints.toLocaleString()}
+                      {adminLoading ? <LoadingDots /> : totalPoints.toLocaleString()}
                     </span>
                   </div>
                   <div className={overviewStyles.healthItem}>
@@ -305,7 +329,7 @@ export default function AdminDashboard({
                       Email Check
                     </span>
                     <span className={`${overviewStyles.badge} ${adminSettings?.emailVerificationEnabled ? overviewStyles.badgeSuccess : overviewStyles.badgeMuted}`}>
-                      {adminLoading ? "..." : adminSettings?.emailVerificationEnabled ? "MANDATORY" : "OPTIONAL"}
+                      {adminLoading ? <LoadingDots /> : adminSettings?.emailVerificationEnabled ? "MANDATORY" : "OPTIONAL"}
                     </span>
                   </div>
                   <div className={overviewStyles.healthItem}>
@@ -314,7 +338,7 @@ export default function AdminDashboard({
                       SMS Check
                     </span>
                     <span className={`${overviewStyles.badge} ${adminSettings?.phoneVerificationEnabled ? overviewStyles.badgeSuccess : overviewStyles.badgeMuted}`}>
-                      {adminLoading ? "..." : adminSettings?.phoneVerificationEnabled ? "MANDATORY" : "OPTIONAL"}
+                      {adminLoading ? <LoadingDots /> : adminSettings?.phoneVerificationEnabled ? "MANDATORY" : "OPTIONAL"}
                     </span>
                   </div>
                 </div>

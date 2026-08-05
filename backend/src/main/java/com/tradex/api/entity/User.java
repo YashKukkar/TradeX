@@ -30,6 +30,9 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(name = "full_name")
+    private String fullName;
+
     @Column(nullable = false)
     private String password;
 
@@ -142,6 +145,27 @@ public class User {
         return bankDetails.stream()
                 .filter(bank -> bank.isPrimary())
                 .findFirst();
+    }
+
+    public String getFirstName() {
+        if (fullName == null || fullName.isBlank()) {
+            if (email != null && email.contains("@")) {
+                String prefix = email.split("@")[0];
+                return prefix.substring(0, 1).toUpperCase() + prefix.substring(1);
+            }
+            return "Trader";
+        }
+        String clean = fullName.trim().replaceAll("\\s+", " ");
+        String[] parts = clean.split(" ");
+        if (parts.length > 1 && isTitle(parts[0])) {
+            return parts[1];
+        }
+        return parts[0];
+    }
+
+    private boolean isTitle(String word) {
+        String lower = word.toLowerCase().replace(".", "");
+        return java.util.Set.of("mr", "mrs", "ms", "dr", "prof", "shri", "smt").contains(lower);
     }
 }
 

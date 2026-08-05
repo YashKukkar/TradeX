@@ -1,7 +1,7 @@
 import Icon from "./Icon";
 import adminStyles from "../AdminUsers.module.css";
 import styles from "./EmployeeManagement.module.css";
-import type { UserInfo } from "../utils/dashboardHelpers";
+import { getDisplayName, type UserInfo } from "../utils/dashboardHelpers";
 import DataTable, { type ColumnDef } from "./DataTable";
 
 interface StaffDirectoryTableProps {
@@ -42,7 +42,14 @@ export default function StaffDirectoryTable({
     {
       label: "Employee Account",
       render: (emp) => (
-        <span className={styles.employeeEmail}>{emp.email}</span>
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+          <span style={{ fontWeight: 700, fontSize: "14px", color: "var(--text)" }}>
+            {emp.fullName || getDisplayName(emp.email)}
+          </span>
+          <span className={styles.employeeEmail} style={{ fontSize: "12px", color: "var(--muted)" }}>
+            {emp.email}
+          </span>
+        </div>
       ),
     },
     {

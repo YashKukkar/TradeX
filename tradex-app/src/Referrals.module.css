@@ -36,7 +36,7 @@
 
 .backBtn:hover {
   color: var(--text);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--clr-white-a15);
 }
 
 .pageTitle {
@@ -67,7 +67,7 @@
 
 .statCard:hover {
   transform: translateY(-2px);
-  border-color: rgba(0, 224, 164, 0.25);
+  border-color: var(--clr-teal-a25);
 }
 
 .statIcon {
@@ -138,13 +138,13 @@
 }
 
 .filterBtn:hover {
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--clr-white-a15);
   color: var(--text);
 }
 
 .filterBtn.active {
-  background: rgba(0, 224, 164, 0.12);
-  border-color: rgba(0, 224, 164, 0.35);
+  background: var(--clr-teal-a12);
+  border-color: var(--clr-teal-a35);
   color: var(--primary);
 }
 
@@ -174,14 +174,14 @@
 }
 
 .table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--clr-white-a02);
 }
 
 .table tbody td {
   padding: 14px 24px;
   font-size: 14px;
   color: var(--text);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--clr-white-a03);
 }
 
 .emailCell {
@@ -209,18 +209,18 @@
 }
 
 .level1 {
-  background: rgba(0, 224, 164, 0.12);
+  background: var(--clr-teal-a12);
   color: var(--primary);
 }
 
 .level2 {
-  background: rgba(255, 176, 32, 0.12);
+  background: var(--clr-amber-a12);
   color: var(--accent);
 }
 
 .level3 {
-  background: rgba(96, 130, 255, 0.12);
-  color: #6082ff;
+  background: var(--clr-blue-a12);
+  color: var(--clr-blue);
 }
 
 .statusBadge {
@@ -234,17 +234,17 @@
 }
 
 .credited {
-  background: rgba(0, 224, 164, 0.12);
+  background: var(--clr-teal-a12);
   color: var(--primary);
 }
 
 .pending {
-  background: rgba(255, 176, 32, 0.12);
+  background: var(--clr-amber-a12);
   color: var(--accent);
 }
 
 .cancelled {
-  background: rgba(255, 90, 106, 0.1);
+  background: var(--clr-red-alt-a10);
   color: var(--danger);
 }
 
@@ -280,13 +280,13 @@
 
 .tabBtn:hover {
   color: var(--text);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--clr-white-a03);
 }
 
 .tabBtn.active {
   color: var(--primary);
-  background: rgba(0, 224, 164, 0.08);
-  border-color: rgba(0, 224, 164, 0.25);
+  background: var(--clr-teal-a08);
+  border-color: var(--clr-teal-a25);
 }
 
 /* Responsive */
@@ -308,9 +308,9 @@
 .skeleton {
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.03) 25%,
-    rgba(255, 255, 255, 0.08) 37%,
-    rgba(255, 255, 255, 0.03) 63%
+    var(--clr-white-a03) 25%,
+    var(--clr-white-a08) 37%,
+    var(--clr-white-a03) 63%
   );
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;

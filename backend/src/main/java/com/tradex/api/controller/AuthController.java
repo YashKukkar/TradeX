@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
@@ -38,7 +40,7 @@ public class AuthController {
         log.info("Processing signup request for email: {}", request.email());
         AuthResponse resp = userService.signup(request);
         securityService.setTokenCookie(response, resp.token());
-        return ResponseEntity.ok(new AuthResponse("session", resp.email()));
+        return ResponseEntity.ok(resp);
     }
 
     @PostMapping("/login")
@@ -46,11 +48,11 @@ public class AuthController {
         log.info("Processing login request for email: {}", request.email());
         AuthResponse resp = userService.login(request);
         securityService.setTokenCookie(response, resp.token());
-        return ResponseEntity.ok(new AuthResponse("session", resp.email()));
+        return ResponseEntity.ok(resp);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(jakarta.servlet.http.HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         log.info("Processing logout request");
         securityService.logout(request, response);
         return ResponseEntity.ok().build();
@@ -105,19 +107,16 @@ public class AuthController {
     }
 
     public record ResetPasswordRequest(
-        @NotBlank(message = "Email is required")
-        String email,
-        @NotBlank(message = "Verification code is required")
-        String code,
-        @NotBlank(message = "New password is required")
-        @Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
-        String newPassword
-    ) {}
+            @NotBlank(message = "Email is required") String email,
+            @NotBlank(message = "Verification code is required") String code,
+            @NotBlank(message = "New password is required") @Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters") String newPassword) {
+    }
 
     @PostMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         log.info("Processing password reset for email: {}", request.email());
-        verificationService.resetPassword(request.email().trim().toLowerCase(), request.code().trim(), request.newPassword());
+        verificationService.resetPassword(request.email().trim().toLowerCase(), request.code().trim(),
+                request.newPassword());
         return ResponseEntity.ok().build();
     }
 
@@ -128,8 +127,7 @@ public class AuthController {
 
     @PutMapping("/profile")
     public ResponseEntity<UserDTO> updateProfile(
-            @Valid @RequestBody UpdateProfileRequest request
-    ) {
+            @Valid @RequestBody UpdateProfileRequest request) {
         String email = securityService.getAuthenticatedUserEmail();
         if (email == null) {
             return ResponseEntity.status(401).build();
@@ -140,8 +138,7 @@ public class AuthController {
 
     @PostMapping("/profile/bank")
     public ResponseEntity<UserDTO> addBankAccount(
-            @Valid @RequestBody AddBankAccountRequest request
-    ) {
+            @Valid @RequestBody AddBankAccountRequest request) {
         String email = securityService.getAuthenticatedUserEmail();
         if (email == null) {
             return ResponseEntity.status(401).build();
@@ -171,18 +168,14 @@ public class AuthController {
     }
 
     public record ChangePasswordRequest(
-        @NotBlank(message = "Current password is required")
-        String currentPassword,
+            @NotBlank(message = "Current password is required") String currentPassword,
 
-        @NotBlank(message = "New password is required")
-        @Size(min = 8, max = 100, message = "New password must be between 8 and 100 characters")
-        String newPassword
-    ) {}
+            @NotBlank(message = "New password is required") @Size(min = 8, max = 100, message = "New password must be between 8 and 100 characters") String newPassword) {
+    }
 
     @PostMapping("/change-password")
     public ResponseEntity<Void> changePassword(
-            @Valid @RequestBody ChangePasswordRequest request
-    ) {
+            @Valid @RequestBody ChangePasswordRequest request) {
         String email = securityService.getAuthenticatedUserEmail();
         if (email == null) {
             return ResponseEntity.status(401).build();
@@ -191,4 +184,3 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 }
-

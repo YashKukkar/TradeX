@@ -39,12 +39,12 @@
   align-items: center;
   gap: var(--space-2);
   transition: all 0.2s ease;
-  box-shadow: 0 4px 15px rgba(0, 224, 164, 0.25);
+  box-shadow: 0 4px 15px var(--clr-teal-a25);
 }
 
 .createBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 224, 164, 0.35);
+  box-shadow: 0 8px 20px var(--clr-teal-a35);
 }
 
 /* Stats Section */

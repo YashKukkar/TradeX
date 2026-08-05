@@ -11,6 +11,8 @@ public record SignupRequest(
 
         @NotBlank @Size(min = 8, max = 100) String password,
 
+        @NotBlank @Size(min = 2, max = 100) String fullName,
+
         @Pattern(regexp = "^[A-Z0-9]{2,10}$") String referralCode,
 
         @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Phone number must contain between 10 and 15 digits") String phoneNumber,
@@ -22,9 +24,14 @@ public record SignupRequest(
     public SignupRequest {
 
         email = normalize(email);
+        fullName = normalizeName(fullName);
         referralCode = normalizeUpper(referralCode);
         accountNumber = normalizeUpper(accountNumber);
         phoneNumber = normalize(phoneNumber);
+    }
+
+    public SignupRequest(String email, String password, String referralCode, String phoneNumber, String accountNumber) {
+        this(email, password, "Default Seeded Name", referralCode, phoneNumber, accountNumber);
     }
 
     private static String normalize(String value) {
@@ -37,5 +44,11 @@ public record SignupRequest(
         return value == null || value.isBlank()
                 ? null
                 : value.trim().toUpperCase();
+    }
+
+    private static String normalizeName(String value) {
+        return value == null || value.isBlank()
+                ? null
+                : value.trim().replaceAll("\\s+", " ");
     }
 }

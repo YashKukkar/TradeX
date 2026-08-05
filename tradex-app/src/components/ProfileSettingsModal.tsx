@@ -19,6 +19,7 @@ interface ProfileSettingsModalProps {
 
 export default function ProfileSettingsModal({ user, onClose }: ProfileSettingsModalProps) {
   const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber || "");
+  const [fullNameState, setFullNameState] = useState(user.fullName || "");
   const [bankName, setBankName] = useState("");
   const [holderName, setHolderName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
@@ -39,7 +40,7 @@ export default function ProfileSettingsModal({ user, onClose }: ProfileSettingsM
 
   const updateProfileMutation = useUpdateProfile(
     () => {
-      setSuccessMsg("Phone number updated successfully!");
+      setSuccessMsg("Profile updated successfully!");
       setTimeout(clearMessages, 3000);
     },
     (err) => {
@@ -97,14 +98,21 @@ export default function ProfileSettingsModal({ user, onClose }: ProfileSettingsM
     }
   );
 
-  const handleUpdatePhone = (e: React.FormEvent) => {
+  const handleUpdateProfile = (e: React.FormEvent) => {
     e.preventDefault();
     clearMessages();
     if (!phoneNumber.trim()) {
       setErrorMsg("Phone number cannot be empty");
       return;
     }
-    updateProfileMutation.mutate({ phoneNumber: phoneNumber.trim() });
+    if (!fullNameState.trim() || fullNameState.trim().length < 2) {
+      setErrorMsg("Full name must be at least 2 characters");
+      return;
+    }
+    updateProfileMutation.mutate({
+      phoneNumber: phoneNumber.trim(),
+      fullName: fullNameState.trim()
+    });
   };
 
   const handleAddBank = (e: React.FormEvent) => {
@@ -173,23 +181,38 @@ export default function ProfileSettingsModal({ user, onClose }: ProfileSettingsM
           </div>
         )}
 
-        <form onSubmit={handleUpdatePhone} className={localStyles.formGroup}>
-          <label className={localStyles.label}>Phone Number</label>
-          <div className={localStyles.inputRow}>
+        <form onSubmit={handleUpdateProfile} style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "24px" }}>
+          <div>
+            <label className={localStyles.label} style={{ display: "block", marginBottom: "6px" }}>Full Name</label>
             <input
               type="text"
               className={localStyles.inputField}
+              style={{ width: "100%" }}
+              placeholder="e.g. Alex Morgan"
+              value={fullNameState}
+              onChange={(e) => setFullNameState(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={localStyles.label} style={{ display: "block", marginBottom: "6px" }}>Phone Number</label>
+            <input
+              type="text"
+              className={localStyles.inputField}
+              style={{ width: "100%" }}
               placeholder="+919876543210"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
             />
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <button
               type="submit"
               className={localStyles.primaryBtn}
+              style={{ height: "38px" }}
               disabled={updateProfileMutation.isPending}
             >
               <Icon name="save" style={{ fontSize: "16px" }} />
-              Save
+              Save Changes
             </button>
           </div>
         </form>

@@ -55,7 +55,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px var(--clr-black-a40);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -69,7 +69,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--clr-black-a10);
 }
 
 .searchInput {
@@ -114,11 +114,11 @@
 }
 
 .optionItemHovered {
-  background: rgba(255, 255, 255, 0.05) !important;
+  background: var(--clr-white-a05) !important;
 }
 
 .optionItemSelected {
-  background: rgba(0, 150, 255, 0.08) !important;
+  background: var(--clr-sky-a08) !important;
 }
 
 .optionLeft {
@@ -161,7 +161,7 @@
   display: inline-block;
   width: 12px;
   height: 12px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid var(--clr-white-a20);
   border-radius: 50%;
   border-top-color: var(--text);
   animation: popover-spin 0.8s linear infinite;

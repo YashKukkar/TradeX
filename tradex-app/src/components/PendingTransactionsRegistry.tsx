@@ -1,5 +1,7 @@
 import Icon from "./Icon";
+import ActionButton from "./ActionButton";
 import styles from "../AdminUsers.module.css";
+
 import LoadingState from "./LoadingState";
 import { formatDateTime, getDisplayName } from "../utils/dashboardHelpers";
 import ResolveTransactionModal from "./ResolveTransactionModal";
@@ -255,23 +257,66 @@ export default function PendingTransactionsRegistry({ user }: PendingTransaction
           ))}
         </div>
 
-        {/* Fuzzy Search Box */}
-        <div className={styles.searchBox} style={{ padding: "6px 12px" }}>
-          <Icon name="search" className={styles.searchIcon} style={{ fontSize: "16px" }} />
-          <label htmlFor="transactionSearch" style={{ display: "none" }}>Search Transactions</label>
-          <input
-            id="transactionSearch"
-            name="transactionSearch"
-            type="text"
-            placeholder="Search email, type, amount..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className={styles.searchInput}
-            style={{ fontSize: "13px", width: "240px" }}
-          />
+        {/* Right side tools: Fuzzy Search Box + Export CSV ActionButton */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div className={styles.searchBox} style={{ padding: "6px 12px" }}>
+            <Icon name="search" className={styles.searchIcon} style={{ fontSize: "16px" }} />
+            <label htmlFor="transactionSearch" style={{ display: "none" }}>Search Transactions</label>
+            <input
+              id="transactionSearch"
+              name="transactionSearch"
+              type="text"
+              placeholder="Search email, type, amount..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={styles.searchInput}
+              style={{ fontSize: "13px", width: "220px" }}
+            />
+          </div>
+          <ActionButton
+            iconName="download"
+            loading={false}
+            onClick={() => {
+              if (!filteredList || filteredList.length === 0) return;
+              const headers = ["ID", "User Email", "Type", "Status", "Amount", "Balance After", "Created At"];
+              const rows = filteredList.map((t) => [
+                t.id,
+                `"${t.userEmail}"`,
+                `"${t.type}"`,
+                `"${t.status}"`,
+                t.amount,
+                t.balanceAfter || 0,
+                `"${formatDateTime(t.createdAt)}"`,
+              ]);
+              const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+              const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement("a");
+              link.setAttribute("href", url);
+              link.setAttribute("download", `tradex-transactions-${activeTab}.csv`);
+              document.body.appendChild(link);
+              link.click();
+              link.remove();
+              URL.revokeObjectURL(url);
+            }}
+            style={{
+              background: "var(--card-bg, #1e222d)",
+              border: "1px solid var(--border)",
+              color: "var(--text)",
+              padding: "6px 12px",
+              borderRadius: "6px",
+              fontSize: "13px",
+              fontWeight: 600,
+            }}
+            title="Export filtered transactions to CSV"
+          >
+            Export CSV
+          </ActionButton>
         </div>
       </div>
     </div>
+
 
       {/* Table / Loading / Error */}
       {activeLoading ? (

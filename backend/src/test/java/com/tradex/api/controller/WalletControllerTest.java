@@ -83,7 +83,7 @@ class WalletControllerTest {
                 "+1234567890",
                 "ACC12345");
 
-        when(walletService.deposit(eq("user@example.com"), any(BigDecimal.class))).thenReturn(mockTx);
+        when(walletService.deposit(eq("user@example.com"), any(BigDecimal.class), any())).thenReturn(mockTx);
 
         mockMvc.perform(post("/api/wallet/deposit")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -111,7 +111,7 @@ class WalletControllerTest {
                 "+1234567890",
                 "ACC12345");
 
-        when(walletService.withdraw(eq("user@example.com"), any(BigDecimal.class))).thenReturn(mockTx);
+        when(walletService.withdraw(eq("user@example.com"), any(BigDecimal.class), any())).thenReturn(mockTx);
 
         mockMvc.perform(post("/api/wallet/withdraw")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -138,7 +138,7 @@ class WalletControllerTest {
                 "+1234567890",
                 "ACC12345");
 
-        when(pointsService.convertPoints(eq("user@example.com"), eq(100L))).thenReturn(mockTx);
+        when(pointsService.convertPoints(eq("user@example.com"), eq(100L), any())).thenReturn(mockTx);
 
         mockMvc.perform(post("/api/wallet/convert-points")
                 .contentType(MediaType.APPLICATION_JSON)

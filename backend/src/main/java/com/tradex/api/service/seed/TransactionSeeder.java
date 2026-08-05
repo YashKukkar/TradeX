@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -151,6 +152,7 @@ public class TransactionSeeder {
                                 .type(WalletTransactionType.DEPOSIT)
                                 .status(WalletTransactionStatus.SUCCESS)
                                 .notes("Deposit approved by admin")
+                                .idempotencyKey(UUID.randomUUID().toString())
                                 .createdAt(u1.getCreatedAt().plusHours(4))
                                 .build());
 
@@ -162,6 +164,7 @@ public class TransactionSeeder {
                                 .type(WalletTransactionType.FIRST_DEPOSIT_BONUS)
                                 .status(WalletTransactionStatus.SUCCESS)
                                 .notes("First-time wallet load bonus reward")
+                                .idempotencyKey(UUID.randomUUID().toString())
                                 .createdAt(u1.getCreatedAt().withHour(13).withMinute(23))
                                 .build());
 
@@ -174,6 +177,7 @@ public class TransactionSeeder {
                                 .type(WalletTransactionType.DEPOSIT)
                                 .status(WalletTransactionStatus.SUCCESS)
                                 .notes("Deposit approved by admin")
+                                .idempotencyKey(UUID.randomUUID().toString())
                                 .createdAt(u2.getCreatedAt().plusHours(2))
                                 .build());
 
@@ -185,6 +189,7 @@ public class TransactionSeeder {
                                 .type(WalletTransactionType.WITHDRAWAL)
                                 .status(WalletTransactionStatus.SUCCESS)
                                 .notes("Withdrawal approved by admin")
+                                .idempotencyKey(UUID.randomUUID().toString())
                                 .createdAt(u2.getCreatedAt().plusDays(1).withHour(10).withMinute(45))
                                 .build());
 
@@ -196,6 +201,7 @@ public class TransactionSeeder {
                                 .type(WalletTransactionType.DEPOSIT)
                                 .status(WalletTransactionStatus.PENDING)
                                 .notes("Deposit request pending approval")
+                                .idempotencyKey(UUID.randomUUID().toString())
                                 .createdAt(now.minusHours(3).withSecond(0).withNano(0))
                                 .build());
 
@@ -207,6 +213,7 @@ public class TransactionSeeder {
                                 .type(WalletTransactionType.WITHDRAWAL)
                                 .status(WalletTransactionStatus.PENDING)
                                 .notes("Withdrawal of funds from wallet to bank account ACCU104")
+                                .idempotencyKey(UUID.randomUUID().toString())
                                 .createdAt(now.minusMinutes(45).withSecond(0).withNano(0))
                                 .build());
 

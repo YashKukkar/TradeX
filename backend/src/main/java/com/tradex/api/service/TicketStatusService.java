@@ -46,10 +46,14 @@ public class TicketStatusService {
         if (admin.getRole() != Role.SUPER_ADMIN) {
             // Cannot modify status of a ticket claimed by another agent
             if (ticket.getAssignedToUser() != null && !ticket.getAssignedToUser().getId().equals(admin.getId())) {
+                log.warn("Forbidden ticket status update: Agent {} attempted to modify ticket {} claimed by agent {}",
+                        adminEmail, ticketId, ticket.getAssignedToUser().getEmail());
                 throw new ForbiddenException("You cannot update status on a ticket claimed by another agent.");
             }
             // Must have the matching permission group to resolve or change status of the ticket (if group is assigned)
             if (ticket.getAssignedToPermission() != null && !admin.getPermissions().contains(ticket.getAssignedToPermission())) {
+                log.warn("Forbidden ticket status update: Agent {} lacks required permission group {} for ticket {}",
+                        adminEmail, ticket.getAssignedToPermission(), ticketId);
                 throw new ForbiddenException("You do not have the required permission group to update status on this ticket.");
             }
         }
@@ -104,10 +108,13 @@ public class TicketStatusService {
         boolean isAdmin = access.isAdmin();
 
         if (ticket.getStatus() != TicketStatus.RESOLVED) {
+            log.warn("Failed ticket reopen: Ticket {} is not in RESOLVED status (current: {}) for user {}",
+                    ticketId, ticket.getStatus(), userEmail);
             throw new BadRequestException("Only resolved tickets can be reopened");
         }
 
         if (ticket.getReopenCount() >= 2) {
+            log.warn("Failed ticket reopen: Ticket {} has already reached max reopen count (2) for user {}", ticketId, userEmail);
             throw new BadRequestException("This ticket has already been reopened the maximum number of times (2). Please raise a new support ticket instead.");
         }
 
@@ -152,7 +159,12 @@ public class TicketStatusService {
         );
 
         if (!toClose.isEmpty()) {
+            log.info("Auto-closure scheduler started. Found {} tickets to close.", toClose.size());
             for (SupportTicket ticket : toClose) {
+                log.info("Auto-closing ticket {} resolved by {} on {}",
+                        ticket.getTicketNumber(),
+                        ticket.getResolvedBy() != null ? ticket.getResolvedBy().getEmail() : "SYSTEM",
+                        ticket.getResolvedAt());
                 if (ticket.getAttachments() != null) {
                     for (TicketAttachment attachment : ticket.getAttachments()) {
                         try {

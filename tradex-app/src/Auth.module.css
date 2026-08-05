@@ -41,11 +41,11 @@
   padding: 44px 40px;
   width: 100%;
   max-width: 420px;
-  background: linear-gradient(160deg, rgba(21, 28, 59, 0.95), rgba(27, 36, 80, 0.92));
+  background: linear-gradient(160deg, var(--clr-scene-blue), lch(11% 18 268 / 0.92));
   backdrop-filter: blur(20px);
   border: 1px solid var(--border);
   border-radius: 20px;
-  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(0, 224, 164, 0.06);
+  box-shadow: 0 32px 64px var(--clr-black-a45), 0 0 0 1px var(--clr-teal-a06);
 }
 
 /* ── Shake animation (error) ── */
@@ -117,7 +117,7 @@
 .input {
   width: 100%;
   padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--clr-white-a04);
   border: 1px solid var(--border);
   border-radius: 10px;
   color: var(--text);
@@ -130,11 +130,11 @@
 
 .input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 224, 164, 0.12);
+  box-shadow: 0 0 0 3px var(--clr-teal-a12);
 }
 
 .input::placeholder {
-  color: rgba(154, 166, 207, 0.45);
+  color: var(--clr-muted-a45);
 }
 
 /* ── Password field with show/hide toggle ── */
@@ -169,7 +169,7 @@
 .button {
   padding: 13px 20px;
   background: linear-gradient(135deg, var(--primary), var(--primary-2));
-  color: #05231c;
+  color: var(--clr-teal-dark);
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -254,7 +254,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(9, 7, 15, 0.65);
+  background: var(--clr-scene-modal);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: 20px;
@@ -275,11 +275,11 @@
 .spinner {
   width: 48px;
   height: 48px;
-  border: 4px solid rgba(0, 224, 164, 0.1);
+  border: 4px solid var(--clr-teal-a10);
   border-left-color: var(--primary);
   border-radius: 50%;
   animation: spin 1.2s linear infinite;
-  box-shadow: 0 0 15px rgba(0, 224, 164, 0.15);
+  box-shadow: 0 0 15px var(--clr-teal-a15);
 }
 
 @keyframes spin {
@@ -293,12 +293,12 @@
   font-weight: 700;
   color: var(--text);
   letter-spacing: 0.02em;
-  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 0 10px var(--clr-black-a50);
 }
 
 .inputInvalid {
-  border-color: #ff4a76 !important;
-  box-shadow: 0 0 10px rgba(255, 74, 118, 0.25) !important;
+  border-color: var(--clr-red-alt) !important;
+  box-shadow: 0 0 10px var(--clr-red-a25) !important;
   animation: errorSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1), borderBlink 1.5s infinite ease-in-out !important;
 }
 
@@ -318,7 +318,7 @@
   width: 110px;
   flex-shrink: 0;
   padding: 12px 10px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--clr-white-a04);
   border: 1px solid var(--border);
   border-radius: 10px;
   color: var(--text);
@@ -331,18 +331,18 @@
 
 .countryCodeSelect:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 224, 164, 0.12);
+  box-shadow: 0 0 0 3px var(--clr-teal-a12);
 }
 
 .countryCodeSelect option {
-  background: #11162d;
+  background: lch(9% 14 268);
   color: var(--text);
 }
 
 .optionalTag {
   font-size: 0.72rem;
   font-weight: 400;
-  color: #7a8aaa;
+  color: var(--clr-muted);
   margin-left: 4px;
 }
 
@@ -356,11 +356,11 @@
 .errorLabel {
   font-size: 11px;
   font-weight: 700;
-  color: #ff4a76;
+  color: var(--clr-red-alt);
   text-transform: none;
   letter-spacing: normal;
-  background: rgba(255, 74, 118, 0.08);
-  border: 1px solid #ff4a76;
+  background: var(--clr-red-alt-a08);
+  border: 1px solid var(--clr-red-alt);
   border-radius: 4px;
   padding: 2px 8px;
   display: inline-flex;
@@ -376,11 +376,11 @@
 
 @keyframes borderBlink {
   0%, 100% {
-    border-color: #ff4a76;
-    box-shadow: 0 0 10px rgba(255, 74, 118, 0.25);
+    border-color: var(--clr-red-alt);
+    box-shadow: 0 0 10px var(--clr-red-a25);
   }
   50% {
-    border-color: rgba(255, 74, 118, 0.3);
-    box-shadow: 0 0 4px rgba(255, 74, 118, 0.05);
+    border-color: var(--clr-red-a30);
+    box-shadow: 0 0 4px var(--clr-red-a05);
   }
 }

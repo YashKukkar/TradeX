@@ -9,6 +9,7 @@ import AdminDashboard from "./components/AdminDashboard";
 import UserDashboard from "./components/UserDashboard";
 import { getDisplayName, formatDate } from "./utils/dashboardHelpers";
 import { isAdminRole } from "./utils/permissions";
+import { safeStorage } from "./utils/api";
 import {
   useCurrentUser,
   useVerification,
@@ -94,7 +95,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (userError) {
       console.error("Dashboard initialization failed:", userError);
-      localStorage.clear();
+      safeStorage.clear();
       navigate("/login");
     }
   }, [userError, navigate]);
@@ -120,7 +121,15 @@ export default function Dashboard() {
   const verifyLoading = verifyMutation.isPending;
 
   const email = user?.email || "";
-  const displayName = user ? getDisplayName(user.email) : "";
+  const displayName = user?.fullName || (user ? getDisplayName(user.email) : "");
+
+  const getInitials = (name: string): string => {
+    if (!name) return "U";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  };
+
   const referralCode = user?.referralCode || "";
   const pointsBalance = user?.pointsBalance ?? 0;
   const phoneNumber = user?.phoneNumber || "";
@@ -164,7 +173,7 @@ export default function Dashboard() {
             aria-expanded={menuOpen}
           >
             <div className={`${styles.avatar} ${isAdmin ? styles.adminAvatar : ""}`}>
-              {isAdmin ? "⚡" : (displayName.charAt(0) || "U")}
+              {isAdmin ? "⚡" : getInitials(displayName)}
             </div>
             <span className={styles.userName}>{displayName || "Loading..."}</span>
             <span className={styles.chevron}>

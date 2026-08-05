@@ -3,6 +3,7 @@ import Icon from "./Icon";
 import { config } from "../config";
 import axios from "axios";
 import { useToast } from "../context/ToastContext";
+import { safeStorage } from "../utils/api";
 
 interface Attachment {
   id: number;
@@ -25,7 +26,7 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
   useEffect(() => {
     if (!attachments || attachments.length === 0) return;
 
-    const token = localStorage.getItem("token");
+    const token = safeStorage.getItem("token");
     const loadedUrls: Record<number, string> = {};
 
     const fetchImage = async (attId: number) => {
@@ -58,7 +59,7 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
   }, [attachments]);
 
   const handleDownload = async (attId: number, fileName: string) => {
-    const token = localStorage.getItem("token");
+    const token = safeStorage.getItem("token");
     try {
       const response = await axios.get(`${config.apiUrl}/tickets/attachments/${attId}`, {
         headers: {

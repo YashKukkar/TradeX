@@ -57,6 +57,9 @@ public class WalletTransaction {
     @JoinColumn(name = "processed_by_id")
     private User processedBy;
 
+    @Column(name = "idempotency_key", unique = true, length = 100)
+    private String idempotencyKey;
+
     public WalletTransaction(User user, BigDecimal amount, BigDecimal balanceAfter, WalletTransactionType type, WalletTransactionStatus status, String notes) {
         this.user = user;
         this.amount = amount;

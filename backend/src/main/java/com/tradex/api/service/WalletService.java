@@ -18,6 +18,7 @@ import java.util.List;
 
 import com.tradex.api.service.handler.TransactionHandler;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.function.Function;
 
@@ -51,6 +52,20 @@ public class WalletService {
 
     @Transactional
     public WalletTransactionDTO deposit(String email, BigDecimal amount) {
+        return deposit(email, amount, null);
+    }
+
+    @Transactional
+    public WalletTransactionDTO deposit(String email, BigDecimal amount, String idempotencyKey) {
+        if (idempotencyKey != null && !idempotencyKey.isBlank()) {
+            Optional<WalletTransaction> existing = walletTransactionRepository.findByIdempotencyKey(idempotencyKey);
+            if (existing.isPresent()) {
+                log.info("Duplicate deposit request detected for key {}. Returning cached transaction.",
+                        idempotencyKey);
+                return new WalletTransactionDTO(existing.get());
+            }
+        }
+
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BadRequestException("Deposit amount must be greater than zero");
         }
@@ -71,6 +86,7 @@ public class WalletService {
                 WalletTransactionType.DEPOSIT,
                 WalletTransactionStatus.PENDING,
                 "Deposit request pending approval");
+        depositTx.setIdempotencyKey(idempotencyKey);
         walletTransactionRepository.save(depositTx);
 
         return new WalletTransactionDTO(depositTx);
@@ -78,6 +94,20 @@ public class WalletService {
 
     @Transactional
     public WalletTransactionDTO withdraw(String email, BigDecimal amount) {
+        return withdraw(email, amount, null);
+    }
+
+    @Transactional
+    public WalletTransactionDTO withdraw(String email, BigDecimal amount, String idempotencyKey) {
+        if (idempotencyKey != null && !idempotencyKey.isBlank()) {
+            Optional<WalletTransaction> existing = walletTransactionRepository.findByIdempotencyKey(idempotencyKey);
+            if (existing.isPresent()) {
+                log.info("Duplicate withdrawal request detected for key {}. Returning cached transaction.",
+                        idempotencyKey);
+                return new WalletTransactionDTO(existing.get());
+            }
+        }
+
         User user = userRepository.findByEmailForUpdate(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
@@ -98,6 +128,7 @@ public class WalletService {
                 WalletTransactionStatus.PENDING,
                 "Withdrawal of funds from wallet to bank account "
                         + user.getPrimaryBank().map(BankDetail::getAccountNumber).orElse("N/A"));
+        withdrawTx.setIdempotencyKey(idempotencyKey);
         walletTransactionRepository.save(withdrawTx);
 
         log.info("Processed withdrawal request of {} (PENDING) for user {}", amount, email);

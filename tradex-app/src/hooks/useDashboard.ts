@@ -1,7 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "../utils/api";
+import { api, safeStorage } from "../utils/api";
 import type { UserProfile, UserInfo, SystemSetting, ReferralReward, PointsTransaction, WalletTransaction } from "../utils/dashboardHelpers";
 import { useOverlay, getPollingInterval } from "../context/OverlayContext";
+
+const generateUUID = (): string => {
+  if (typeof window !== "undefined" && window.crypto && window.crypto.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
 
 export interface ReferralsData {
   downline: ReferralReward[];
@@ -119,8 +130,8 @@ export function useLogout(onLogoutComplete: () => void) {
       }
     },
     onSuccess: () => {
+      safeStorage.clear();
       queryClient.clear();
-      localStorage.clear();
       sessionStorage.clear();
       document.cookie = "token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
       document.documentElement.removeAttribute("data-theme");
@@ -159,6 +170,7 @@ export function useDeposit(
     mutationFn: ({ amount }) => {
       return api("/wallet/deposit", {
         method: "POST",
+        headers: { "Idempotency-Key": generateUUID() },
         body: JSON.stringify({ amount })
       });
     },
@@ -184,6 +196,7 @@ export function useWithdraw(
     mutationFn: ({ amount }) => {
       return api("/wallet/withdraw", {
         method: "POST",
+        headers: { "Idempotency-Key": generateUUID() },
         body: JSON.stringify({ amount })
       });
     },
@@ -209,6 +222,7 @@ export function useConvertPoints(
     mutationFn: ({ points }) => {
       return api("/wallet/convert-points", {
         method: "POST",
+        headers: { "Idempotency-Key": generateUUID() },
         body: JSON.stringify({ points })
       });
     },
@@ -238,11 +252,11 @@ export function useUpdateProfile(
 ) {
   const queryClient = useQueryClient();
 
-  return useMutation<UserProfile, Error, { phoneNumber: string }>({
-    mutationFn: ({ phoneNumber }) => {
+  return useMutation<UserProfile, Error, { phoneNumber: string; fullName?: string }>({
+    mutationFn: ({ phoneNumber, fullName }) => {
       return api("/auth/profile", {
         method: "PUT",
-        body: JSON.stringify({ phoneNumber })
+        body: JSON.stringify({ phoneNumber, fullName })
       });
     },
     onSuccess: () => {

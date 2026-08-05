@@ -91,8 +91,8 @@ if (-not (Test-Path "$ROOT\tradex-app\node_modules\.bin\vite.ps1")) {
 $env:_JAVA_OPTIONS = "-XX:-UsePerfData"
 
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "`$env:_JAVA_OPTIONS='-XX:-UsePerfData'; Set-Location '$ROOT\backend'; mvn spring-boot:run '-Dspring-boot.run.fork=false'"
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$ROOT\nextjs-app'; & '.\node_modules\.bin\next.ps1' dev"
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$ROOT\tradex-app'; & '.\node_modules\.bin\vite.ps1'"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$ROOT\nextjs-app'; npm run dev"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$ROOT\tradex-app'; npm run dev"
 
 Write-Host ""
 Write-Host "Running:"

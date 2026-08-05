@@ -1,6 +1,7 @@
 import Icon from "./Icon";
 import styles from "../AdminUsers.module.css";
 import ActionBadge from "./ActionBadge";
+import ActionButton from "./ActionButton";
 import { formatEpochTime } from "../utils/dashboardHelpers";
 import LoadingState from "./LoadingState";
 import DataTable, { type ColumnDef } from "./DataTable";
@@ -71,11 +72,57 @@ export default function AdminAuditLogsRegistry({
     );
   };
 
+  const handleExportLogs = () => {
+    if (!logs || logs.length === 0) {
+      showToast("No audit logs available to export.", "warning");
+      return;
+    }
+    const headers = ["ID", "Timestamp", "Actor", "Action", "Target User", "Details"];
+    const rows = logs.map((l) => [
+      l.id,
+      `"${formatEpochTime(l.createdAt)}"`,
+      `"${l.actorEmail}"`,
+      `"${l.action}"`,
+      `"${l.targetEmail}"`,
+      `"${(l.details || "").replace(/"/g, '""')}"`,
+    ]);
+    const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `tradex-audit-logs-page-${page + 1}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    showToast("Audit logs exported to CSV!", "success");
+  };
+
   return (
     <div className={styles.tableSection}>
-      <div className={styles.tableHeader}>
+      <div className={styles.tableHeader} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h2 className={styles.tableTitle}>System Audit Logs</h2>
+        <ActionButton
+          iconName="download"
+          loading={false}
+          onClick={handleExportLogs}
+          style={{
+            background: "var(--card-bg, #1e222d)",
+            border: "1px solid var(--border)",
+            color: "var(--text)",
+            padding: "6px 14px",
+            borderRadius: "6px",
+            fontSize: "13px",
+            fontWeight: 600,
+          }}
+          title="Export visible audit logs to CSV"
+        >
+          Export CSV
+        </ActionButton>
       </div>
+
 
       {loading ? (
         <LoadingState message="Querying audit records..." />

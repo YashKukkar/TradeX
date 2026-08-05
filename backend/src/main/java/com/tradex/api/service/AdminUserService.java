@@ -54,6 +54,7 @@ public class AdminUserService {
 
     private void selfActionGuard(String adminEmail, User target, String action) {
         if (target.getEmail().equalsIgnoreCase(adminEmail)) {
+            log.warn("Forbidden admin self-action: Admin {} tried to {} their own account", adminEmail, action);
             throw new BadRequestException("Admin cannot " + action + " their own account");
         }
     }
@@ -67,6 +68,7 @@ public class AdminUserService {
         selfActionGuard(adminEmail, target, "lock");
 
         if (target.isLocked()) {
+            log.warn("Admin action failed: User {} is already locked (requested by admin {})", target.getEmail(), adminEmail);
             throw new BadRequestException("User account is already locked");
         }
 
@@ -80,6 +82,7 @@ public class AdminUserService {
         User target = loadTargetForUpdate(userId);
 
         if (!target.isLocked()) {
+            log.warn("Admin action failed: User {} is not locked (requested by admin {})", target.getEmail(), adminEmail);
             throw new BadRequestException("User account is not locked");
         }
 
@@ -96,6 +99,7 @@ public class AdminUserService {
         selfActionGuard(adminEmail, target, "disable");
 
         if (!target.isEnabled()) {
+            log.warn("Admin action failed: User {} is already disabled (requested by admin {})", target.getEmail(), adminEmail);
             throw new BadRequestException("User account is already disabled");
         }
 
@@ -109,6 +113,7 @@ public class AdminUserService {
         User target = loadTargetForUpdate(userId);
 
         if (target.isEnabled()) {
+            log.warn("Admin action failed: User {} is already enabled (requested by admin {})", target.getEmail(), adminEmail);
             throw new BadRequestException("User account is already enabled");
         }
 
@@ -124,6 +129,7 @@ public class AdminUserService {
         User target = loadTargetForUpdate(userId);
 
         if (target.isEmailVerified()) {
+            log.warn("Admin action failed: User {} email is already verified (requested by admin {})", target.getEmail(), adminEmail);
             throw new BadRequestException("User email is already verified");
         }
 
@@ -139,6 +145,7 @@ public class AdminUserService {
         Instant now = Instant.now();
         Instant lastReset = passwordResetCooldowns.getIfPresent(userId);
         if (lastReset != null && now.isBefore(lastReset.plusSeconds(60))) {
+            log.warn("Admin action failed: Password reset cooldown active for user ID {} (requested by admin {})", userId, adminEmail);
             throw new BadRequestException("Please wait at least 60 seconds between password reset requests for this user.");
         }
  
@@ -165,6 +172,8 @@ public class AdminUserService {
         long newBalance = currentBalance + request.delta();
 
         if (newBalance < 0) {
+            log.warn("Admin action failed: Adjusting points by {} would result in negative points balance ({}) for user {} (requested by admin {})",
+                    request.delta(), newBalance, target.getEmail(), adminEmail);
             throw new BadRequestException(
                     "Adjustment would result in a negative points balance (current: " + currentBalance +
                     ", delta: " + request.delta() + ")");
@@ -203,9 +212,12 @@ public class AdminUserService {
                 target = walletBalanceManager.mutateWithdrawableBalance(target, delta);
                 newBalance = target.getWithdrawableBalance();
             } else {
+                log.warn("Admin action failed: Invalid wallet type {} requested by admin {}", request.walletType(), adminEmail);
                 throw new BadRequestException("Invalid wallet type: " + request.walletType());
             }
         } catch (IllegalArgumentException e) {
+            log.warn("Admin action failed: Wallet adjustment by {} failed for user {} due to: {} (requested by admin {})",
+                    delta, target.getEmail(), e.getMessage(), adminEmail);
             throw new BadRequestException("Adjustment failed: " + e.getMessage());
         }
 

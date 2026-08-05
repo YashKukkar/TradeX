@@ -47,7 +47,7 @@ const COLUMNS: ColumnDef<FilteredUser>[] = [
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
           <span style={{ fontWeight: 750, fontSize: "14px", color: "var(--text)", lineHeight: 1.2 }}>
-            {getDisplayName(u.email)}
+            {u.fullName || getDisplayName(u.email)}
           </span>
           <span className={styles.userEmail} style={{ fontSize: "12px", color: "var(--muted)" }}>
             <HighlightText text={u.email} indices={emailIndices} />

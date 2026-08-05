@@ -1,5 +1,6 @@
 package com.tradex.api.controller;
 
+import com.tradex.api.dto.PointsTransactionDTO;
 import com.tradex.api.dto.ReferralRewardDTO;
 import com.tradex.api.service.ReferralService;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +29,8 @@ public class ReferralController {
     }
 
     @GetMapping("/transactions")
-    public ResponseEntity<List<com.tradex.api.dto.PointsTransactionDTO>> getMyTransactions(Principal principal) {
-        List<com.tradex.api.dto.PointsTransactionDTO> transactions = referralService.getMyTransactions(principal.getName());
+    public ResponseEntity<List<PointsTransactionDTO>> getMyTransactions(Principal principal) {
+        List<PointsTransactionDTO> transactions = referralService.getMyTransactions(principal.getName());
         return ResponseEntity.ok(transactions);
     }
 }
-

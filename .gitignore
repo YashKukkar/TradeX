@@ -12,6 +12,7 @@ TradeX.zip
 !launch.ps1
 
 # Backend (Java/Maven)
+backend/bin/
 backend/target/
 backend/.mvn/wrapper/maven-wrapper.jar
 backend/.apt_generated

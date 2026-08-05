@@ -40,6 +40,7 @@ public class TicketCreationService {
                 user,
                 List.of(TicketStatus.OPEN, TicketStatus.IN_PROGRESS));
         if (activeCount >= 3) {
+            log.warn("Failed ticket creation: User {} already has {} active tickets", userEmail, activeCount);
             throw new BadRequestException("You already have " + activeCount
                     + " active support tickets. Please wait for them to be resolved before opening a new one.");
         }
@@ -55,6 +56,7 @@ public class TicketCreationService {
 
         if (files != null && !files.isEmpty()) {
             if (files.size() > 5) {
+                log.warn("Failed ticket creation: User {} uploaded {} files, exceeding max limit of 5", userEmail, files.size());
                 throw new BadRequestException("Maximum of 5 attachments allowed per ticket");
             }
             ticketAttachmentService.processAndAttachFiles(ticket, files);

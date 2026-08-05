@@ -7,6 +7,8 @@ import java.util.List;
 public record UserDTO(
     Long id,
     String email,
+    String fullName,
+    String firstName,
     String referralCode,
     Long pointsBalance,
     String referralPath,
@@ -28,14 +30,14 @@ public record UserDTO(
 ) {
     // Compact constructor for minimal contexts (e.g. referral tree nodes)
     public UserDTO(Long id, String email, String referralCode, Long pointsBalance, String referralPath, String referredByEmail, String phoneNumber) {
-        this(id, email, referralCode, pointsBalance, referralPath, referredByEmail, phoneNumber, "USER", System.currentTimeMillis() / 1000, false, false, BigDecimal.ZERO, BigDecimal.ZERO, true, false, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), 0L);
+        this(id, email, null, null, referralCode, pointsBalance, referralPath, referredByEmail, phoneNumber, "USER", System.currentTimeMillis() / 1000, false, false, BigDecimal.ZERO, BigDecimal.ZERO, true, false, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), 0L);
     }
 
     public UserDTO(Long id, String email, String referralCode, Long pointsBalance, String referralPath, String referredByEmail, String phoneNumber, String role, Long createdAt) {
-        this(id, email, referralCode, pointsBalance, referralPath, referredByEmail, phoneNumber, role, createdAt, false, false, BigDecimal.ZERO, BigDecimal.ZERO, true, false, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), 0L);
+        this(id, email, null, null, referralCode, pointsBalance, referralPath, referredByEmail, phoneNumber, role, createdAt, false, false, BigDecimal.ZERO, BigDecimal.ZERO, true, false, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), 0L);
     }
 
     public UserDTO(Long id, String email, String referralCode, Long pointsBalance, String referralPath, String referredByEmail, String phoneNumber, String role, Long createdAt, boolean emailVerified, boolean phoneVerified, BigDecimal withdrawableBalance, BigDecimal bonusBalance, boolean enabled, boolean locked, List<String> permissions) {
-        this(id, email, referralCode, pointsBalance, referralPath, referredByEmail, phoneNumber, role, createdAt, emailVerified, phoneVerified, withdrawableBalance, bonusBalance, enabled, locked, permissions, Collections.emptyList(), Collections.emptyList(), permissions, 0L);
+        this(id, email, null, null, referralCode, pointsBalance, referralPath, referredByEmail, phoneNumber, role, createdAt, emailVerified, phoneVerified, withdrawableBalance, bonusBalance, enabled, locked, permissions, Collections.emptyList(), Collections.emptyList(), permissions, 0L);
     }
 }

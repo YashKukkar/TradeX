@@ -44,30 +44,33 @@ public class WalletController {
     @PostMapping("/deposit")
     public ResponseEntity<WalletTransactionDTO> deposit(
             Principal principal,
-            @Valid @RequestBody WalletAmountRequest request
+            @Valid @RequestBody WalletAmountRequest request,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey
     ) {
-        log.info("Deposit request for user {} with amount {}", principal.getName(), request.amount());
-        WalletTransactionDTO tx = walletService.deposit(principal.getName(), request.amount());
+        log.info("Deposit request for user {} with amount {} and idempotency key {}", principal.getName(), request.amount(), idempotencyKey);
+        WalletTransactionDTO tx = walletService.deposit(principal.getName(), request.amount(), idempotencyKey);
         return ResponseEntity.ok(tx);
     }
 
     @PostMapping("/withdraw")
     public ResponseEntity<WalletTransactionDTO> withdraw(
             Principal principal,
-            @Valid @RequestBody WalletAmountRequest request
+            @Valid @RequestBody WalletAmountRequest request,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey
     ) {
-        log.info("Withdrawal request for user {} with amount {}", principal.getName(), request.amount());
-        WalletTransactionDTO tx = walletService.withdraw(principal.getName(), request.amount());
+        log.info("Withdrawal request for user {} with amount {} and idempotency key {}", principal.getName(), request.amount(), idempotencyKey);
+        WalletTransactionDTO tx = walletService.withdraw(principal.getName(), request.amount(), idempotencyKey);
         return ResponseEntity.ok(tx);
     }
 
     @PostMapping("/convert-points")
     public ResponseEntity<WalletTransactionDTO> convertPoints(
             Principal principal,
-            @Valid @RequestBody ConvertPointsRequest request
+            @Valid @RequestBody ConvertPointsRequest request,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey
     ) {
-        log.info("Points conversion request for user {} with points {}", principal.getName(), request.points());
-        WalletTransactionDTO tx = pointsService.convertPoints(principal.getName(), request.points());
+        log.info("Points conversion request for user {} with points {} and idempotency key {}", principal.getName(), request.points(), idempotencyKey);
+        WalletTransactionDTO tx = pointsService.convertPoints(principal.getName(), request.points(), idempotencyKey);
         return ResponseEntity.ok(tx);
     }
 

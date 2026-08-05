@@ -45,40 +45,7 @@ public class SystemSettingsSeeder {
             settings.setSmtpFromName(seedConfig.getSmtpFromName());
             systemSettingRepository.save(settings);
         } else {
-            boolean updated = false;
-            if (!settings.isEmailNotificationsEnabled()) {
-                settings.setEmailNotificationsEnabled(true);
-                updated = true;
-            }
-            if (settings.getSmtpUsername() == null || settings.getSmtpUsername().isBlank()) {
-                settings.setSmtpUsername(seedConfig.getSmtpUsername());
-                updated = true;
-            }
-            if (settings.getSmtpPassword() == null || settings.getSmtpPassword().isBlank()) {
-                settings.setSmtpPassword(seedConfig.getSmtpPassword());
-                updated = true;
-            }
-            if (settings.getSmtpFromEmail() == null || settings.getSmtpFromEmail().isBlank() || "support@tradex.com".equalsIgnoreCase(settings.getSmtpFromEmail())) {
-                settings.setSmtpFromEmail(seedConfig.getSmtpFromEmail());
-                updated = true;
-            }
-            if (settings.getReferralCoinsLimitTier() == null || settings.getReferralCoinsLimitTier() == 0) {
-                settings.setReferralCoinsLimitTier(seedConfig.getReferralCoinsLimitTier());
-                updated = true;
-            }
-            if (settings.getReferralCoinsSubsequentAmount() == null || settings.getReferralCoinsSubsequentAmount() == 0L) {
-                settings.setReferralCoinsSubsequentAmount(seedConfig.getReferralCoinsSubsequent());
-                updated = true;
-            }
-            if (settings.getRedirectEmailAddress() == null || settings.getRedirectEmailAddress().isBlank()) {
-                settings.setRedirectEmailAddress(seedConfig.getRedirectEmailAddress());
-                updated = true;
-            }
-            if (updated) {
-                settings.setReferralCoinsSubsequentEnabled(true);
-                systemSettingRepository.save(settings);
-                log.info("Migrated existing system settings with new limits and defaults");
-            }
+            log.info("System settings already exist. Skipping system settings seeding.");
         }
         systemSettingService.refreshCache();
     }

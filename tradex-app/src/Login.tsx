@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { config } from "./config";
 import styles from "./Auth.module.css";
-import { api } from "./utils/api";
+import { api, safeStorage } from "./utils/api";
 import Icon from "./components/Icon";
 
 export default function Login() {
@@ -26,6 +26,15 @@ export default function Login() {
     setTimeout(() => setShake(false), 500);
   };
 
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    if (token) {
+      safeStorage.setItem("token", token);
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -37,7 +46,7 @@ export default function Login() {
         body: JSON.stringify({ email, password })
       });
 
-      localStorage.setItem("token", data.token);
+      safeStorage.setItem("token", data.token);
       queryClient.clear();
       setIsRedirecting(true);
       setTimeout(() => {

@@ -48,6 +48,13 @@ export default function UserDashboard({
   const transactions = walletData?.transactions || [];
   const hasDeposited = transactions.some(t => t.type === "DEPOSIT" && t.status === "SUCCESS");
 
+  const getInitials = (name: string): string => {
+    if (!name) return "U";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  };
+
   return (
     <>
       {/* Premium Welcome Hero Card */}
@@ -56,11 +63,11 @@ export default function UserDashboard({
         <div className={styles.heroContent}>
           <div className={styles.heroLeft}>
             <div className={styles.userAvatar}>
-              <span>{displayName.charAt(0).toUpperCase() || "U"}</span>
+              <span>{getInitials(user?.fullName || displayName)}</span>
             </div>
             <div>
               <h1 className={styles.heroTitle}>
-                Welcome back, <span className={styles.heroName}>{displayName}</span>
+                Welcome back, <span className={styles.heroName}>{user?.firstName || displayName}</span>
               </h1>
               <p className={styles.heroSub}>
                 Manage your funds, track referrals, and trace your wallet history in real-time.
