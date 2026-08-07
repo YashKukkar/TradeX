@@ -19,7 +19,7 @@ A full-stack trading platform with a marketing site, a user-facing web app, and 
 
 | Service | Tech | Port |
 |---------|------|------|
-| **Backend API** | Spring Boot 3.2 / Java 21 | `8080` |
+| **Backend API** | Spring Boot 4.1 / Java 26 | `8080` |
 | **NextJS** | Next.js 16 (React 19) | `3000` |
 | **Trading App** | Vite + TypeScript | `5173` |
 
