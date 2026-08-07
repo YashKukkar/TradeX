@@ -89,7 +89,7 @@ function SignupForm() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (Object.keys(errors).length > 0) {
       setIsError(true);
       setMessage("Please resolve all validation errors before submitting.");
@@ -161,143 +161,143 @@ function SignupForm() {
           <h2 className={styles.title}>Create your account</h2>
           <p className={styles.subtitle}>Start trading in minutes. No hidden fees.</p>
           <form onSubmit={handleSignup} className={styles.form}>
-          <div className={styles.formFields}>
-            <div className={styles.fieldGroup}>
-              <div className={styles.labelHeader}>
-                <label className={styles.label}>Full Name</label>
-                {errors.fullName && <span className={styles.errorLabel}>{errors.fullName}</span>}
-              </div>
-              <input
-                type="text"
-                placeholder="e.g. Alex Morgan (First / Given name first)"
-                value={fullName}
-                onChange={(e) => { setFullName(e.target.value); setMessage(""); }}
-                required
-                className={`${styles.input} ${errors.fullName ? styles.inputInvalid : ""}`}
-              />
-            </div>
-            <div className={styles.fieldGroup}>
-              <div className={styles.labelHeader}>
-                <label className={styles.label}>Email Address</label>
-                {errors.email && <span className={styles.errorLabel}>{errors.email}</span>}
-              </div>
-              <input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => { setEmail(e.target.value); setMessage(""); }}
-                required
-                className={`${styles.input} ${errors.email ? styles.inputInvalid : ""}`}
-              />
-            </div>
-            <div className={styles.fieldGroup}>
-              <div className={styles.labelHeader}>
-                <label className={styles.label}>Password</label>
-                {errors.password && <span className={styles.errorLabel}>{errors.password}</span>}
-              </div>
-              <div className={styles.passwordWrapper}>
+            <div className={styles.formFields}>
+              <div className={styles.fieldGroup}>
+                <div className={styles.labelHeader}>
+                  <label className={styles.label}>Full Name</label>
+                  {errors.fullName && <span className={styles.errorLabel}>{errors.fullName}</span>}
+                </div>
                 <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Min. 8 characters"
-                  value={password}
-                  onChange={(e) => { setPassword(e.target.value); setMessage(""); }}
+                  type="text"
+                  placeholder="e.g. Alex Morgan (First / Given name first)"
+                  value={fullName}
+                  onChange={(e) => { setFullName(e.target.value); setMessage(""); }}
                   required
-                  minLength={8}
-                  className={`${styles.input} ${styles.inputPassword} ${errors.password ? styles.inputInvalid : ""}`}
+                  className={`${styles.input} ${errors.fullName ? styles.inputInvalid : ""}`}
                 />
-                <button
-                  type="button"
-                  className={styles.eyeBtn}
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  <span className="material-symbols-outlined">
-                    {showPassword ? "visibility_off" : "visibility"}
-                  </span>
-                </button>
               </div>
-            </div>
-            <div className={styles.fieldGroup}>
-              <div className={styles.labelHeader}>
-                <label className={styles.label}>Confirm Password</label>
-                {errors.confirmPassword && <span className={styles.errorLabel}>{errors.confirmPassword}</span>}
-              </div>
-              <div className={styles.passwordWrapper}>
+              <div className={styles.fieldGroup}>
+                <div className={styles.labelHeader}>
+                  <label className={styles.label}>Email Address</label>
+                  {errors.email && <span className={styles.errorLabel}>{errors.email}</span>}
+                </div>
                 <input
-                  type={showConfirm ? "text" : "password"}
-                  placeholder="Re-enter your password"
-                  value={confirmPassword}
-                  onChange={(e) => { setConfirmPassword(e.target.value); setMessage(""); }}
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); setMessage(""); }}
                   required
-                  className={`${styles.input} ${styles.inputPassword} ${errors.confirmPassword ? styles.inputInvalid : ""}`}
+                  className={`${styles.input} ${errors.email ? styles.inputInvalid : ""}`}
                 />
-                <button
-                  type="button"
-                  className={styles.eyeBtn}
-                  onClick={() => setShowConfirm(!showConfirm)}
-                  aria-label={showConfirm ? "Hide password" : "Show password"}
-                >
-                  <span className="material-symbols-outlined">
-                    {showConfirm ? "visibility_off" : "visibility"}
-                  </span>
-                </button>
               </div>
-            </div>
-            <div className={styles.fieldGroup}>
-              <div className={styles.labelHeader}>
-                <label className={styles.label}>Phone Number <span className={styles.optionalTag}>(Optional)</span></label>
-                {errors.phoneNumber && <span className={styles.errorLabel}>{errors.phoneNumber}</span>}
+              <div className={styles.fieldGroup}>
+                <div className={styles.labelHeader}>
+                  <label className={styles.label}>Password</label>
+                  {errors.password && <span className={styles.errorLabel}>{errors.password}</span>}
+                </div>
+                <div className={styles.passwordWrapper}>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Min. 8 characters"
+                    value={password}
+                    onChange={(e) => { setPassword(e.target.value); setMessage(""); }}
+                    required
+                    minLength={8}
+                    className={`${styles.input} ${styles.inputPassword} ${errors.password ? styles.inputInvalid : ""}`}
+                  />
+                  <button
+                    type="button"
+                    className={styles.eyeBtn}
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    <span className="material-symbols-outlined">
+                      {showPassword ? "visibility_off" : "visibility"}
+                    </span>
+                  </button>
+                </div>
               </div>
-              <div className={styles.phoneInputGroup}>
-                <select
-                  value={countryCode}
-                  onChange={(e) => { setCountryCode(e.target.value); setMessage(""); }}
-                  className={styles.countryCodeSelect}
-                >
-                  <option value="+91">🇮🇳 +91</option>
-                  <option value="+1">🇺🇸 +1</option>
-                  <option value="+44">🇬🇧 +44</option>
-                  <option value="+61">🇦🇺 +61</option>
-                  <option value="+971">🇦🇪 +971</option>
-                  <option value="+65">🇸🇬 +65</option>
-                  <option value="+81">🇯🇵 +81</option>
-                  <option value="+49">🇩🇪 +49</option>
-                  <option value="+33">🇫🇷 +33</option>
-                </select>
+              <div className={styles.fieldGroup}>
+                <div className={styles.labelHeader}>
+                  <label className={styles.label}>Confirm Password</label>
+                  {errors.confirmPassword && <span className={styles.errorLabel}>{errors.confirmPassword}</span>}
+                </div>
+                <div className={styles.passwordWrapper}>
+                  <input
+                    type={showConfirm ? "text" : "password"}
+                    placeholder="Re-enter your password"
+                    value={confirmPassword}
+                    onChange={(e) => { setConfirmPassword(e.target.value); setMessage(""); }}
+                    required
+                    className={`${styles.input} ${styles.inputPassword} ${errors.confirmPassword ? styles.inputInvalid : ""}`}
+                  />
+                  <button
+                    type="button"
+                    className={styles.eyeBtn}
+                    onClick={() => setShowConfirm(!showConfirm)}
+                    aria-label={showConfirm ? "Hide password" : "Show password"}
+                  >
+                    <span className="material-symbols-outlined">
+                      {showConfirm ? "visibility_off" : "visibility"}
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div className={styles.fieldGroup}>
+                <div className={styles.labelHeader}>
+                  <label className={styles.label}>Phone Number <span className={styles.optionalTag}>(Optional)</span></label>
+                  {errors.phoneNumber && <span className={styles.errorLabel}>{errors.phoneNumber}</span>}
+                </div>
+                <div className={styles.phoneInputGroup}>
+                  <select
+                    value={countryCode}
+                    onChange={(e) => { setCountryCode(e.target.value); setMessage(""); }}
+                    className={styles.countryCodeSelect}
+                  >
+                    <option value="+91">🇮🇳 +91</option>
+                    <option value="+1">🇺🇸 +1</option>
+                    <option value="+44">🇬🇧 +44</option>
+                    <option value="+61">🇦🇺 +61</option>
+                    <option value="+971">🇦🇪 +971</option>
+                    <option value="+65">🇸🇬 +65</option>
+                    <option value="+81">🇯🇵 +81</option>
+                    <option value="+49">🇩🇪 +49</option>
+                    <option value="+33">🇫🇷 +33</option>
+                  </select>
+                  <input
+                    type="tel"
+                    placeholder="98765 43210"
+                    value={localPhoneNumber}
+                    onChange={(e) => { setLocalPhoneNumber(e.target.value); setMessage(""); }}
+                    className={`${styles.input} ${errors.phoneNumber ? styles.inputInvalid : ""}`}
+                  />
+                </div>
+              </div>
+              <div className={styles.fieldGroup}>
+                <div className={styles.labelHeader}>
+                  <label className={styles.label}>Referral Code (Optional)</label>
+                  {errors.referralCode && <span className={styles.errorLabel}>{errors.referralCode}</span>}
+                </div>
                 <input
-                  type="tel"
-                  placeholder="98765 43210"
-                  value={localPhoneNumber}
-                  onChange={(e) => { setLocalPhoneNumber(e.target.value); setMessage(""); }}
-                  className={`${styles.input} ${errors.phoneNumber ? styles.inputInvalid : ""}`}
+                  type="text"
+                  placeholder="e.g. ABC123"
+                  value={referralCode}
+                  onChange={(e) => setReferralCode(e.target.value)}
+                  className={`${styles.input} ${errors.referralCode ? styles.inputInvalid : ""}`}
                 />
               </div>
             </div>
-            <div className={styles.fieldGroup}>
-              <div className={styles.labelHeader}>
-                <label className={styles.label}>Referral Code (Optional)</label>
-                {errors.referralCode && <span className={styles.errorLabel}>{errors.referralCode}</span>}
-              </div>
-              <input
-                type="text"
-                placeholder="e.g. ABC123"
-                value={referralCode}
-                onChange={(e) => setReferralCode(e.target.value)}
-                className={`${styles.input} ${errors.referralCode ? styles.inputInvalid : ""}`}
-              />
-            </div>
-          </div>
-          <button type="submit" className={styles.button} disabled={isLoading}>
-            {isLoading ? "Creating account…" : "Create Account"}
-          </button>
-        </form>
-        {message && (
-          <p className={isError ? styles.error : styles.success}>{message}</p>
-        )}
-        <p className={styles.footerText}>
-          Already have an account?{" "}
-          <a href={`${APP_URL}/login`} className={styles.link}>Log in here</a>
-        </p>
+            <button type="submit" className={styles.button} disabled={isLoading}>
+              {isLoading ? "Creating account…" : "Create Account"}
+            </button>
+          </form>
+          {message && (
+            <p className={isError ? styles.error : styles.success}>{message}</p>
+          )}
+          <p className={styles.footerText}>
+            Already have an account?{" "}
+            <a href={`${APP_URL}/login`} className={styles.link}>Log in here</a>
+          </p>
         </div>
       </div>
     </div>

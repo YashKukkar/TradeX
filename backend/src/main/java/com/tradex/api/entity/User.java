@@ -167,5 +167,15 @@ public class User {
         String lower = word.toLowerCase().replace(".", "");
         return java.util.Set.of("mr", "mrs", "ms", "dr", "prof", "shri", "smt").contains(lower);
     }
+
+    public boolean isCustomer() {
+        return this.role == Role.USER;
+    }
+
+    public void validateCustomerAccess() {
+        if (!isCustomer()) {
+            throw new com.tradex.api.exception.AppException.ForbiddenException("This operation is only available to customers");
+        }
+    }
 }
 

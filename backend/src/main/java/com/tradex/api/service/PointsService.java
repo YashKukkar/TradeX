@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -59,9 +60,7 @@ public class PointsService {
         User user = userRepository.findByEmailForUpdate(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
-        if (user.getRole() == Role.EMPLOYEE || user.getRole() == Role.SUPER_ADMIN) {
-            throw new ForbiddenException("This operation is only available to customers");
-        }
+        validateCustomerAccess(user);
 
         Long currentPoints = user.getPointsBalance();
         if (currentPoints < points) {
@@ -82,24 +81,11 @@ public class PointsService {
         user = walletBalanceManager.mutateBonusBalance(user, cashAwarded);
         BigDecimal newBonus = user.getBonusBalance();
 
-        PointsTransaction pointsTx = new PointsTransaction(
-                user,
-                -points,
-                newPoints,
-                PointsTransactionType.CONVERT_TO_CASH,
-                "Converted " + points + " points to bonus cash");
+        PointsTransaction pointsTx = buildPointsTransaction(user, -points, newPoints, "Converted " + points + " points to bonus cash");
         pointsTransactionRepository.save(pointsTx);
 
-        WalletTransaction walletTx = new WalletTransaction(
-                user,
-                cashAwarded,
-                newBonus,
-                WalletTransactionType.POINTS_CONVERSION,
-                WalletTransactionStatus.SUCCESS,
-                "Converted " + points + " TradeX Points into bonus cash");
-        walletTx.setApprovedAt(java.time.LocalDateTime.now());
-        walletTx.setIdempotencyKey(idempotencyKey);
-        walletTransactionRepository.save(walletTx);
+        WalletTransaction walletTx = buildPointsWalletTransaction(user, cashAwarded, newBonus, points, idempotencyKey);
+        WalletTransaction savedWalletTx = saveWithIdempotencyFallback(walletTx, idempotencyKey);
 
         AdminAuditLog auditLog = new AdminAuditLog(
                 user,
@@ -108,8 +94,51 @@ public class PointsService {
                 "Converted " + points + " points to ₹" + cashAwarded.setScale(2, RoundingMode.HALF_UP) + " bonus cash");
         adminAuditLogRepository.save(auditLog);
 
-        log.info("Converted {} points to {} bonus cash for user {}", points, cashAwarded, email);
+        log.info("Converted {} points to {} bonus cash for user {} (WalletTx ID: {}, Key: {})",
+                points, cashAwarded, email, savedWalletTx.getId(), idempotencyKey);
 
-        return new WalletTransactionDTO(walletTx);
+        return new WalletTransactionDTO(savedWalletTx);
+    }
+
+    private void validateCustomerAccess(User user) {
+        user.validateCustomerAccess();
+    }
+
+    private PointsTransaction buildPointsTransaction(User user, long pointsDelta, long balanceAfter, String description) {
+        return new PointsTransaction(
+                user,
+                pointsDelta,
+                balanceAfter,
+                PointsTransactionType.CONVERT_TO_CASH,
+                description);
+    }
+
+    private WalletTransaction buildPointsWalletTransaction(User user, BigDecimal amount, BigDecimal balanceAfter, long points, String idempotencyKey) {
+        WalletTransaction walletTx = new WalletTransaction(
+                user,
+                amount,
+                balanceAfter,
+                WalletTransactionType.POINTS_CONVERSION,
+                WalletTransactionStatus.SUCCESS,
+                "Converted " + points + " TradeX Points into bonus cash");
+        walletTx.setApprovedAt(java.time.LocalDateTime.now());
+        walletTx.setIdempotencyKey(idempotencyKey);
+        return walletTx;
+    }
+
+    private WalletTransaction saveWithIdempotencyFallback(WalletTransaction tx, String idempotencyKey) {
+        try {
+            WalletTransaction saved = walletTransactionRepository.save(tx);
+            return (saved != null) ? saved : tx;
+        } catch (DataIntegrityViolationException ex) {
+            if (idempotencyKey != null && !idempotencyKey.isBlank()) {
+                Optional<WalletTransaction> existing = walletTransactionRepository.findByIdempotencyKey(idempotencyKey);
+                if (existing.isPresent()) {
+                    log.warn("Concurrent duplicate points conversion prevented by DB constraint for idempotency key: {}", idempotencyKey);
+                    return existing.get();
+                }
+            }
+            throw ex;
+        }
     }
 }

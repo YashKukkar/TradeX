@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("null")
 public class AdminSeeder {
 
     private final UserRepository userRepository;
@@ -59,17 +58,14 @@ public class AdminSeeder {
         // Seed default employees e1@tradex.com, e2@tradex.com, e3@tradex.com
         seedEmployee("e1@tradex.com", adminPassword, new HashSet<>(List.of(
                 Permission.MANAGE_USERS,
-                Permission.MANAGE_POINTS
-        )), new HashSet<>(List.of("User Ops", "Points Team")));
+                Permission.MANAGE_POINTS)), new HashSet<>(List.of("User Ops", "Points Team")));
 
         seedEmployee("e2@tradex.com", adminPassword, new HashSet<>(List.of(
                 Permission.MANAGE_DEPOSITS,
-                Permission.MANAGE_WITHDRAWALS
-        )), new HashSet<>(List.of("Deposit Review", "Withdrawal Review")));
+                Permission.MANAGE_WITHDRAWALS)), new HashSet<>(List.of("Deposit Review", "Withdrawal Review")));
 
         seedEmployee("e3@tradex.com", adminPassword, new HashSet<>(List.of(
-                Permission.MANAGE_SETTINGS
-        )), new HashSet<>(List.of("System Config")));
+                Permission.MANAGE_SETTINGS)), new HashSet<>(List.of("System Config")));
     }
 
     private void seedTeam(String name, String description, List<String> permissions) {

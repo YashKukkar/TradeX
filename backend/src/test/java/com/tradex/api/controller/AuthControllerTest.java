@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,8 +29,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.hamcrest.Matchers;
 
 @SpringBootTest
-@AutoConfigureMockMvc
-@SuppressWarnings("null")
+@AutoConfigureMockMvc(addFilters = false)
 @Transactional // Rolls back database after each test
 class AuthControllerTest {
 
@@ -307,14 +306,14 @@ class AuthControllerTest {
                 userRepository.save(user);
 
                 java.time.LocalDateTime expiry = java.time.LocalDateTime.now().plusMinutes(10);
-                VerificationToken token = new VerificationToken(user, hashOtp("123456"), VerificationType.PASSWORD_RESET, expiry);
+                VerificationToken token = new VerificationToken(user, hashOtp("123456"),
+                                VerificationType.PASSWORD_RESET, expiry);
                 verificationTokenRepository.save(token);
 
                 AuthController.ResetPasswordRequest request = new AuthController.ResetPasswordRequest(
-                        "reset@example.com",
-                        "123456",
-                        "newsecurepassword"
-                );
+                                "reset@example.com",
+                                "123456",
+                                "newsecurepassword");
 
                 mockMvc.perform(post("/api/auth/reset-password")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -323,7 +322,8 @@ class AuthControllerTest {
 
                 User updatedUser = userRepository.findByEmail("reset@example.com").orElseThrow();
                 org.junit.jupiter.api.Assertions.assertFalse(updatedUser.isCredentialsExpired());
-                org.junit.jupiter.api.Assertions.assertTrue(passwordEncoder.matches("newsecurepassword", updatedUser.getPassword()));
+                org.junit.jupiter.api.Assertions
+                                .assertTrue(passwordEncoder.matches("newsecurepassword", updatedUser.getPassword()));
         }
 
         @Test
@@ -333,9 +333,8 @@ class AuthControllerTest {
                 userRepository.save(user);
 
                 AuthController.ChangePasswordRequest request = new AuthController.ChangePasswordRequest(
-                        "oldpassword",
-                        "newpassword123"
-                );
+                                "oldpassword",
+                                "newpassword123");
 
                 mockMvc.perform(post("/api/auth/change-password")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -343,7 +342,8 @@ class AuthControllerTest {
                                 .andExpect(status().isOk());
 
                 User updatedUser = userRepository.findByEmail("change@example.com").orElseThrow();
-                org.junit.jupiter.api.Assertions.assertTrue(passwordEncoder.matches("newpassword123", updatedUser.getPassword()));
+                org.junit.jupiter.api.Assertions
+                                .assertTrue(passwordEncoder.matches("newpassword123", updatedUser.getPassword()));
         }
 
         @Test
@@ -353,9 +353,8 @@ class AuthControllerTest {
                 userRepository.save(user);
 
                 AuthController.ChangePasswordRequest request = new AuthController.ChangePasswordRequest(
-                        "wrongoldpassword",
-                        "newpassword123"
-                );
+                                "wrongoldpassword",
+                                "newpassword123");
 
                 mockMvc.perform(post("/api/auth/change-password")
                                 .contentType(MediaType.APPLICATION_JSON)

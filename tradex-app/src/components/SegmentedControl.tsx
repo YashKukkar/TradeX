@@ -26,7 +26,7 @@ export default function SegmentedControl<T extends string>({
     <div
       style={{
         display: "flex",
-        background: "rgba(0, 0, 0, 0.18)",
+        background: "var(--clr-black-a20)",
         borderRadius: "8px",
         padding: "3px",
         border: "1px solid var(--border)",

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component("walletSecurity")
 @RequiredArgsConstructor
-@SuppressWarnings("null")
+
 public class WalletSecurityEvaluator {
 
     private final WalletTransactionRepository walletTransactionRepository;

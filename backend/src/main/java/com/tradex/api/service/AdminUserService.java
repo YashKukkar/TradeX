@@ -1,4 +1,5 @@
 package com.tradex.api.service;
+
 import com.tradex.api.mapper.UserMapper;
 
 import com.tradex.api.config.audit.AdminAudited;
@@ -32,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("null")
+
 public class AdminUserService {
 
     private final UserRepository userRepository;
@@ -45,7 +46,6 @@ public class AdminUserService {
     private final Cache<Long, Instant> passwordResetCooldowns = Caffeine.newBuilder()
             .expireAfterWrite(60, TimeUnit.SECONDS)
             .build();
-
 
     private User loadTargetForUpdate(Long userId) {
         return userRepository.findByIdForUpdate(userId)
@@ -68,7 +68,8 @@ public class AdminUserService {
         selfActionGuard(adminEmail, target, "lock");
 
         if (target.isLocked()) {
-            log.warn("Admin action failed: User {} is already locked (requested by admin {})", target.getEmail(), adminEmail);
+            log.warn("Admin action failed: User {} is already locked (requested by admin {})", target.getEmail(),
+                    adminEmail);
             throw new BadRequestException("User account is already locked");
         }
 
@@ -82,7 +83,8 @@ public class AdminUserService {
         User target = loadTargetForUpdate(userId);
 
         if (!target.isLocked()) {
-            log.warn("Admin action failed: User {} is not locked (requested by admin {})", target.getEmail(), adminEmail);
+            log.warn("Admin action failed: User {} is not locked (requested by admin {})", target.getEmail(),
+                    adminEmail);
             throw new BadRequestException("User account is not locked");
         }
 
@@ -99,7 +101,8 @@ public class AdminUserService {
         selfActionGuard(adminEmail, target, "disable");
 
         if (!target.isEnabled()) {
-            log.warn("Admin action failed: User {} is already disabled (requested by admin {})", target.getEmail(), adminEmail);
+            log.warn("Admin action failed: User {} is already disabled (requested by admin {})", target.getEmail(),
+                    adminEmail);
             throw new BadRequestException("User account is already disabled");
         }
 
@@ -113,7 +116,8 @@ public class AdminUserService {
         User target = loadTargetForUpdate(userId);
 
         if (target.isEnabled()) {
-            log.warn("Admin action failed: User {} is already enabled (requested by admin {})", target.getEmail(), adminEmail);
+            log.warn("Admin action failed: User {} is already enabled (requested by admin {})", target.getEmail(),
+                    adminEmail);
             throw new BadRequestException("User account is already enabled");
         }
 
@@ -129,7 +133,8 @@ public class AdminUserService {
         User target = loadTargetForUpdate(userId);
 
         if (target.isEmailVerified()) {
-            log.warn("Admin action failed: User {} email is already verified (requested by admin {})", target.getEmail(), adminEmail);
+            log.warn("Admin action failed: User {} email is already verified (requested by admin {})",
+                    target.getEmail(), adminEmail);
             throw new BadRequestException("User email is already verified");
         }
 
@@ -145,26 +150,25 @@ public class AdminUserService {
         Instant now = Instant.now();
         Instant lastReset = passwordResetCooldowns.getIfPresent(userId);
         if (lastReset != null && now.isBefore(lastReset.plusSeconds(60))) {
-            log.warn("Admin action failed: Password reset cooldown active for user ID {} (requested by admin {})", userId, adminEmail);
-            throw new BadRequestException("Please wait at least 60 seconds between password reset requests for this user.");
+            log.warn("Admin action failed: Password reset cooldown active for user ID {} (requested by admin {})",
+                    userId, adminEmail);
+            throw new BadRequestException(
+                    "Please wait at least 60 seconds between password reset requests for this user.");
         }
- 
+
         User target = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
- 
+
         target.setCredentialsExpired(true);
         verificationService.createVerificationToken(target, VerificationType.PASSWORD_RESET);
- 
+
         passwordResetCooldowns.put(userId, now);
     }
 
     // ── Adjust Points ─────────────────────────────────────────────────────────
 
     @Transactional
-    @AdminAudited(
-        action = AdminAction.POINTS_ADJUSTMENT,
-        details = "'Points adjusted by ' + #request.delta + ' (new balance: ' + #result.pointsBalance + '). Reason: ' + #request.reason"
-    )
+    @AdminAudited(action = AdminAction.POINTS_ADJUSTMENT, details = "'Points adjusted by ' + #request.delta + ' (new balance: ' + #result.pointsBalance + '). Reason: ' + #request.reason")
     public UserDTO adjustPoints(String adminEmail, Long userId, AdminAdjustPointsRequest request) {
         User target = loadTargetForUpdate(userId);
 
@@ -172,11 +176,12 @@ public class AdminUserService {
         long newBalance = currentBalance + request.delta();
 
         if (newBalance < 0) {
-            log.warn("Admin action failed: Adjusting points by {} would result in negative points balance ({}) for user {} (requested by admin {})",
+            log.warn(
+                    "Admin action failed: Adjusting points by {} would result in negative points balance ({}) for user {} (requested by admin {})",
                     request.delta(), newBalance, target.getEmail(), adminEmail);
             throw new BadRequestException(
                     "Adjustment would result in a negative points balance (current: " + currentBalance +
-                    ", delta: " + request.delta() + ")");
+                            ", delta: " + request.delta() + ")");
         }
 
         target.setPointsBalance(newBalance);
@@ -194,10 +199,7 @@ public class AdminUserService {
     }
 
     @Transactional
-    @AdminAudited(
-        action = AdminAction.WALLET_ADJUSTMENT,
-        details = "'Wallet adjusted: type=' + #request.walletType + ', delta=' + #request.delta + '. Reason: ' + #request.reason"
-    )
+    @AdminAudited(action = AdminAction.WALLET_ADJUSTMENT, details = "'Wallet adjusted: type=' + #request.walletType + ', delta=' + #request.delta + '. Reason: ' + #request.reason")
     public UserDTO adjustWallet(String adminEmail, Long userId, AdminAdjustWalletRequest request) {
         User target = loadTargetForUpdate(userId);
 
@@ -212,11 +214,13 @@ public class AdminUserService {
                 target = walletBalanceManager.mutateWithdrawableBalance(target, delta);
                 newBalance = target.getWithdrawableBalance();
             } else {
-                log.warn("Admin action failed: Invalid wallet type {} requested by admin {}", request.walletType(), adminEmail);
+                log.warn("Admin action failed: Invalid wallet type {} requested by admin {}", request.walletType(),
+                        adminEmail);
                 throw new BadRequestException("Invalid wallet type: " + request.walletType());
             }
         } catch (IllegalArgumentException e) {
-            log.warn("Admin action failed: Wallet adjustment by {} failed for user {} due to: {} (requested by admin {})",
+            log.warn(
+                    "Admin action failed: Wallet adjustment by {} failed for user {} due to: {} (requested by admin {})",
                     delta, target.getEmail(), e.getMessage(), adminEmail);
             throw new BadRequestException("Adjustment failed: " + e.getMessage());
         }
@@ -257,8 +261,7 @@ public class AdminUserService {
                         tx.getNotes(),
                         tx.getCreatedAt() != null
                                 ? tx.getCreatedAt().atZone(java.time.ZoneId.systemDefault()).toEpochSecond()
-                                : System.currentTimeMillis() / 1000
-                ))
+                                : System.currentTimeMillis() / 1000))
                 .toList();
     }
 

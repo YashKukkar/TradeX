@@ -204,10 +204,11 @@
 }
 
 .ticketId {
-  font-family: monospace;
-  font-size: 13px;
+  font-family: 'IBM Plex Sans', ui-monospace, monospace;
+  font-size: 12.5px;
   color: var(--muted);
   font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
 .categoryTag {
@@ -257,11 +258,13 @@
   .contentGrid {
     grid-template-columns: 1fr;
   }
+
   .ticketCard {
     grid-template-columns: 1fr;
     align-items: flex-start;
     gap: var(--space-3);
   }
+
   .ticketActions {
     align-self: flex-end;
   }

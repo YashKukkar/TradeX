@@ -35,7 +35,6 @@ class WalletServiceTest {
     @Mock
     private WalletTransactionRepository walletTransactionRepository;
 
-
     @Mock
     private SystemSettingService systemSettingService;
 
@@ -59,15 +58,14 @@ class WalletServiceTest {
         user.setWithdrawableBalance(BigDecimal.ZERO);
         user.setBonusBalance(BigDecimal.ZERO);
         user.setBankDetails(new ArrayList<>(List.of(
-            BankDetail.builder()
-                .user(user)
-                .accountNumber("1234567890")
-                .ifscCode("BANK0000001")
-                .holderName("Test User")
-                .bankName("Test Bank")
-                .isPrimary(true)
-                .build()
-        )));
+                BankDetail.builder()
+                        .user(user)
+                        .accountNumber("1234567890")
+                        .ifscCode("BANK0000001")
+                        .holderName("Test User")
+                        .bankName("Test Bank")
+                        .isPrimary(true)
+                        .build())));
 
         settings = new SystemSetting();
         settings.setFirstDepositRewardEnabled(true);
@@ -88,22 +86,19 @@ class WalletServiceTest {
                 walletTransactionRepository,
                 adminAuditLogRepository,
                 walletBalanceManager,
-                systemSettingService
-        );
+                systemSettingService);
         WithdrawalTransactionHandler withdrawalHandler = new WithdrawalTransactionHandler(
                 walletTransactionRepository,
                 adminAuditLogRepository,
-                walletBalanceManager
-        );
+                walletBalanceManager);
 
         walletService = new WalletService(
-            userRepository,
-            walletTransactionRepository,
-            walletTransactionHelper,
-            appProperties,
-            walletBalanceManager,
-            List.of(depositHandler, withdrawalHandler)
-        );
+                userRepository,
+                walletTransactionRepository,
+                walletTransactionHelper,
+                appProperties,
+                walletBalanceManager,
+                List.of(depositHandler, withdrawalHandler));
     }
 
     @Test
@@ -123,12 +118,14 @@ class WalletServiceTest {
     @Test
     @DisplayName("Should approve deposit and award first-time bonus")
     void testApproveDepositWithBonus() {
-        WalletTransaction pendingTx = new WalletTransaction(user, new BigDecimal("500.00"), BigDecimal.ZERO, WalletTransactionType.DEPOSIT, WalletTransactionStatus.PENDING, "Pending");
+        WalletTransaction pendingTx = new WalletTransaction(user, new BigDecimal("500.00"), BigDecimal.ZERO,
+                WalletTransactionType.DEPOSIT, WalletTransactionStatus.PENDING, "Pending");
         pendingTx.setId(10L);
 
         when(walletTransactionRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(pendingTx));
         when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(user));
-        when(walletTransactionRepository.existsByUserIdAndTypeAndStatus(1L, WalletTransactionType.DEPOSIT, WalletTransactionStatus.SUCCESS)).thenReturn(false);
+        when(walletTransactionRepository.existsByUserIdAndTypeAndStatus(1L, WalletTransactionType.DEPOSIT,
+                WalletTransactionStatus.SUCCESS)).thenReturn(false);
         when(systemSettingService.getSettings()).thenReturn(settings);
 
         WalletTransactionDTO result = walletService.approveTransaction(10L);
@@ -142,7 +139,8 @@ class WalletServiceTest {
     @Test
     @DisplayName("Should reject deposit and not change balance")
     void testRejectDeposit() {
-        WalletTransaction pendingTx = new WalletTransaction(user, new BigDecimal("50.00"), BigDecimal.ZERO, WalletTransactionType.DEPOSIT, WalletTransactionStatus.PENDING, "Pending");
+        WalletTransaction pendingTx = new WalletTransaction(user, new BigDecimal("50.00"), BigDecimal.ZERO,
+                WalletTransactionType.DEPOSIT, WalletTransactionStatus.PENDING, "Pending");
         pendingTx.setId(11L);
 
         when(walletTransactionRepository.findByIdForUpdate(11L)).thenReturn(Optional.of(pendingTx));
@@ -174,7 +172,8 @@ class WalletServiceTest {
     @DisplayName("Should approve withdrawal")
     void testApproveWithdrawal() {
         user.setWithdrawableBalance(new BigDecimal("100.00"));
-        WalletTransaction pendingTx = new WalletTransaction(user, new BigDecimal("100.00"), new BigDecimal("100.00"), WalletTransactionType.WITHDRAWAL, WalletTransactionStatus.PENDING, "Pending");
+        WalletTransaction pendingTx = new WalletTransaction(user, new BigDecimal("100.00"), new BigDecimal("100.00"),
+                WalletTransactionType.WITHDRAWAL, WalletTransactionStatus.PENDING, "Pending");
         pendingTx.setId(12L);
 
         when(walletTransactionRepository.findByIdForUpdate(12L)).thenReturn(Optional.of(pendingTx));
@@ -191,7 +190,8 @@ class WalletServiceTest {
     @DisplayName("Should reject withdrawal and refund balance")
     void testRejectWithdrawal() {
         user.setWithdrawableBalance(new BigDecimal("100.00"));
-        WalletTransaction pendingTx = new WalletTransaction(user, new BigDecimal("100.00"), new BigDecimal("100.00"), WalletTransactionType.WITHDRAWAL, WalletTransactionStatus.PENDING, "Pending");
+        WalletTransaction pendingTx = new WalletTransaction(user, new BigDecimal("100.00"), new BigDecimal("100.00"),
+                WalletTransactionType.WITHDRAWAL, WalletTransactionStatus.PENDING, "Pending");
         pendingTx.setId(13L);
 
         when(walletTransactionRepository.findByIdForUpdate(13L)).thenReturn(Optional.of(pendingTx));
@@ -209,12 +209,11 @@ class WalletServiceTest {
     void testWithdrawBelowMinimumLimit() {
         when(userRepository.findByEmailForUpdate("user@example.com")).thenReturn(Optional.of(user));
 
-        assertThrows(BadRequestException.class, () ->
-            walletService.withdraw("user@example.com", new BigDecimal("50.00"))
-        );
+        assertThrows(BadRequestException.class,
+                () -> walletService.withdraw("user@example.com", new BigDecimal("50.00")));
         verify(walletTransactionHelper, times(1)).logFailedTransaction(
-                eq(1L), eq(new BigDecimal("50.00")), eq(BigDecimal.ZERO), eq(WalletTransactionType.WITHDRAWAL), anyString()
-        );
+                eq(1L), eq(new BigDecimal("50.00")), eq(BigDecimal.ZERO), eq(WalletTransactionType.WITHDRAWAL),
+                anyString());
     }
 
     @Test
@@ -222,12 +221,11 @@ class WalletServiceTest {
     void testWithdrawAboveMaximumLimit() {
         when(userRepository.findByEmailForUpdate("user@example.com")).thenReturn(Optional.of(user));
 
-        assertThrows(BadRequestException.class, () ->
-            walletService.withdraw("user@example.com", new BigDecimal("60000.00"))
-        );
+        assertThrows(BadRequestException.class,
+                () -> walletService.withdraw("user@example.com", new BigDecimal("60000.00")));
         verify(walletTransactionHelper, times(1)).logFailedTransaction(
-                eq(1L), eq(new BigDecimal("60000.00")), eq(BigDecimal.ZERO), eq(WalletTransactionType.WITHDRAWAL), anyString()
-        );
+                eq(1L), eq(new BigDecimal("60000.00")), eq(BigDecimal.ZERO), eq(WalletTransactionType.WITHDRAWAL),
+                anyString());
     }
 
     @Test
@@ -236,12 +234,11 @@ class WalletServiceTest {
         user.setBankDetails(new java.util.ArrayList<>());
         when(userRepository.findByEmailForUpdate("user@example.com")).thenReturn(Optional.of(user));
 
-        assertThrows(BadRequestException.class, () ->
-            walletService.withdraw("user@example.com", new BigDecimal("100.00"))
-        );
+        assertThrows(BadRequestException.class,
+                () -> walletService.withdraw("user@example.com", new BigDecimal("100.00")));
         verify(walletTransactionHelper, times(1)).logFailedTransaction(
-                eq(1L), eq(new BigDecimal("100.00")), eq(BigDecimal.ZERO), eq(WalletTransactionType.WITHDRAWAL), anyString()
-        );
+                eq(1L), eq(new BigDecimal("100.00")), eq(BigDecimal.ZERO), eq(WalletTransactionType.WITHDRAWAL),
+                anyString());
     }
 
     @Test
@@ -250,18 +247,18 @@ class WalletServiceTest {
         user.setWithdrawableBalance(new BigDecimal("10.00"));
         when(userRepository.findByEmailForUpdate("user@example.com")).thenReturn(Optional.of(user));
 
-        assertThrows(BadRequestException.class, () ->
-            walletService.withdraw("user@example.com", new BigDecimal("100.00"))
-        );
+        assertThrows(BadRequestException.class,
+                () -> walletService.withdraw("user@example.com", new BigDecimal("100.00")));
         verify(walletTransactionHelper, times(1)).logFailedTransaction(
-                eq(1L), eq(new BigDecimal("100.00")), eq(new BigDecimal("10.00")), eq(WalletTransactionType.WITHDRAWAL), anyString()
-        );
+                eq(1L), eq(new BigDecimal("100.00")), eq(new BigDecimal("10.00")), eq(WalletTransactionType.WITHDRAWAL),
+                anyString());
     }
 
     @Test
     @DisplayName("Should approve transaction successfully")
     void testApproveTransactionSuccess() {
-        WalletTransaction pendingTx = new WalletTransaction(user, new BigDecimal("100.00"), BigDecimal.ZERO, WalletTransactionType.DEPOSIT, WalletTransactionStatus.PENDING, "Pending");
+        WalletTransaction pendingTx = new WalletTransaction(user, new BigDecimal("100.00"), BigDecimal.ZERO,
+                WalletTransactionType.DEPOSIT, WalletTransactionStatus.PENDING, "Pending");
         pendingTx.setId(10L);
 
         when(walletTransactionRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(pendingTx));
@@ -276,7 +273,8 @@ class WalletServiceTest {
     @Test
     @DisplayName("Should reject transaction successfully")
     void testRejectTransactionSuccess() {
-        WalletTransaction pendingTx = new WalletTransaction(user, new BigDecimal("100.00"), BigDecimal.ZERO, WalletTransactionType.WITHDRAWAL, WalletTransactionStatus.PENDING, "Pending");
+        WalletTransaction pendingTx = new WalletTransaction(user, new BigDecimal("100.00"), BigDecimal.ZERO,
+                WalletTransactionType.WITHDRAWAL, WalletTransactionStatus.PENDING, "Pending");
         pendingTx.setId(10L);
 
         when(walletTransactionRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(pendingTx));

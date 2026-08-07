@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("null")
+
 public class TicketAssignmentService {
 
     private final SupportTicketRepository supportTicketRepository;
@@ -44,7 +44,8 @@ public class TicketAssignmentService {
             ticket.setAssignedToPermission(null);
             ticket.setAssignedToUser(null);
             ticket.setClaimedAt(null);
-            ticketHistoryService.logHistory(ticket, "UNASSIGNED", "Unassigned from group queue: " + (oldPerm != null ? oldPerm : "None"), adminEmail);
+            ticketHistoryService.logHistory(ticket, "UNASSIGNED",
+                    "Unassigned from group queue: " + (oldPerm != null ? oldPerm : "None"), adminEmail);
             log.info("Admin {} unassigned ticket {}", adminEmail, ticket.getTicketNumber());
         } else {
             String perm = permissionName.trim().toUpperCase();
@@ -52,7 +53,9 @@ public class TicketAssignmentService {
             ticket.setAssignedToPermission(perm);
             ticket.setAssignedToUser(null);
             ticket.setClaimedAt(null);
-            ticketHistoryService.logHistory(ticket, "ASSIGNED", "Assigned to group queue: " + perm + (oldPerm != null ? " (transferred from " + oldPerm + ")" : ""), adminEmail);
+            ticketHistoryService.logHistory(ticket, "ASSIGNED",
+                    "Assigned to group queue: " + perm + (oldPerm != null ? " (transferred from " + oldPerm + ")" : ""),
+                    adminEmail);
             log.info("Admin {} assigned ticket {} to permission group {}", adminEmail, ticket.getTicketNumber(), perm);
         }
 
@@ -72,21 +75,27 @@ public class TicketAssignmentService {
         if (admin.getRole() != Role.SUPER_ADMIN) {
             // Cannot claim a ticket claimed by another agent
             if (ticket.getAssignedToUser() != null && !ticket.getAssignedToUser().getId().equals(admin.getId())) {
-                throw new BadRequestException("This ticket is already claimed by another agent: " + ticket.getAssignedToUser().getEmail());
+                throw new BadRequestException(
+                        "This ticket is already claimed by another agent: " + ticket.getAssignedToUser().getEmail());
             }
-            // Must have the matching permission group to claim the ticket (if group is assigned)
-            if (ticket.getAssignedToPermission() != null && !admin.getPermissions().contains(ticket.getAssignedToPermission())) {
-                throw new ForbiddenException("You do not have the required permission (" + ticket.getAssignedToPermission() + ") to claim this ticket");
+            // Must have the matching permission group to claim the ticket (if group is
+            // assigned)
+            if (ticket.getAssignedToPermission() != null
+                    && !admin.getPermissions().contains(ticket.getAssignedToPermission())) {
+                throw new ForbiddenException("You do not have the required permission ("
+                        + ticket.getAssignedToPermission() + ") to claim this ticket");
             }
         }
 
         ticket.setAssignedToUser(admin);
         ticket.setClaimedAt(LocalDateTime.now());
-        ticketHistoryService.logHistory(ticket, "SELF_ASSIGNED", "Ticket assigned to self by agent: " + adminEmail, adminEmail);
+        ticketHistoryService.logHistory(ticket, "SELF_ASSIGNED", "Ticket assigned to self by agent: " + adminEmail,
+                adminEmail);
 
         if (ticket.getStatus() == TicketStatus.OPEN) {
             ticket.setStatus(TicketStatus.IN_PROGRESS);
-            ticketHistoryService.logHistory(ticket, "STATUS_CHANGED", "Status auto-updated to IN_PROGRESS upon self-assignment", "SYSTEM");
+            ticketHistoryService.logHistory(ticket, "STATUS_CHANGED",
+                    "Status auto-updated to IN_PROGRESS upon self-assignment", "SYSTEM");
         }
 
         log.info("Ticket {} self-assigned by agent {}", ticket.getTicketNumber(), adminEmail);

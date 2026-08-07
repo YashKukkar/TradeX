@@ -6,7 +6,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SuppressWarnings("null")
 class JwtUtilTest {
 
     private JwtUtil jwtUtil;
@@ -38,4 +37,3 @@ class JwtUtilTest {
         assertFalse(jwtUtil.validateToken(token, "wronguser@example.com"));
     }
 }
-

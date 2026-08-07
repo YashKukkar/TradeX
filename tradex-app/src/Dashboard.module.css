@@ -29,7 +29,7 @@
 }
 
 .brand {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 22px;
   font-weight: 800;
   color: var(--text);
@@ -600,7 +600,7 @@
 }
 
 .telemetryValue {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 26px;
   font-weight: 800;
   color: var(--text);
@@ -976,7 +976,7 @@
 }
 
 .balanceValue {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 22px;
   font-weight: 800;
   color: var(--text);
@@ -1265,7 +1265,7 @@
 }
 
 .pointsValue {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 28px;
   font-weight: 850;
   color: var(--accent);

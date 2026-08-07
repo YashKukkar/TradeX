@@ -29,4 +29,11 @@ public final class DataFormatter {
         return maskedName + "@" + domain;
     }
 
+    public static String maskAccountNumber(String accountNumber) {
+        if (accountNumber == null || accountNumber.isBlank()) {
+            return "****";
+        }
+        int length = accountNumber.length();
+        return (length <= 4) ? "****" : "****" + accountNumber.substring(length - 4);
+    }
 }

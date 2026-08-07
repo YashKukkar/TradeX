@@ -1,4 +1,5 @@
 package com.tradex.api.service;
+
 import com.tradex.api.mapper.UserMapper;
 
 import com.tradex.api.dto.CreateEmployeeRequest;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("null")
+
 public class EmployeeService {
 
     private final UserRepository userRepository;
@@ -61,7 +62,8 @@ public class EmployeeService {
                 .build();
 
         User saved = userRepository.save(employee);
-        log.info("Created employee account: {} with permissions: {} and teams: {}", saved.getEmail(), permissions, validTeams);
+        log.info("Created employee account: {} with permissions: {} and teams: {}", saved.getEmail(), permissions,
+                validTeams);
         return userMapper.toDTO(saved);
     }
 
@@ -80,7 +82,8 @@ public class EmployeeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found: " + employeeId));
 
         if (employee.getRole() != Role.EMPLOYEE) {
-            log.warn("Failed updating employee permissions: User ID {} is not an employee (role: {})", employeeId, employee.getRole());
+            log.warn("Failed updating employee permissions: User ID {} is not an employee (role: {})", employeeId,
+                    employee.getRole());
             throw new BadRequestException("Cannot update permissions for non-employee user.");
         }
 
@@ -98,7 +101,8 @@ public class EmployeeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found: " + employeeId));
 
         if (employee.getRole() != Role.EMPLOYEE) {
-            log.warn("Failed disabling employee: User ID {} is not an employee (role: {})", employeeId, employee.getRole());
+            log.warn("Failed disabling employee: User ID {} is not an employee (role: {})", employeeId,
+                    employee.getRole());
             throw new BadRequestException("Cannot delete non-employee user via this endpoint.");
         }
 
@@ -109,7 +113,8 @@ public class EmployeeService {
     }
 
     private Set<String> parsePermissions(List<String> permStrings) {
-        if (permStrings == null) return new java.util.HashSet<>();
+        if (permStrings == null)
+            return new java.util.HashSet<>();
         Set<String> set = new java.util.HashSet<>();
         for (String p : permStrings) {
             if (p != null && !p.trim().isEmpty()) {

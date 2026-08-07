@@ -1,4 +1,5 @@
 package com.tradex.api.service;
+
 import com.tradex.api.mapper.UserMapper;
 
 import com.tradex.api.dto.UserDTO;
@@ -26,7 +27,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("null")
 public class VerificationService {
 
     private final VerificationTokenRepository verificationTokenRepository;
@@ -99,22 +99,11 @@ public class VerificationService {
         String hashedOtp = hashOtp(otp);
         LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(appProperties.getOtp().getExpiryMinutes());
 
-        Optional<VerificationToken> existingTokenOpt = verificationTokenRepository.findByUserAndTypeForUpdate(user,
-                type);
-        if (existingTokenOpt.isPresent()) {
-            VerificationToken existing = existingTokenOpt.get();
-            LocalDateTime createdAt = existing.getExpiryTime().minusMinutes(appProperties.getOtp().getExpiryMinutes());
-            if (createdAt.plusSeconds(appProperties.getOtp().getResendCooldownSeconds()).isAfter(LocalDateTime.now())) {
-                throw new BadRequestException(
-                        "Please wait at least " + appProperties.getOtp().getResendCooldownSeconds() + " seconds before requesting a new verification code");
-            }
-            existing.setToken(hashedOtp);
-            existing.setExpiryTime(expiryTime);
-            existing.setAttempts(0);
-        } else {
-            VerificationToken token = new VerificationToken(user, hashedOtp, type, expiryTime);
-            verificationTokenRepository.save(token);
-        }
+        VerificationToken token = buildOrUpdateVerificationToken(user, type, hashedOtp, expiryTime);
+        verificationTokenRepository.save(token);
+
+        log.info("Created verification token ID: {}, type: {}, user: {}, expiresAt: {}",
+                token.getId(), type, user.getEmail(), expiryTime);
 
         // Send OTP via email based on type
         if (type == VerificationType.EMAIL) {
@@ -122,10 +111,26 @@ public class VerificationService {
         } else if (type == VerificationType.PASSWORD_RESET) {
             emailService.sendPasswordResetEmail(user.getEmail(), otp);
         }
+    }
 
-        log.debug("Generated {} verification OTP for user {}",
-                type.name(),
-                user.getEmail());
+    private VerificationToken buildOrUpdateVerificationToken(User user, VerificationType type, String hashedOtp,
+            LocalDateTime expiryTime) {
+        Optional<VerificationToken> existingTokenOpt = verificationTokenRepository.findByUserAndTypeForUpdate(user,
+                type);
+        if (existingTokenOpt.isPresent()) {
+            VerificationToken existing = existingTokenOpt.get();
+            LocalDateTime createdAt = existing.getExpiryTime().minusMinutes(appProperties.getOtp().getExpiryMinutes());
+            if (createdAt.plusSeconds(appProperties.getOtp().getResendCooldownSeconds()).isAfter(LocalDateTime.now())) {
+                throw new BadRequestException(
+                        "Please wait at least " + appProperties.getOtp().getResendCooldownSeconds()
+                                + " seconds before requesting a new verification code");
+            }
+            existing.setToken(hashedOtp);
+            existing.setExpiryTime(expiryTime);
+            existing.setAttempts(0);
+            return existing;
+        }
+        return new VerificationToken(user, hashedOtp, type, expiryTime);
     }
 
     private VerificationToken validateVerificationToken(
@@ -136,21 +141,24 @@ public class VerificationService {
         VerificationToken token = verificationTokenRepository
                 .findByUserAndTypeForUpdate(user, type)
                 .orElseGet(() -> {
-                    log.warn("Verification failed for user {}: No active verification token found of type {}", user.getEmail(), type);
+                    log.warn("Verification failed for user {}: No active verification token found of type {}",
+                            user.getEmail(), type);
                     throw new BadRequestException("No active verification token found");
                 });
 
         // Expire token automatically on check
         if (token.getExpiryTime().isBefore(LocalDateTime.now())) {
             verificationTokenRepository.delete(token);
-            log.warn("Verification failed for user {}: Token of type {} expired at {}", user.getEmail(), type, token.getExpiryTime());
+            log.warn("Verification failed for user {}: Token of type {} expired at {}", user.getEmail(), type,
+                    token.getExpiryTime());
             throw new BadRequestException("Verification token expired");
         }
 
         // Rate limit verification attempts
         if (token.getAttempts() >= appProperties.getOtp().getMaxAttempts()) {
             verificationTokenRepository.delete(token);
-            log.warn("Verification failed for user {}: Token of type {} blocked due to too many attempts", user.getEmail(), type);
+            log.warn("Verification failed for user {}: Token of type {} blocked due to too many attempts",
+                    user.getEmail(), type);
             throw new BadRequestException("Verification token blocked");
         }
 
@@ -161,7 +169,8 @@ public class VerificationService {
 
             if (token.getAttempts() >= appProperties.getOtp().getMaxAttempts()) {
                 verificationTokenRepository.delete(token);
-                log.warn("Verification failed for user {}: Token of type {} blocked after reaching max attempts ({}/{})",
+                log.warn(
+                        "Verification failed for user {}: Token of type {} blocked after reaching max attempts ({}/{})",
                         user.getEmail(), type, token.getAttempts(), appProperties.getOtp().getMaxAttempts());
                 throw new BadRequestException("Verification token blocked");
             }

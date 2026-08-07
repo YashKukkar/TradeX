@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("null")
+
 public class DepositTransactionHandler implements TransactionHandler {
 
     private final WalletTransactionRepository walletTransactionRepository;
@@ -58,8 +58,8 @@ public class DepositTransactionHandler implements TransactionHandler {
                 actor,
                 target,
                 AdminAction.APPROVE_DEPOSIT,
-                "Deposit approved: amount=" + tx.getAmount().stripTrailingZeros().toPlainString() + " | Notes: " + tx.getNotes()
-        );
+                "Deposit approved: amount=" + tx.getAmount().stripTrailingZeros().toPlainString() + " | Notes: "
+                        + tx.getNotes());
         adminAuditLogRepository.save(auditLog);
 
         applyFirstDepositBonus(target, tx.getAmount(), isFirstDeposit);
@@ -82,17 +82,19 @@ public class DepositTransactionHandler implements TransactionHandler {
                 actor,
                 target,
                 AdminAction.REJECT_DEPOSIT,
-                "Deposit rejected: amount=" + tx.getAmount().stripTrailingZeros().toPlainString() + " | Reason: " + reason
-        );
+                "Deposit rejected: amount=" + tx.getAmount().stripTrailingZeros().toPlainString() + " | Reason: "
+                        + reason);
         adminAuditLogRepository.save(auditLog);
     }
 
     private void applyFirstDepositBonus(User user, BigDecimal depositAmount, boolean isFirstDeposit) {
-        if (!isFirstDeposit) return;
+        if (!isFirstDeposit)
+            return;
 
         SystemSetting settings = systemSettingService.getSettings();
         boolean enabled = settings.isFirstDepositRewardEnabled();
-        if (!enabled) return;
+        if (!enabled)
+            return;
 
         BigDecimal threshold = settings.getFirstDepositRewardThreshold();
         if (threshold == null || depositAmount.compareTo(threshold) < 0) {

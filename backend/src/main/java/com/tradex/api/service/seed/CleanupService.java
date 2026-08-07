@@ -43,7 +43,8 @@ public class CleanupService {
             return;
         }
 
-        // Fetch and wipe support tickets, comments, and attachments for existing test users
+        // Fetch and wipe support tickets, comments, and attachments for existing test
+        // users
         List<SupportTicket> testTickets = new ArrayList<>();
         for (User user : existingUsers) {
             testTickets.addAll(supportTicketRepository.findByUserOrderByCreatedAtDesc(user));
@@ -57,12 +58,10 @@ public class CleanupService {
 
             // Delete comment entities
             ticketCommentRepository.deleteAll(
-                    testTickets.stream().flatMap(t -> t.getComments().stream()).collect(Collectors.toList())
-            );
+                    testTickets.stream().flatMap(t -> t.getComments().stream()).collect(Collectors.toList()));
             // Delete attachment entities
             ticketAttachmentRepository.deleteAll(
-                    testTickets.stream().flatMap(t -> t.getAttachments().stream()).collect(Collectors.toList())
-            );
+                    testTickets.stream().flatMap(t -> t.getAttachments().stream()).collect(Collectors.toList()));
             // Delete ticket history entities
             ticketHistoryRepository.deleteByTicketIn(testTickets);
             // Delete support tickets

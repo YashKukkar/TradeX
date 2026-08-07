@@ -242,45 +242,33 @@ export default function AdminDashboard({
                 </div>
                 <div className={overviewStyles.cardSplitLayout}>
                   <div className={overviewStyles.cardSplitCol}>
-                    <div className={overviewStyles.subSectionTitle} style={{ color: "#4caf50" }}>Deposits</div>
+                    <div className={overviewStyles.subSectionTitle} style={{ color: "var(--success)" }}>Deposits</div>
                     <div className={overviewStyles.cardSubMetric}>
-                      <span className={overviewStyles.cardSubMetricLabel}>Completed</span>
-                      <span className={overviewStyles.cardSubMetricValue} style={{ color: "#4caf50" }}>
+                      <span className={overviewStyles.cardSubMetricLabel}>Total Amount</span>
+                      <span className={overviewStyles.cardSubMetricValue} style={{ color: "var(--success)" }}>
                         {metricsLoading ? <LoadingDots /> : `₹${(dashboardMetrics?.totalDeposits ?? 0).toLocaleString()}`}
                       </span>
                     </div>
                     <div className={overviewStyles.cardSubMetric}>
-                      <span className={overviewStyles.cardSubMetricLabel}>Volume Count</span>
+                      <span className={overviewStyles.cardSubMetricLabel}>Successful Count</span>
                       <span className={overviewStyles.cardSubMetricValue}>
-                        {metricsLoading ? <LoadingDots /> : `${dashboardMetrics?.totalDepositsCount ?? 0} successful`}
-                      </span>
-                    </div>
-                    <div className={overviewStyles.cardSubMetric}>
-                      <span className={overviewStyles.cardSubMetricLabel}>Pending Queue</span>
-                      <span className={overviewStyles.cardSubMetricValue} style={{ color: "#ff9800" }}>
-                        {metricsLoading ? <LoadingDots /> : `₹${(dashboardMetrics?.pendingDepositsAmount ?? 0).toLocaleString()}`}
+                        {metricsLoading ? <LoadingDots /> : (dashboardMetrics?.totalDepositsCount ?? 0).toLocaleString()}
                       </span>
                     </div>
                   </div>
                   <div className={overviewStyles.verticalDivider}></div>
                   <div className={overviewStyles.cardSplitCol}>
-                    <div className={overviewStyles.subSectionTitle} style={{ color: "#ff5a6a" }}>Withdrawals</div>
+                    <div className={overviewStyles.subSectionTitle} style={{ color: "var(--danger)" }}>Withdrawals</div>
                     <div className={overviewStyles.cardSubMetric}>
-                      <span className={overviewStyles.cardSubMetricLabel}>Completed</span>
-                      <span className={overviewStyles.cardSubMetricValue} style={{ color: "#ff5a6a" }}>
+                      <span className={overviewStyles.cardSubMetricLabel}>Total Amount</span>
+                      <span className={overviewStyles.cardSubMetricValue} style={{ color: "var(--danger)" }}>
                         {metricsLoading ? <LoadingDots /> : `₹${(dashboardMetrics?.totalWithdrawals ?? 0).toLocaleString()}`}
                       </span>
                     </div>
                     <div className={overviewStyles.cardSubMetric}>
-                      <span className={overviewStyles.cardSubMetricLabel}>Volume Count</span>
+                      <span className={overviewStyles.cardSubMetricLabel}>Successful Count</span>
                       <span className={overviewStyles.cardSubMetricValue}>
-                        {metricsLoading ? <LoadingDots /> : `${dashboardMetrics?.totalWithdrawalsCount ?? 0} successful`}
-                      </span>
-                    </div>
-                    <div className={overviewStyles.cardSubMetric}>
-                      <span className={overviewStyles.cardSubMetricLabel}>Pending Queue</span>
-                      <span className={overviewStyles.cardSubMetricValue} style={{ color: "#ff9800" }}>
-                        {metricsLoading ? <LoadingDots /> : `₹${(dashboardMetrics?.pendingWithdrawalsAmount ?? 0).toLocaleString()}`}
+                        {metricsLoading ? <LoadingDots /> : (dashboardMetrics?.totalWithdrawalsCount ?? 0).toLocaleString()}
                       </span>
                     </div>
                   </div>

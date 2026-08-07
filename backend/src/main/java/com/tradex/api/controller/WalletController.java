@@ -1,6 +1,7 @@
 package com.tradex.api.controller;
 
 import com.tradex.api.dto.WalletTransactionDTO;
+import com.tradex.api.exception.AppException;
 import com.tradex.api.service.WalletService;
 import com.tradex.api.service.PointsService;
 import jakarta.validation.Valid;
@@ -29,26 +30,29 @@ public class WalletController {
     private final PointsService pointsService;
 
     public record WalletAmountRequest(
-        @NotNull(message = "Amount cannot be null")
-        @Positive(message = "Amount must be greater than zero")
-        BigDecimal amount
-    ) {}
+            @NotNull(message = "Amount cannot be null") @Positive(message = "Amount must be greater than zero") BigDecimal amount) {
+    }
 
     public record ConvertPointsRequest(
-        @NotNull(message = "Points value cannot be null")
-        @Min(value = 1, message = "Points value must be at least 1")
-        Long points
-    ) {}
+            @NotNull(message = "Points value cannot be null") @Min(value = 1, message = "Points value must be at least 1") Long points) {
+    }
 
+    private String getUserEmail(Principal principal) {
+        if (principal == null || principal.getName() == null || principal.getName().isBlank()) {
+            throw new AppException.UnauthorizedException("Authentication principal is missing");
+        }
+        return principal.getName();
+    }
 
     @PostMapping("/deposit")
     public ResponseEntity<WalletTransactionDTO> deposit(
             Principal principal,
             @Valid @RequestBody WalletAmountRequest request,
-            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey
-    ) {
-        log.info("Deposit request for user {} with amount {} and idempotency key {}", principal.getName(), request.amount(), idempotencyKey);
-        WalletTransactionDTO tx = walletService.deposit(principal.getName(), request.amount(), idempotencyKey);
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+        String email = getUserEmail(principal);
+        log.info("Deposit request for user {} with amount {} and idempotency key {}", email, request.amount(),
+                idempotencyKey);
+        WalletTransactionDTO tx = walletService.deposit(email, request.amount(), idempotencyKey);
         return ResponseEntity.ok(tx);
     }
 
@@ -56,10 +60,11 @@ public class WalletController {
     public ResponseEntity<WalletTransactionDTO> withdraw(
             Principal principal,
             @Valid @RequestBody WalletAmountRequest request,
-            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey
-    ) {
-        log.info("Withdrawal request for user {} with amount {} and idempotency key {}", principal.getName(), request.amount(), idempotencyKey);
-        WalletTransactionDTO tx = walletService.withdraw(principal.getName(), request.amount(), idempotencyKey);
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+        String email = getUserEmail(principal);
+        log.info("Withdrawal request for user {} with amount {} and idempotency key {}", email, request.amount(),
+                idempotencyKey);
+        WalletTransactionDTO tx = walletService.withdraw(email, request.amount(), idempotencyKey);
         return ResponseEntity.ok(tx);
     }
 
@@ -67,17 +72,19 @@ public class WalletController {
     public ResponseEntity<WalletTransactionDTO> convertPoints(
             Principal principal,
             @Valid @RequestBody ConvertPointsRequest request,
-            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey
-    ) {
-        log.info("Points conversion request for user {} with points {} and idempotency key {}", principal.getName(), request.points(), idempotencyKey);
-        WalletTransactionDTO tx = pointsService.convertPoints(principal.getName(), request.points(), idempotencyKey);
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+        String email = getUserEmail(principal);
+        log.info("Points conversion request for user {} with points {} and idempotency key {}", email, request.points(),
+                idempotencyKey);
+        WalletTransactionDTO tx = pointsService.convertPoints(email, request.points(), idempotencyKey);
         return ResponseEntity.ok(tx);
     }
 
     @GetMapping("/transactions")
     public ResponseEntity<List<WalletTransactionDTO>> getMyTransactions(Principal principal) {
-        log.info("Fetching wallet transactions for user {}", principal.getName());
-        List<WalletTransactionDTO> txs = walletService.getMyWalletTransactions(principal.getName());
+        String email = getUserEmail(principal);
+        log.info("Fetching wallet transactions for user {}", email);
+        List<WalletTransactionDTO> txs = walletService.getMyWalletTransactions(email);
         return ResponseEntity.ok(txs);
     }
 }

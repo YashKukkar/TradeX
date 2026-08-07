@@ -227,7 +227,7 @@ export default function Login() {
 
           {error && <p className={styles.error}>{error}</p>}
           {successMsg && <p style={{ color: "var(--primary)", fontSize: "13px", marginTop: "12px", textAlign: "center" }}>{successMsg}</p>}
-          
+
           <p className={styles.footerText}>
             New to TradeX?{" "}
             <a href={`${config.websiteUrl}/signup`} className={styles.link}>Create a free account</a>

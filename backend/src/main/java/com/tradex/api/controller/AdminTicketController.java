@@ -2,6 +2,8 @@ package com.tradex.api.controller;
 
 import com.tradex.api.dto.*;
 import com.tradex.api.service.SupportTicketService;
+import com.tradex.api.util.SecurityUtils;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +25,7 @@ public class AdminTicketController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EMPLOYEE')")
     @GetMapping
     public ResponseEntity<List<TicketDTO>> getAllTickets(Authentication auth) {
-        return ResponseEntity.ok(supportTicketService.getAllTickets(auth.getName()));
+        return ResponseEntity.ok(supportTicketService.getAllTickets(SecurityUtils.getAuthenticatedEmail(auth)));
     }
 
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EMPLOYEE')")
@@ -32,7 +34,8 @@ public class AdminTicketController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateStatusRequest request,
             Authentication auth) {
-        return ResponseEntity.ok(supportTicketService.updateTicketStatus(id, request.status(), auth.getName()));
+        return ResponseEntity.ok(supportTicketService.updateTicketStatus(id, request.status(),
+                SecurityUtils.getAuthenticatedEmail(auth)));
     }
 
     public record AssignTicketRequest(String assignedToPermission) {
@@ -44,7 +47,8 @@ public class AdminTicketController {
             @PathVariable Long id,
             @RequestBody AssignTicketRequest request,
             Authentication auth) {
-        return ResponseEntity.ok(supportTicketService.assignTicket(id, request.assignedToPermission(), auth.getName()));
+        return ResponseEntity.ok(supportTicketService.assignTicket(id, request.assignedToPermission(),
+                com.tradex.api.util.SecurityUtils.getAuthenticatedEmail(auth)));
     }
 
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EMPLOYEE')")
@@ -52,7 +56,8 @@ public class AdminTicketController {
     public ResponseEntity<TicketDetailDTO> claimTicket(
             @PathVariable Long id,
             Authentication auth) {
-        return ResponseEntity.ok(supportTicketService.claimTicket(id, auth.getName()));
+        return ResponseEntity.ok(
+                supportTicketService.claimTicket(id, com.tradex.api.util.SecurityUtils.getAuthenticatedEmail(auth)));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_USERS')")

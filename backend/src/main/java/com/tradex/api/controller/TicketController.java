@@ -2,6 +2,7 @@ package com.tradex.api.controller;
 
 import com.tradex.api.dto.*;
 import com.tradex.api.service.SupportTicketService;
+import com.tradex.api.util.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import java.util.List;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("null")
+
 public class TicketController {
 
     private final SupportTicketService supportTicketService;
@@ -29,19 +30,20 @@ public class TicketController {
             @RequestPart("ticket") @Valid TicketCreateRequest request,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
             Authentication auth) {
-        log.info("User {} creating support ticket: {}", auth.getName(), request.getSubject());
-        TicketDetailDTO ticket = supportTicketService.createTicket(auth.getName(), request, files);
+        String email = SecurityUtils.getAuthenticatedEmail(auth);
+        log.info("User {} creating support ticket: {}", email, request.getSubject());
+        TicketDetailDTO ticket = supportTicketService.createTicket(email, request, files);
         return ResponseEntity.status(HttpStatus.CREATED).body(ticket);
     }
 
     @GetMapping("/tickets")
     public ResponseEntity<List<TicketDTO>> getUserTickets(Authentication auth) {
-        return ResponseEntity.ok(supportTicketService.getUserTickets(auth.getName()));
+        return ResponseEntity.ok(supportTicketService.getUserTickets(SecurityUtils.getAuthenticatedEmail(auth)));
     }
 
     @GetMapping("/tickets/{id}")
     public ResponseEntity<TicketDetailDTO> getTicketDetail(@PathVariable Long id, Authentication auth) {
-        return ResponseEntity.ok(supportTicketService.getTicketDetail(auth.getName(), id));
+        return ResponseEntity.ok(supportTicketService.getTicketDetail(SecurityUtils.getAuthenticatedEmail(auth), id));
     }
 
     @PostMapping("/tickets/{id}/comments")
@@ -49,7 +51,7 @@ public class TicketController {
             @PathVariable Long id,
             @Valid @RequestBody TicketCommentRequest request,
             Authentication auth) {
-        return ResponseEntity.ok(supportTicketService.addComment(auth.getName(), id, request, null));
+        return ResponseEntity.ok(supportTicketService.addComment(SecurityUtils.getAuthenticatedEmail(auth), id, request, null));
     }
 
     @PostMapping(value = "/tickets/{id}/comments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -58,24 +60,26 @@ public class TicketController {
             @RequestPart("comment") @Valid TicketCommentRequest request,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
             Authentication auth) {
-        return ResponseEntity.ok(supportTicketService.addComment(auth.getName(), id, request, files));
+        return ResponseEntity.ok(supportTicketService.addComment(SecurityUtils.getAuthenticatedEmail(auth), id, request, files));
     }
 
     @PostMapping("/tickets/{id}/reopen")
     public ResponseEntity<TicketDetailDTO> reopenTicket(@PathVariable Long id, Authentication auth) {
-        return ResponseEntity.ok(supportTicketService.reopenTicket(id, auth.getName()));
+        return ResponseEntity.ok(supportTicketService.reopenTicket(id, SecurityUtils.getAuthenticatedEmail(auth)));
     }
 
     @PostMapping("/tickets/{id}/close")
     public ResponseEntity<TicketDetailDTO> closeTicket(@PathVariable Long id, Authentication auth) {
-        return ResponseEntity.ok(supportTicketService.closeTicket(id, auth.getName()));
+        return ResponseEntity.ok(supportTicketService.closeTicket(id, SecurityUtils.getAuthenticatedEmail(auth)));
     }
 
     @GetMapping("/tickets/attachments/{attachmentId}")
     public ResponseEntity<byte[]> downloadAttachment(@PathVariable Long attachmentId, Authentication auth) {
-        log.info("[Download] Request | attachmentId={} | user={}", attachmentId, auth.getName());
-        AttachmentDownload download = supportTicketService.getAttachmentDownload(auth.getName(), attachmentId);
-        log.info("[Download] Success | attachmentId={} | fileName={} | size={} bytes", attachmentId, download.fileName(), download.data().length);
+        String email = SecurityUtils.getAuthenticatedEmail(auth);
+        log.info("[Download] Request | attachmentId={} | user={}", attachmentId, email);
+        AttachmentDownload download = supportTicketService.getAttachmentDownload(email, attachmentId);
+        log.info("[Download] Success | attachmentId={} | fileName={} | size={} bytes", attachmentId,
+                download.fileName(), download.data().length);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + download.fileName() + "\"")
                 .contentType(MediaType.parseMediaType(download.contentType()))

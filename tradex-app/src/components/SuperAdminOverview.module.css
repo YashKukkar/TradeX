@@ -122,10 +122,11 @@
 /* Performance Section */
 .perfSection {
   margin-top: 32px;
-  background: var(--clr-white-a01);
-  border: 1px solid var(--clr-white-a05);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
   border-radius: 16px;
   padding: 24px;
+  box-shadow: var(--shadow);
 }
 
 .perfHeader {
@@ -149,36 +150,57 @@
 .tableWrapper {
   overflow-x: auto;
   border-radius: 12px;
-  border: 1px solid var(--clr-white-a05);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-recessed);
 }
 
 .perfTable {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   text-align: left;
   font-size: 13px;
 }
 
 .perfTable th {
-  background: var(--clr-white-a03);
+  background: var(--surface-elevated);
   color: var(--muted);
-  font-weight: 600;
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--clr-white-a08);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-strong);
+  border-right: 1px solid var(--border-subtle);
 }
 
 .perfTable td {
   padding: 14px 16px;
-  border-bottom: 1px solid var(--clr-white-a05);
+  border-bottom: 1px solid var(--border-subtle);
+  border-right: 1px solid var(--border-subtle);
   color: var(--text);
+  vertical-align: middle;
+}
+
+.perfTable th:last-child,
+.perfTable td:last-child {
+  border-right: none;
+}
+
+.perfTable tbody tr {
+  transition: background 0.15s ease;
+}
+
+.perfTable tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.perfTable tbody tr:hover {
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .perfTable tr:last-child td {
   border-bottom: none;
-}
-
-.perfTable tr:hover td {
-  background: var(--clr-white-a01);
 }
 
 .employeeRow {
@@ -419,13 +441,16 @@
   .metricsGrid {
     grid-template-columns: 1fr !important;
   }
+
   .cardSplitLayout {
     flex-direction: column;
   }
+
   .verticalDivider {
     width: 100%;
     height: 1px;
   }
+
   .gridSpan2 {
     grid-column: span 1 !important;
   }
@@ -453,13 +478,14 @@
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  padding: 8px 12px !important;
-  background: var(--clr-white-a02);
+  letter-spacing: 0.06em;
+  padding: 10px 16px !important;
+  background: var(--surface-elevated);
+  border-bottom: 1px solid var(--border-strong);
 }
 
 .tableColDivider {
-  border-right: 1px solid var(--clr-white-a06);
+  border-right: 2px solid var(--border-strong) !important;
 }
 
 .metricPill {
@@ -505,7 +531,7 @@
 }
 
 .platformHeroValue {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 32px;
   font-weight: 800;
   background: linear-gradient(135deg, var(--clr-white) 0%, #c084fc 100%);
@@ -528,8 +554,3 @@
   border: 1px solid var(--clr-green-a30);
   box-shadow: inset 0 1px 0 0 var(--clr-white-a15), 0 2px 6px var(--clr-black-a20);
 }
-
-
-
-
-

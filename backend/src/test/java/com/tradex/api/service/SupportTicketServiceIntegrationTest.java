@@ -17,7 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.mockito.Mockito;
 import static org.mockito.ArgumentMatchers.any;
 
@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-@SuppressWarnings("null")
+
 class SupportTicketServiceIntegrationTest {
 
     @Autowired
@@ -37,7 +37,7 @@ class SupportTicketServiceIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
-    @MockBean
+    @MockitoBean
     private AttachmentStorageService attachmentStorageService;
 
     private User testUser;
@@ -72,8 +72,7 @@ class SupportTicketServiceIntegrationTest {
         TicketCreateRequest request = new TicketCreateRequest(
                 TicketCategory.GENERAL,
                 "Need help resetting password",
-                "I cannot reset my password from the settings page."
-        );
+                "I cannot reset my password from the settings page.");
 
         TicketDetailDTO ticket = supportTicketService.createTicket(testUser.getEmail(), request, null);
 
@@ -95,15 +94,13 @@ class SupportTicketServiceIntegrationTest {
         TicketCreateRequest request = new TicketCreateRequest(
                 TicketCategory.TECHNICAL,
                 "Error loading dashboard",
-                "See the attached screenshot of the JS console error."
-        );
+                "See the attached screenshot of the JS console error.");
 
         MockMultipartFile file1 = new MockMultipartFile(
                 "files",
                 "screenshot.png",
                 "image/png",
-                "fake image content".getBytes()
-        );
+                "fake image content".getBytes());
 
         List<MultipartFile> files = new ArrayList<>();
         files.add(file1);
@@ -120,12 +117,14 @@ class SupportTicketServiceIntegrationTest {
         assertTrue(attachment.getFileSize() > 0);
 
         // Verify attachment download
-        AttachmentDownload retrievedDownload = supportTicketService.getAttachmentDownload(testUser.getEmail(), attachment.getId());
+        AttachmentDownload retrievedDownload = supportTicketService.getAttachmentDownload(testUser.getEmail(),
+                attachment.getId());
         assertNotNull(retrievedDownload);
         assertNotNull(retrievedDownload.data());
 
         // Admin should also be able to download
-        AttachmentDownload adminRetrievedDownload = supportTicketService.getAttachmentDownload(testAdmin.getEmail(), attachment.getId());
+        AttachmentDownload adminRetrievedDownload = supportTicketService.getAttachmentDownload(testAdmin.getEmail(),
+                attachment.getId());
         assertNotNull(adminRetrievedDownload);
         assertNotNull(adminRetrievedDownload.data());
     }
@@ -147,14 +146,16 @@ class SupportTicketServiceIntegrationTest {
 
     @Test
     void testAddCommentsAndAutoStatusTransition() {
-        TicketCreateRequest request = new TicketCreateRequest(TicketCategory.OTHER, "Test Status", "Status transitions");
+        TicketCreateRequest request = new TicketCreateRequest(TicketCategory.OTHER, "Test Status",
+                "Status transitions");
         TicketDetailDTO ticket = supportTicketService.createTicket(testUser.getEmail(), request, null);
 
         assertEquals(TicketStatus.OPEN, ticket.getStatus());
 
         // Admin replies -> Status should auto-transition to IN_PROGRESS
         TicketCommentRequest adminReply = new TicketCommentRequest("We are investigating this issue.");
-        TicketCommentDTO adminComment = supportTicketService.addComment(testAdmin.getEmail(), ticket.getId(), adminReply, null);
+        TicketCommentDTO adminComment = supportTicketService.addComment(testAdmin.getEmail(), ticket.getId(),
+                adminReply, null);
 
         assertNotNull(adminComment);
         assertTrue(adminComment.isAdminReply());
@@ -172,11 +173,13 @@ class SupportTicketServiceIntegrationTest {
         assertEquals(testAdmin.getEmail(), resolvedTicket.getResolvedByEmail());
 
         // Verify customer cannot see resolvedByEmail (privacy rule)
-        TicketDetailDTO resolvedTicketCustomer = supportTicketService.getTicketDetail(testUser.getEmail(), ticket.getId());
+        TicketDetailDTO resolvedTicketCustomer = supportTicketService.getTicketDetail(testUser.getEmail(),
+                ticket.getId());
         assertNull(resolvedTicketCustomer.getResolvedByEmail());
 
         assertThrows(BadRequestException.class, () -> {
-            supportTicketService.addComment(testUser.getEmail(), ticket.getId(), new TicketCommentRequest("Should fail"), null);
+            supportTicketService.addComment(testUser.getEmail(), ticket.getId(),
+                    new TicketCommentRequest("Should fail"), null);
         });
 
         supportTicketService.reopenTicket(ticket.getId(), testUser.getEmail());
@@ -191,31 +194,29 @@ class SupportTicketServiceIntegrationTest {
 
         // Replying to closed ticket is blocked
         assertThrows(BadRequestException.class, () -> {
-            supportTicketService.addComment(testUser.getEmail(), ticket.getId(), new TicketCommentRequest("Should fail"), null);
+            supportTicketService.addComment(testUser.getEmail(), ticket.getId(),
+                    new TicketCommentRequest("Should fail"), null);
         });
     }
 
-
-
     @Test
     void testAddCommentWithAttachments() {
-        TicketCreateRequest request = new TicketCreateRequest(TicketCategory.GENERAL, "Attachment Comment Test", "Test");
+        TicketCreateRequest request = new TicketCreateRequest(TicketCategory.GENERAL, "Attachment Comment Test",
+                "Test");
         TicketDetailDTO ticket = supportTicketService.createTicket(testUser.getEmail(), request, null);
 
         org.springframework.mock.web.MockMultipartFile file = new org.springframework.mock.web.MockMultipartFile(
                 "files",
                 "comment-doc.txt",
                 "text/plain",
-                "comment file content".getBytes()
-        );
+                "comment file content".getBytes());
 
         TicketCommentRequest commentReq = new TicketCommentRequest("Here is the requested log file.");
         TicketCommentDTO comment = supportTicketService.addComment(
                 testUser.getEmail(),
                 ticket.getId(),
                 commentReq,
-                List.of(file)
-        );
+                List.of(file));
 
         assertNotNull(comment);
         assertEquals("Here is the requested log file.", comment.getMessage());
@@ -277,7 +278,8 @@ class SupportTicketServiceIntegrationTest {
 
         // Employee 2 attempts to comment -> should throw ForbiddenException
         assertThrows(ForbiddenException.class, () -> {
-            supportTicketService.addComment(finalEmp2.getEmail(), ticket.getId(), new TicketCommentRequest("Hacking"), null);
+            supportTicketService.addComment(finalEmp2.getEmail(), ticket.getId(), new TicketCommentRequest("Hacking"),
+                    null);
         });
 
         // Employee 1 claims it -> should succeed
@@ -286,11 +288,13 @@ class SupportTicketServiceIntegrationTest {
         assertEquals(employee1.getEmail(), claimedByEmp1.getAssignedToUserEmail());
 
         // Employee 1 comments -> should succeed
-        TicketCommentDTO emp1Comment = supportTicketService.addComment(employee1.getEmail(), ticket.getId(), new TicketCommentRequest("Checking deposits"), null);
+        TicketCommentDTO emp1Comment = supportTicketService.addComment(employee1.getEmail(), ticket.getId(),
+                new TicketCommentRequest("Checking deposits"), null);
         assertNotNull(emp1Comment);
 
         // Employee 1 resolves -> should succeed
-        TicketDetailDTO resolvedByEmp1 = supportTicketService.updateTicketStatus(ticket.getId(), TicketStatus.RESOLVED, employee1.getEmail());
+        TicketDetailDTO resolvedByEmp1 = supportTicketService.updateTicketStatus(ticket.getId(), TicketStatus.RESOLVED,
+                employee1.getEmail());
         assertEquals(TicketStatus.RESOLVED, resolvedByEmp1.getStatus());
     }
 }

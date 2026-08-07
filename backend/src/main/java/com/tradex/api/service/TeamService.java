@@ -22,7 +22,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("null")
+
 public class TeamService {
 
     private final TeamRepository teamRepository;

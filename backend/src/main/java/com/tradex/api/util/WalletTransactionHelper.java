@@ -8,7 +8,7 @@ import com.tradex.api.repository.UserRepository;
 import com.tradex.api.repository.WalletTransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.lang.NonNull;
+import lombok.NonNull;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 

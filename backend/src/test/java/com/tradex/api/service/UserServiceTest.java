@@ -30,7 +30,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("null")
+
 class UserServiceTest {
 
     @Mock
@@ -67,25 +67,25 @@ class UserServiceTest {
     void setUp() {
         lenient().when(userMapper.toDTO(any())).thenAnswer(invocation -> {
             User u = invocation.getArgument(0);
-            if (u == null) return null;
+            if (u == null)
+                return null;
             return new UserDTO(
-                u.getId(),
-                u.getEmail(),
-                u.getReferralCode(),
-                u.getPointsBalance(),
-                u.getReferralPath(),
-                u.getReferredBy() != null ? u.getReferredBy().getEmail() : null,
-                u.getPhoneNumber(),
-                u.getRole() != null ? u.getRole().name() : "USER",
-                0L,
-                u.isEmailVerified(),
-                u.isPhoneVerified(),
-                u.getWithdrawableBalance(),
-                u.getBonusBalance(),
-                u.isEnabled(),
-                u.isLocked(),
-                java.util.Collections.emptyList()
-            );
+                    u.getId(),
+                    u.getEmail(),
+                    u.getReferralCode(),
+                    u.getPointsBalance(),
+                    u.getReferralPath(),
+                    u.getReferredBy() != null ? u.getReferredBy().getEmail() : null,
+                    u.getPhoneNumber(),
+                    u.getRole() != null ? u.getRole().name() : "USER",
+                    0L,
+                    u.isEmailVerified(),
+                    u.isPhoneVerified(),
+                    u.getWithdrawableBalance(),
+                    u.getBonusBalance(),
+                    u.isEnabled(),
+                    u.isLocked(),
+                    java.util.Collections.emptyList());
         });
         user = new User("test@example.com", "password");
         settings = new SystemSetting();
@@ -180,9 +180,8 @@ class UserServiceTest {
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("wrongpassword", "password")).thenReturn(false);
 
-        assertThrows(AppException.BadRequestException.class, () ->
-            userService.changePassword("test@example.com", "wrongpassword", "newpassword")
-        );
+        assertThrows(AppException.BadRequestException.class,
+                () -> userService.changePassword("test@example.com", "wrongpassword", "newpassword"));
         verify(userRepository, never()).save(any(User.class));
     }
 }

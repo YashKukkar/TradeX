@@ -25,7 +25,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("null")
+
 public class TicketCommentService {
 
     private final SupportTicketRepository supportTicketRepository;
@@ -35,7 +35,8 @@ public class TicketCommentService {
     private final TicketMapper ticketMapper;
 
     @Transactional
-    public TicketCommentDTO addComment(String userEmail, Long ticketId, TicketCommentRequest request, List<MultipartFile> files) {
+    public TicketCommentDTO addComment(String userEmail, Long ticketId, TicketCommentRequest request,
+            List<MultipartFile> files) {
         SupportTicket ticket = supportTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
 
@@ -57,7 +58,8 @@ public class TicketCommentService {
                 throw new ForbiddenException("You cannot reply to a ticket claimed by another agent.");
             }
             // Cannot comment if group is assigned and they don't have the permission
-            if (ticket.getAssignedToPermission() != null && !author.getPermissions().contains(ticket.getAssignedToPermission())) {
+            if (ticket.getAssignedToPermission() != null
+                    && !author.getPermissions().contains(ticket.getAssignedToPermission())) {
                 log.warn("Forbidden ticket reply: Agent {} lacks required permission group {} for ticket {}",
                         userEmail, ticket.getAssignedToPermission(), ticketId);
                 throw new ForbiddenException("You do not have the required permission group to reply to this ticket.");
@@ -65,26 +67,32 @@ public class TicketCommentService {
         }
 
         if (ticket.getStatus() == TicketStatus.RESOLVED || ticket.getStatus() == TicketStatus.CLOSED) {
-            log.warn("Failed comment addition: Chat is disabled for ticket {} in status {}", ticketId, ticket.getStatus());
-            throw new BadRequestException("Chat is disabled for resolved or closed tickets. Please reopen the ticket first.");
+            log.warn("Failed comment addition: Chat is disabled for ticket {} in status {}", ticketId,
+                    ticket.getStatus());
+            throw new BadRequestException(
+                    "Chat is disabled for resolved or closed tickets. Please reopen the ticket first.");
         }
 
         if (ticket.getComments().size() >= 50) {
             log.warn("Failed comment addition: Conversation limit (50) reached for ticket {}", ticketId);
-            throw new BadRequestException("This support ticket has reached the maximum conversation limit of 50 messages. Please raise a new ticket.");
+            throw new BadRequestException(
+                    "This support ticket has reached the maximum conversation limit of 50 messages. Please raise a new ticket.");
         }
 
         if (files != null && !files.isEmpty()) {
             long newFilesCount = files.stream().filter(file -> !file.isEmpty()).count();
             if (newFilesCount > 0) {
                 if (author.getRole() != Role.USER) {
-                    log.warn("Failed comment addition: Support staff {} attempted to upload attachments to ticket {}", userEmail, ticketId);
+                    log.warn("Failed comment addition: Support staff {} attempted to upload attachments to ticket {}",
+                            userEmail, ticketId);
                     throw new BadRequestException("Support staff are not permitted to upload attachments.");
                 }
                 int currentAttachmentsCount = ticket.getAttachments().size();
                 if (currentAttachmentsCount + newFilesCount > 5) {
                     log.warn("Failed comment addition: Attachment limit exceeded (limit: 5) for ticket {}", ticketId);
-                    throw new BadRequestException("This ticket cannot have more than 5 total attachments. Currently has " + currentAttachmentsCount + ".");
+                    throw new BadRequestException(
+                            "This ticket cannot have more than 5 total attachments. Currently has "
+                                    + currentAttachmentsCount + ".");
                 }
             }
             ticketAttachmentService.processAndAttachFiles(ticket, files);
@@ -100,12 +108,16 @@ public class TicketCommentService {
         ticket.getComments().add(comment);
         ticket.setUpdatedAt(LocalDateTime.now());
 
-        ticketHistoryService.logHistory(ticket, "COMMENT_ADDED", "Reply added: " + (request.getMessage().length() > 60 ? request.getMessage().substring(0, 57) + "..." : request.getMessage()), userEmail);
+        ticketHistoryService.logHistory(ticket, "COMMENT_ADDED",
+                "Reply added: " + (request.getMessage().length() > 60 ? request.getMessage().substring(0, 57) + "..."
+                        : request.getMessage()),
+                userEmail);
 
         // Auto transition status when replied
         if (isAdmin && ticket.getStatus() == TicketStatus.OPEN) {
             ticket.setStatus(TicketStatus.IN_PROGRESS);
-            ticketHistoryService.logHistory(ticket, "STATUS_CHANGED", "Status auto-updated to IN_PROGRESS upon agent reply", "SYSTEM");
+            ticketHistoryService.logHistory(ticket, "STATUS_CHANGED",
+                    "Status auto-updated to IN_PROGRESS upon agent reply", "SYSTEM");
         }
 
         supportTicketRepository.save(ticket);

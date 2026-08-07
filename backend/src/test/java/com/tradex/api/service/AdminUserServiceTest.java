@@ -35,7 +35,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("null")
+
 class AdminUserServiceTest {
 
     @Mock
@@ -66,25 +66,25 @@ class AdminUserServiceTest {
     void setUp() {
         lenient().when(userMapper.toDTO(any())).thenAnswer(invocation -> {
             User u = invocation.getArgument(0);
-            if (u == null) return null;
+            if (u == null)
+                return null;
             return new UserDTO(
-                u.getId(),
-                u.getEmail(),
-                null,
-                u.getPointsBalance(),
-                null,
-                null,
-                null,
-                u.getRole() != null ? u.getRole().name() : "USER",
-                0L,
-                u.isEmailVerified(),
-                u.isPhoneVerified(),
-                u.getWithdrawableBalance(),
-                u.getBonusBalance(),
-                u.isEnabled(),
-                u.isLocked(),
-                Collections.emptyList()
-            );
+                    u.getId(),
+                    u.getEmail(),
+                    null,
+                    u.getPointsBalance(),
+                    null,
+                    null,
+                    null,
+                    u.getRole() != null ? u.getRole().name() : "USER",
+                    0L,
+                    u.isEmailVerified(),
+                    u.isPhoneVerified(),
+                    u.getWithdrawableBalance(),
+                    u.getBonusBalance(),
+                    u.isEnabled(),
+                    u.isLocked(),
+                    Collections.emptyList());
         });
         targetUser = new User();
         targetUser.setId(2L);
@@ -118,9 +118,7 @@ class AdminUserServiceTest {
     void testLockUserSelfActionGuard() {
         when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(adminUser));
 
-        assertThrows(BadRequestException.class, () ->
-            adminUserService.lockUser("admin@example.com", 1L)
-        );
+        assertThrows(BadRequestException.class, () -> adminUserService.lockUser("admin@example.com", 1L));
     }
 
     @Test
@@ -128,18 +126,14 @@ class AdminUserServiceTest {
         targetUser.setLocked(true);
         when(userRepository.findByIdForUpdate(2L)).thenReturn(Optional.of(targetUser));
 
-        assertThrows(BadRequestException.class, () ->
-            adminUserService.lockUser("admin@example.com", 2L)
-        );
+        assertThrows(BadRequestException.class, () -> adminUserService.lockUser("admin@example.com", 2L));
     }
 
     @Test
     void testLockUserNotFound() {
         when(userRepository.findByIdForUpdate(99L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () ->
-            adminUserService.lockUser("admin@example.com", 99L)
-        );
+        assertThrows(ResourceNotFoundException.class, () -> adminUserService.lockUser("admin@example.com", 99L));
     }
 
     @Test
@@ -157,9 +151,7 @@ class AdminUserServiceTest {
     void testUnlockUserNotLocked() {
         when(userRepository.findByIdForUpdate(2L)).thenReturn(Optional.of(targetUser));
 
-        assertThrows(BadRequestException.class, () ->
-            adminUserService.unlockUser("admin@example.com", 2L)
-        );
+        assertThrows(BadRequestException.class, () -> adminUserService.unlockUser("admin@example.com", 2L));
     }
 
     // ── Enable / Disable Tests ────────────────────────────────────────────────
@@ -178,9 +170,7 @@ class AdminUserServiceTest {
     void testDisableUserSelfActionGuard() {
         when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(adminUser));
 
-        assertThrows(BadRequestException.class, () ->
-            adminUserService.disableUser("admin@example.com", 1L)
-        );
+        assertThrows(BadRequestException.class, () -> adminUserService.disableUser("admin@example.com", 1L));
     }
 
     @Test
@@ -188,9 +178,7 @@ class AdminUserServiceTest {
         targetUser.setEnabled(false);
         when(userRepository.findByIdForUpdate(2L)).thenReturn(Optional.of(targetUser));
 
-        assertThrows(BadRequestException.class, () ->
-            adminUserService.disableUser("admin@example.com", 2L)
-        );
+        assertThrows(BadRequestException.class, () -> adminUserService.disableUser("admin@example.com", 2L));
     }
 
     @Test
@@ -208,9 +196,7 @@ class AdminUserServiceTest {
     void testEnableUserAlreadyEnabled() {
         when(userRepository.findByIdForUpdate(2L)).thenReturn(Optional.of(targetUser));
 
-        assertThrows(BadRequestException.class, () ->
-            adminUserService.enableUser("admin@example.com", 2L)
-        );
+        assertThrows(BadRequestException.class, () -> adminUserService.enableUser("admin@example.com", 2L));
     }
 
     // ── Force Email Verification Tests ────────────────────────────────────────
@@ -230,9 +216,7 @@ class AdminUserServiceTest {
         targetUser.setEmailVerified(true);
         when(userRepository.findByIdForUpdate(2L)).thenReturn(Optional.of(targetUser));
 
-        assertThrows(BadRequestException.class, () ->
-            adminUserService.forceVerifyEmail("admin@example.com", 2L)
-        );
+        assertThrows(BadRequestException.class, () -> adminUserService.forceVerifyEmail("admin@example.com", 2L));
     }
 
     // ── Password Reset Email Tests ────────────────────────────────────────────
@@ -250,9 +234,8 @@ class AdminUserServiceTest {
     void testSendPasswordResetEmailNotFound() {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () ->
-            adminUserService.sendPasswordResetEmail("admin@example.com", 99L)
-        );
+        assertThrows(ResourceNotFoundException.class,
+                () -> adminUserService.sendPasswordResetEmail("admin@example.com", 99L));
     }
 
     // ── Adjust Points Tests ───────────────────────────────────────────────────
@@ -287,9 +270,7 @@ class AdminUserServiceTest {
 
         AdminAdjustPointsRequest request = new AdminAdjustPointsRequest(-150L, "Too much deduction");
 
-        assertThrows(BadRequestException.class, () ->
-            adminUserService.adjustPoints("admin@example.com", 2L, request)
-        );
+        assertThrows(BadRequestException.class, () -> adminUserService.adjustPoints("admin@example.com", 2L, request));
     }
 
     // ── Queries Tests ─────────────────────────────────────────────────────────

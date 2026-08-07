@@ -6,7 +6,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.lang.NonNull;
+import lombok.NonNull;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -25,7 +25,7 @@ public class EmailService {
     private String otpEmailTemplate;
 
     @Async
-    public void sendOtpEmail(@NonNull String toEmail, @NonNull String otp) {
+    public void sendOtpEmail(String toEmail, @NonNull String otp) {
         SystemSetting settings = systemSettingService.getSettings();
 
         if (!settings.isEmailNotificationsEnabled()) {

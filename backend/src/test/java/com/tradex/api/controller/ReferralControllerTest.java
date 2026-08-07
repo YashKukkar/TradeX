@@ -7,10 +7,11 @@ import com.tradex.api.service.ReferralService;
 import com.tradex.api.service.SystemSettingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -21,27 +22,29 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.tradex.api.config.JacksonConfig;
+
 @WebMvcTest(ReferralController.class)
-@Import({SecurityConfig.class, JwtAuthenticationFilter.class})
-@AutoConfigureMockMvc
+@Import({ SecurityConfig.class, JwtAuthenticationFilter.class, JacksonConfig.class })
+@AutoConfigureMockMvc(addFilters = false)
 class ReferralControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private ReferralService referralService;
 
-    @MockBean
+    @MockitoBean
     private SystemSettingService systemSettingService;
 
-    @MockBean
+    @MockitoBean
     private JwtUtil jwtUtil;
 
-    @MockBean
+    @MockitoBean
     private com.tradex.api.security.TokenBlacklistCache tokenBlacklistCache;
 
-    @MockBean
+    @MockitoBean
     private com.tradex.api.repository.UserRepository userRepository;
 
     @Test
@@ -49,7 +52,8 @@ class ReferralControllerTest {
     void testGetMyReferrals() throws Exception {
         when(referralService.getMyReferrals("test@example.com")).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/api/referrals/downline"))
+        mockMvc.perform(get("/api/referrals/downline")
+                .principal(new UsernamePasswordAuthenticationToken("test@example.com", "password")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
     }
@@ -59,7 +63,8 @@ class ReferralControllerTest {
     void testGetMyTransactions() throws Exception {
         when(referralService.getMyTransactions("test@example.com")).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/api/referrals/transactions"))
+        mockMvc.perform(get("/api/referrals/transactions")
+                .principal(new UsernamePasswordAuthenticationToken("test@example.com", "password")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
     }
@@ -67,7 +72,6 @@ class ReferralControllerTest {
     @Test
     void testUnauthorizedAccess() throws Exception {
         mockMvc.perform(get("/api/referrals/downline"))
-                .andExpect(status().isUnauthorized()); 
+                .andExpect(status().isUnauthorized());
     }
 }
-

@@ -25,7 +25,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("null")
+
 public class TicketStatusService {
 
     private final SupportTicketRepository supportTicketRepository;
@@ -50,11 +50,14 @@ public class TicketStatusService {
                         adminEmail, ticketId, ticket.getAssignedToUser().getEmail());
                 throw new ForbiddenException("You cannot update status on a ticket claimed by another agent.");
             }
-            // Must have the matching permission group to resolve or change status of the ticket (if group is assigned)
-            if (ticket.getAssignedToPermission() != null && !admin.getPermissions().contains(ticket.getAssignedToPermission())) {
+            // Must have the matching permission group to resolve or change status of the
+            // ticket (if group is assigned)
+            if (ticket.getAssignedToPermission() != null
+                    && !admin.getPermissions().contains(ticket.getAssignedToPermission())) {
                 log.warn("Forbidden ticket status update: Agent {} lacks required permission group {} for ticket {}",
                         adminEmail, ticket.getAssignedToPermission(), ticketId);
-                throw new ForbiddenException("You do not have the required permission group to update status on this ticket.");
+                throw new ForbiddenException(
+                        "You do not have the required permission group to update status on this ticket.");
             }
         }
 
@@ -77,14 +80,16 @@ public class TicketStatusService {
             ticket.setResolvedBy(null);
         }
 
-        ticketHistoryService.logHistory(ticket, "STATUS_CHANGED", "Status changed from " + oldStatus + " to " + status, adminEmail);
+        ticketHistoryService.logHistory(ticket, "STATUS_CHANGED", "Status changed from " + oldStatus + " to " + status,
+                adminEmail);
 
         supportTicketRepository.save(ticket);
         log.info("Admin {} updated ticket {} status to {}", adminEmail, ticket.getTicketNumber(), status);
         return ticketMapper.mapToDetailDTO(ticket, true);
     }
 
-    private record TicketAccess(SupportTicket ticket, User user, boolean isAdmin) {}
+    private record TicketAccess(SupportTicket ticket, User user, boolean isAdmin) {
+    }
 
     private TicketAccess checkAccess(Long ticketId, String userEmail, String action) {
         SupportTicket ticket = supportTicketRepository.findById(ticketId)
@@ -114,8 +119,10 @@ public class TicketStatusService {
         }
 
         if (ticket.getReopenCount() >= 2) {
-            log.warn("Failed ticket reopen: Ticket {} has already reached max reopen count (2) for user {}", ticketId, userEmail);
-            throw new BadRequestException("This ticket has already been reopened the maximum number of times (2). Please raise a new support ticket instead.");
+            log.warn("Failed ticket reopen: Ticket {} has already reached max reopen count (2) for user {}", ticketId,
+                    userEmail);
+            throw new BadRequestException(
+                    "This ticket has already been reopened the maximum number of times (2). Please raise a new support ticket instead.");
         }
 
         ticket.setStatus(TicketStatus.OPEN);
@@ -155,8 +162,7 @@ public class TicketStatusService {
         LocalDateTime cutoff = LocalDateTime.now().minusHours(36);
         List<SupportTicket> toClose = supportTicketRepository.findByStatusAndResolvedAtBefore(
                 TicketStatus.RESOLVED,
-                cutoff
-        );
+                cutoff);
 
         if (!toClose.isEmpty()) {
             log.info("Auto-closure scheduler started. Found {} tickets to close.", toClose.size());
@@ -177,7 +183,8 @@ public class TicketStatusService {
                 }
                 ticket.setStatus(TicketStatus.CLOSED);
                 ticket.setUpdatedAt(LocalDateTime.now());
-                ticketHistoryService.logHistory(ticket, "CLOSED", "Ticket automatically closed due to inactivity and attachments deleted.", "SYSTEM");
+                ticketHistoryService.logHistory(ticket, "CLOSED",
+                        "Ticket automatically closed due to inactivity and attachments deleted.", "SYSTEM");
             }
             supportTicketRepository.saveAll(toClose);
             log.info("Auto-closed {} resolved tickets and cleaned up attachments.", toClose.size());

@@ -1,4 +1,5 @@
 package com.tradex.api.service;
+
 import com.tradex.api.mapper.UserMapper;
 
 import com.tradex.api.entity.ReferralReward;
@@ -135,12 +136,7 @@ public class ReferralService {
                 break;
             }
 
-            ReferralReward reward = new ReferralReward(
-                    referrer,
-                    newUser,
-                    level,
-                    points,
-                    ReferralRewardStatus.CREDITED);
+            ReferralReward reward = buildReferralReward(referrer, newUser, level, points);
             rewardsToSave.add(reward);
 
             long currentBalance = referrer.getPointsBalance() != null ? referrer.getPointsBalance() : 0L;
@@ -148,19 +144,7 @@ public class ReferralService {
             referrer.setPointsBalance(balanceAfter);
             referrersToSave.add(referrer);
 
-            PointsTransactionType txType = switch (level) {
-                case 1 -> PointsTransactionType.REFERRAL_L1;
-                case 2 -> PointsTransactionType.REFERRAL_L2;
-                case 3 -> PointsTransactionType.REFERRAL_L3;
-                default -> PointsTransactionType.SUBSEQUENT_REFERRAL;
-            };
-
-            PointsTransaction refTx = new PointsTransaction(
-                    referrer,
-                    points,
-                    balanceAfter,
-                    txType,
-                    "Referral reward (Level " + level + ") from " + DataFormatter.maskEmail(newUser.getEmail()));
+            PointsTransaction refTx = buildReferralPointsTransaction(referrer, points, balanceAfter, level, DataFormatter.maskEmail(newUser.getEmail()));
             transactionsToSave.add(refTx);
 
             log.info("Awarded {} referral points to {} (Level {})", points, referrer.getEmail(), level);
@@ -298,5 +282,30 @@ public class ReferralService {
                 yield settings.getReferralCoinsSubsequentAmount();
             }
         };
+    }
+
+    private ReferralReward buildReferralReward(User referrer, User newUser, int level, long points) {
+        return new ReferralReward(
+                referrer,
+                newUser,
+                level,
+                points,
+                ReferralRewardStatus.CREDITED);
+    }
+
+    private PointsTransaction buildReferralPointsTransaction(User referrer, long points, long balanceAfter, int level, String maskedEmail) {
+        PointsTransactionType txType = switch (level) {
+            case 1 -> PointsTransactionType.REFERRAL_L1;
+            case 2 -> PointsTransactionType.REFERRAL_L2;
+            case 3 -> PointsTransactionType.REFERRAL_L3;
+            default -> PointsTransactionType.SUBSEQUENT_REFERRAL;
+        };
+
+        return new PointsTransaction(
+                referrer,
+                points,
+                balanceAfter,
+                txType,
+                "Referral reward (Level " + level + ") from " + maskedEmail);
     }
 }

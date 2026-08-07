@@ -5,12 +5,17 @@ import com.tradex.api.entity.*;
 import com.tradex.api.enums.*;
 import com.tradex.api.repository.UserRepository;
 import com.tradex.api.repository.WalletTransactionRepository;
+import com.tradex.api.util.DataFormatter;
 import com.tradex.api.util.WalletTransactionHelper;
 import com.tradex.api.exception.AppException.*;
 import com.tradex.api.config.AppProperties;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 import com.tradex.api.annotation.EvictDashboardCache;
 
 import java.math.BigDecimal;
@@ -20,11 +25,9 @@ import com.tradex.api.service.handler.TransactionHandler;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.function.Function;
 
 @Service
 @Slf4j
-@SuppressWarnings("null")
 public class WalletService {
 
     private final UserRepository userRepository;
@@ -47,7 +50,7 @@ public class WalletService {
         this.appProperties = appProperties;
         this.walletBalanceManager = walletBalanceManager;
         this.transactionHandlers = handlers.stream()
-                .collect(Collectors.toMap(TransactionHandler::getType, Function.identity()));
+                .collect(Collectors.toMap(handler -> handler.getType(), handler -> handler));
     }
 
     @Transactional
@@ -66,30 +69,26 @@ public class WalletService {
             }
         }
 
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BadRequestException("Deposit amount must be greater than zero");
-        }
-
-        log.info("Creating pending deposit of {} for user {}", amount, email);
+        validateDepositAmount(amount);
 
         User user = userRepository.findByEmailForUpdate(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
-        if (user.getRole() == Role.EMPLOYEE || user.getRole() == Role.SUPER_ADMIN) {
-            throw new ForbiddenException("This operation is only available to customers");
-        }
+        validateCustomerAccess(user);
 
-        WalletTransaction depositTx = new WalletTransaction(
+        WalletTransaction depositTx = buildPendingTransaction(
                 user,
                 amount,
                 user.getWithdrawableBalance(),
                 WalletTransactionType.DEPOSIT,
-                WalletTransactionStatus.PENDING,
-                "Deposit request pending approval");
-        depositTx.setIdempotencyKey(idempotencyKey);
-        walletTransactionRepository.save(depositTx);
+                "Deposit request pending approval",
+                idempotencyKey);
 
-        return new WalletTransactionDTO(depositTx);
+        WalletTransaction savedTx = saveWithIdempotencyFallback(depositTx, idempotencyKey);
+        log.info("Created pending deposit request ID: {}, amount: {}, user: {}, idempotencyKey: {}",
+                savedTx.getId(), amount, email, idempotencyKey);
+
+        return new WalletTransactionDTO(savedTx);
     }
 
     @Transactional
@@ -111,29 +110,28 @@ public class WalletService {
         User user = userRepository.findByEmailForUpdate(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
-        if (user.getRole() == Role.EMPLOYEE || user.getRole() == Role.SUPER_ADMIN) {
-            throw new ForbiddenException("This operation is only available to customers");
-        }
-
         validateWithdrawal(user, amount);
 
         user = walletBalanceManager.mutateWithdrawableBalance(user, amount.negate());
         BigDecimal newBalance = user.getWithdrawableBalance();
 
-        WalletTransaction withdrawTx = new WalletTransaction(
+        String bankDescription = "Withdrawal of funds from wallet to bank account ending in "
+                + user.getPrimaryBank().map(bank -> DataFormatter.maskAccountNumber(bank.getAccountNumber()))
+                        .orElse("N/A");
+
+        WalletTransaction withdrawTx = buildPendingTransaction(
                 user,
                 amount,
                 newBalance,
                 WalletTransactionType.WITHDRAWAL,
-                WalletTransactionStatus.PENDING,
-                "Withdrawal of funds from wallet to bank account "
-                        + user.getPrimaryBank().map(BankDetail::getAccountNumber).orElse("N/A"));
-        withdrawTx.setIdempotencyKey(idempotencyKey);
-        walletTransactionRepository.save(withdrawTx);
+                bankDescription,
+                idempotencyKey);
 
-        log.info("Processed withdrawal request of {} (PENDING) for user {}", amount, email);
+        WalletTransaction savedTx = saveWithIdempotencyFallback(withdrawTx, idempotencyKey);
+        log.info("Processed withdrawal request ID: {} of amount: {} (PENDING) for user: {}, idempotencyKey: {}",
+                savedTx.getId(), amount, email, idempotencyKey);
 
-        return new WalletTransactionDTO(withdrawTx);
+        return new WalletTransactionDTO(savedTx);
     }
 
     @Transactional(readOnly = true)
@@ -171,6 +169,14 @@ public class WalletService {
         return approveTransactionInternal(tx);
     }
 
+    @Transactional
+    @EvictDashboardCache("transactions")
+    public WalletTransactionDTO rejectTransaction(Long transactionId, String reason) {
+        WalletTransaction tx = walletTransactionRepository.findByIdForUpdate(transactionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));
+        return rejectTransactionInternal(tx, reason);
+    }
+
     private WalletTransactionDTO approveTransactionInternal(WalletTransaction tx) {
         if (tx.getStatus() != WalletTransactionStatus.PENDING) {
             throw new BadRequestException("Transaction is not pending");
@@ -188,14 +194,6 @@ public class WalletService {
         handler.approve(actor, user, tx);
 
         return new WalletTransactionDTO(tx);
-    }
-
-    @Transactional
-    @EvictDashboardCache("transactions")
-    public WalletTransactionDTO rejectTransaction(Long transactionId, String reason) {
-        WalletTransaction tx = walletTransactionRepository.findByIdForUpdate(transactionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));
-        return rejectTransactionInternal(tx, reason);
     }
 
     private WalletTransactionDTO rejectTransactionInternal(WalletTransaction tx, String reason) {
@@ -223,15 +221,26 @@ public class WalletService {
     }
 
     private User getAuthenticatedActorOrDefault(User defaultValue) {
-        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
-                .getContext().getAuthentication();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
             return userRepository.findByEmail(auth.getName()).orElse(defaultValue);
         }
         return defaultValue;
     }
 
+    private void validateCustomerAccess(User user) {
+        user.validateCustomerAccess();
+    }
+
+    private void validateDepositAmount(BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BadRequestException("Deposit amount must be greater than zero");
+        }
+    }
+
     private void validateWithdrawal(User user, BigDecimal amount) {
+        validateCustomerAccess(user);
+
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BadRequestException("Withdrawal amount must be greater than zero");
         }
@@ -257,6 +266,41 @@ public class WalletService {
         if (currentBalance.compareTo(amount) < 0) {
             logFailedWithdrawal(user, amount, "Withdrawal failed: Insufficient withdrawable balance");
             throw new BadRequestException("Insufficient withdrawable balance");
+        }
+    }
+
+    private WalletTransaction buildPendingTransaction(
+            User user,
+            BigDecimal amount,
+            BigDecimal balanceAfter,
+            WalletTransactionType type,
+            String notes,
+            String idempotencyKey) {
+        WalletTransaction tx = new WalletTransaction(
+                user,
+                amount,
+                balanceAfter,
+                type,
+                WalletTransactionStatus.PENDING,
+                notes);
+        tx.setIdempotencyKey(idempotencyKey);
+        return tx;
+    }
+
+    private WalletTransaction saveWithIdempotencyFallback(WalletTransaction tx, String idempotencyKey) {
+        try {
+            WalletTransaction saved = walletTransactionRepository.save(tx);
+            return (saved != null) ? saved : tx;
+        } catch (DataIntegrityViolationException ex) {
+            if (idempotencyKey != null && !idempotencyKey.isBlank()) {
+                Optional<WalletTransaction> existing = walletTransactionRepository.findByIdempotencyKey(idempotencyKey);
+                if (existing.isPresent()) {
+                    log.warn("Concurrent duplicate request prevented by DB unique constraint for idempotency key: {}",
+                            idempotencyKey);
+                    return existing.get();
+                }
+            }
+            throw ex;
         }
     }
 

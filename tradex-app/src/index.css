@@ -1,47 +1,100 @@
 :root {
-  /* ── Shade Layering Palette ── */
-  --bg: #060913;
-  --bg-2: #090e1c;
-  --surface-recessed: #0a0f22;
-  --surface: #121832;
-  --surface-elevated: #192244;
-  --surface-2: #192244;
-  --surface-hover: #222d56;
+  /* ════════════════════════════════════════════════════════════════
+     1. MINIMALIST LCH SEMANTIC DESIGN SYSTEM TOKENS
+     Hue Anchors:
+       265 = Slate/Charcoal (neutrals)
+       172 = Teal (primary interactive accent)
+       155 = Emerald (success)
+        75 = Amber (warning)
+        25 = Crimson (danger)
+       280 = Indigo (user ops)
+       225 = Sky Blue (settings ops)
+     ════════════════════════════════════════════════════════════════ */
+  --color-bg-app: lch(2.5% 6 265);              /* Deep pitch obsidian background */
+  --color-bg-surface: lch(5.5% 10 265);          /* Dark charcoal surface */
+  --color-bg-surface-elevated: lch(8% 12 265);   /* Deep elevated surface */
+  --color-bg-surface-recessed: lch(3.8% 8 265);  /* Obsidian recessed panel */
 
-  --text: #e2e8f0;
-  --muted: #8fa0dd;
-  --primary: lch(83% 55 166);
-  --primary-2: lch(72% 55 166);
-  --accent: lch(75% 65 72);
-  --danger: lch(58% 72 21);
-  --border: lch(100% 0 0 / 0.06);
-  --border-strong: lch(100% 0 0 / 0.12);
+  --color-text-primary: lch(97% 2 265);         /* Crisp white text (WCAG AA > 15:1) */
+  --color-text-muted: lch(67% 18 265);          /* Soft slate text (WCAG AA > 5.2:1) */
+  --color-text-placeholder: lch(48% 18 265);    /* Muted placeholder text (WCAG AA > 4.5:1) */
 
-  --success: lch(83% 55 166);
-  --success-bg: lch(83% 55 166 / 0.06);
-  --success-border: lch(83% 55 166 / 0.15);
+  --color-border-subtle: lch(100% 0 0 / 0.07);
+  --color-border-strong: lch(100% 0 0 / 0.14);
 
-  --warning: lch(75% 65 72);
-  --warning-bg: lch(75% 65 72 / 0.06);
-  --warning-border: lch(75% 65 72 / 0.15);
+  --color-interactive-primary: lch(68% 42 172); /* Refined teal accent */
+  --color-interactive-hover: lch(55% 42 172);   /* Deep interactive hover */
 
-  --danger-bg: lch(58% 72 21 / 0.06);
-  --danger-border: lch(58% 72 21 / 0.15);
+  --color-status-success: lch(68% 52 155);      /* Emerald success */
+  --color-status-warning: lch(72% 70 75);       /* Warm amber warning */
+  --color-status-danger: lch(58% 72 25);        /* Crimson danger */
+
+  /* ════════════════════════════════════════════════════════════════
+     2. ALIASED COMPONENT MAPPINGS
+     ════════════════════════════════════════════════════════════════ */
+  --bg: var(--color-bg-app);
+  --bg-2: lch(3.8% 8 265);
+  --surface-recessed: var(--color-bg-surface-recessed);
+  --surface: var(--color-bg-surface);
+  --surface-elevated: var(--color-bg-surface-elevated);
+  --surface-2: var(--color-bg-surface-elevated);
+  --surface-hover: lch(10% 14 265);
+
+  --text: var(--color-text-primary);
+  --muted: var(--color-text-muted);
+  --clr-muted-a45: var(--color-text-placeholder);
+  --primary: var(--color-interactive-primary);
+  --primary-2: var(--color-interactive-hover);
+  --accent: var(--color-status-warning);
+  --danger: var(--color-status-danger);
+  --border: var(--color-border-subtle);
+  --border-strong: var(--color-border-strong);
+
+  --success: var(--color-status-success);
+  --success-bg: lch(68% 52 155 / 0.08);
+  --success-border: lch(68% 52 155 / 0.18);
+
+  --warning: var(--color-status-warning);
+  --warning-bg: lch(72% 70 75 / 0.08);
+  --warning-border: lch(72% 70 75 / 0.18);
+
+  --danger-bg: lch(58% 72 25 / 0.08);
+  --danger-border: lch(58% 72 25 / 0.18);
+
+  /* LCH Palette tokens for permission badges & telemetry tags */
+  --clr-indigo: lch(62% 55 280);
+  --clr-indigo-a10: lch(62% 55 280 / 0.12);
+  --clr-indigo-a20: lch(62% 55 280 / 0.25);
+
+  --clr-sky: lch(72% 45 225);
+  --clr-sky-a10: lch(72% 45 225 / 0.12);
+  --clr-sky-a20: lch(72% 45 225 / 0.25);
+
+  --clr-amber: lch(72% 70 75);
+  --clr-amber-a10: lch(72% 70 75 / 0.12);
+  --clr-amber-a20: lch(72% 70 75 / 0.25);
+
+  --clr-green: lch(68% 52 155);
+  --clr-green-a10: lch(68% 52 155 / 0.12);
+  --clr-green-a20: lch(68% 52 155 / 0.25);
+
+  --clr-red-alt: lch(58% 72 25);
+  --clr-red-alt-a10: lch(58% 72 25 / 0.12);
+  --clr-red-a20: lch(58% 72 25 / 0.25);
 
   --radius: 12px;
   --radius-lg: 16px;
 
-  /* ── Shadow System (LCH) ── */
+  /* ── LCH Shadow System ── */
   --shadow-elevated:
-    inset 0 1px 0 0 lch(100% 0 0 / 0.14),
+    inset 0 1px 0 0 lch(100% 0 0 / 0.08),
     0 2px 4px lch(0% 0 0 / 0.25),
     0 8px 24px -4px lch(0% 0 0 / 0.35);
 
   --shadow-elevated-hover:
-    inset 0 1px 0 0 lch(100% 0 0 / 0.25),
+    inset 0 1px 0 0 lch(100% 0 0 / 0.15),
     0 4px 8px lch(0% 0 0 / 0.3),
-    0 14px 36px -4px lch(0% 0 0 / 0.45),
-    var(--glow);
+    0 14px 36px -4px lch(0% 0 0 / 0.45);
 
   --shadow-recessed:
     inset 0 2px 4px 0 lch(0% 0 0 / 0.45),
@@ -49,23 +102,12 @@
 
   --shadow-recessed-focus:
     inset 0 2px 4px 0 lch(0% 0 0 / 0.5),
-    inset 0 -1px 0 0 lch(100% 0 0 / 0.12),
-    0 0 0 2px lch(83% 55 166 / 0.25);
+    0 0 0 2px lch(68% 42 172 / 0.25);
 
   --shadow: var(--shadow-elevated);
-  --glow: 0 0 32px -8px lch(83% 55 166 / 0.14);
-  --glow-strong: 0 0 40px -4px lch(83% 55 166 / 0.28);
 
-  --surface-grad: linear-gradient(175deg, #161e3d, #0f142a);
-  --surface-2-grad: linear-gradient(175deg, #1c264d, #141b37);
-  --recessed-grad: linear-gradient(175deg, #070a16, #0c1022);
-
-  --card-hover-border: lch(83% 55 166 / 0.25);
-  --card-hover-shadow: var(--shadow-elevated-hover);
-  --cta-bg: linear-gradient(175deg, lch(83% 55 166 / 0.16), lch(83% 55 166 / 0.06));
-  --cta-border: lch(83% 55 166 / 0.2);
-  --cta-hover-bg: linear-gradient(175deg, lch(83% 55 166 / 0.26), lch(83% 55 166 / 0.12));
-  --cta-hover-shadow: inset 0 1px 0 0 lch(100% 0 0 / 0.2), var(--glow-strong);
+  --surface-grad: linear-gradient(175deg, lch(9% 14 265), lch(7% 12 265));
+  --surface-2-grad: linear-gradient(175deg, lch(12% 16 265), lch(9% 14 265));
 
   --transition: 200ms cubic-bezier(0.16, 1, 0.3, 1);
 
@@ -77,169 +119,47 @@
   --space-6: 24px;
   --space-7: 32px;
   --space-8: 40px;
+}
 
-  /* ══════════════════════════════════════
-     LCH Color Token Library
-     Hue anchors:
-       308 = Purple  (primary brand)
-       166 = Teal    (success / CTA)
-        27 = Red     (danger / error)
-        21 = Pink-Red (danger-alt / badge)
-        72 = Amber   (warning)
-       272 = Blue    (info / link)
-       214 = Cyan    (accent-2)
-     Change only L% or /alpha to theme.
-  ══════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════════
+   3. DEVICE THEME MANAGEMENT (prefers-color-scheme & data-theme)
+   ════════════════════════════════════════════════════════════════ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
 
-  /* Purple */
-  --clr-purple: lch(54% 82 308);
-  --clr-purple-dark: lch(41% 85 308);
-  --clr-purple-near: lch(5% 15 308);
-  --clr-purple-bg: lch(3% 4 308);
-  --clr-purple-a04: lch(54% 82 308 / 0.04);
-  --clr-purple-a05: lch(54% 82 308 / 0.05);
-  --clr-purple-a08: lch(54% 82 308 / 0.08);
-  --clr-purple-a10: lch(54% 82 308 / 0.1);
-  --clr-purple-a12: lch(54% 82 308 / 0.12);
-  --clr-purple-a15: lch(54% 82 308 / 0.15);
-  --clr-purple-a18: lch(54% 82 308 / 0.18);
-  --clr-purple-a20: lch(54% 82 308 / 0.2);
-  --clr-purple-a25: lch(54% 82 308 / 0.25);
-  --clr-purple-a30: lch(54% 82 308 / 0.3);
-  --clr-purple-a35: lch(54% 82 308 / 0.35);
-  --clr-purple-a40: lch(54% 82 308 / 0.4);
-  --clr-purple-a45: lch(54% 82 308 / 0.45);
-  --clr-purple-a75: lch(54% 82 308 / 0.75);
-  --clr-purple-dark-a12: lch(41% 85 308 / 0.12);
-  --clr-purple-dark-a15: lch(41% 85 308 / 0.15);
-  --clr-purple-dark-a16: lch(41% 85 308 / 0.16);
+@media (prefers-color-scheme: light) {
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --color-bg-app: lch(98% 2 265);
+    --color-bg-surface: lch(100% 0 0);
+    --color-bg-surface-elevated: lch(96% 2 265);
+    --color-bg-surface-recessed: lch(92% 3 265);
 
-  /* Teal / Green */
-  --clr-teal: lch(83% 55 166);
-  --clr-teal-mid: lch(72% 55 166);
-  --clr-teal-dark: lch(13% 18 166);
-  --clr-teal-a06: lch(83% 55 166 / 0.06);
-  --clr-teal-a08: lch(83% 55 166 / 0.08);
-  --clr-teal-a10: lch(83% 55 166 / 0.1);
-  --clr-teal-a12: lch(83% 55 166 / 0.12);
-  --clr-teal-a14: lch(83% 55 166 / 0.14);
-  --clr-teal-a15: lch(83% 55 166 / 0.15);
-  --clr-teal-a16: lch(83% 55 166 / 0.16);
-  --clr-teal-a18: lch(83% 55 166 / 0.18);
-  --clr-teal-a20: lch(83% 55 166 / 0.2);
-  --clr-teal-a25: lch(83% 55 166 / 0.25);
-  --clr-teal-a26: lch(83% 55 166 / 0.26);
-  --clr-teal-a28: lch(83% 55 166 / 0.28);
-  --clr-teal-a30: lch(83% 55 166 / 0.3);
+    --color-text-primary: lch(12% 16 265);       /* WCAG AA contrast > 15:1 */
+    --color-text-muted: lch(38% 18 265);         /* WCAG AA contrast > 7:1 */
+    --color-text-placeholder: lch(48% 18 265);   /* WCAG AA contrast > 4.5:1 */
 
-  /* Red / Danger */
-  --clr-red: lch(52% 65 27);
-  --clr-red-alt: lch(58% 72 21);
-  --clr-red-alt-hi: lch(67% 72 21);
-  --clr-red-a06: lch(52% 65 27 / 0.06);
-  --clr-red-a08: lch(52% 65 27 / 0.08);
-  --clr-red-a10: lch(52% 65 27 / 0.1);
-  --clr-red-a15: lch(52% 65 27 / 0.15);
-  --clr-red-a16: lch(52% 65 27 / 0.16);
-  --clr-red-a20: lch(52% 65 27 / 0.2);
-  --clr-red-a25: lch(52% 65 27 / 0.25);
-  --clr-red-alt-a08: lch(58% 72 21 / 0.08);
-  --clr-red-alt-a10: lch(58% 72 21 / 0.1);
-  --clr-red-alt-a35: lch(58% 72 21 / 0.35);
-  --clr-red-alt-a50: lch(58% 72 21 / 0.5);
+    --color-border-subtle: lch(0% 0 0 / 0.08);
+    --color-border-strong: lch(0% 0 0 / 0.16);
 
-  /* Amber / Warning */
-  --clr-amber: lch(75% 65 72);
-  --clr-amber-a06: lch(75% 65 72 / 0.06);
-  --clr-amber-a10: lch(75% 65 72 / 0.1);
-  --clr-amber-a15: lch(75% 65 72 / 0.15);
-  --clr-amber-a25: lch(75% 65 72 / 0.25);
-
-  /* Blue / Info */
-  --clr-blue: lch(57% 70 272);
-  --clr-blue-a08: lch(57% 70 272 / 0.08);
-  --clr-blue-a16: lch(57% 70 272 / 0.16);
-  --clr-blue-a20: lch(57% 70 272 / 0.2);
-
-  /* Cyan */
-  --clr-cyan: lch(70% 42 214);
-  --clr-cyan-a20: lch(70% 42 214 / 0.2);
-
-  /* Neutrals */
-  --clr-white: lch(100% 0 0);
-  --clr-black: lch(0% 0 0);
-  --clr-white-a02: lch(100% 0 0 / 0.02);
-  --clr-white-a03: lch(100% 0 0 / 0.03);
-  --clr-white-a04: lch(100% 0 0 / 0.04);
-  --clr-white-a05: lch(100% 0 0 / 0.05);
-  --clr-white-a06: lch(100% 0 0 / 0.06);
-  --clr-white-a08: lch(100% 0 0 / 0.08);
-  --clr-white-a10: lch(100% 0 0 / 0.1);
-  --clr-white-a12: lch(100% 0 0 / 0.12);
-  --clr-white-a14: lch(100% 0 0 / 0.14);
-  --clr-white-a15: lch(100% 0 0 / 0.15);
-  --clr-white-a18: lch(100% 0 0 / 0.18);
-  --clr-white-a20: lch(100% 0 0 / 0.2);
-  --clr-white-a25: lch(100% 0 0 / 0.25);
-  --clr-black-a02: lch(0% 0 0 / 0.02);
-  --clr-black-a05: lch(0% 0 0 / 0.05);
-  --clr-black-a10: lch(0% 0 0 / 0.1);
-  --clr-black-a15: lch(0% 0 0 / 0.15);
-  --clr-black-a20: lch(0% 0 0 / 0.2);
-  --clr-black-a25: lch(0% 0 0 / 0.25);
-  --clr-black-a30: lch(0% 0 0 / 0.3);
-  --clr-black-a35: lch(0% 0 0 / 0.35);
-  --clr-black-a40: lch(0% 0 0 / 0.4);
-  --clr-black-a45: lch(0% 0 0 / 0.45);
-  --clr-black-a50: lch(0% 0 0 / 0.5);
-  --clr-black-a70: lch(0% 0 0 / 0.7);
-  --clr-black-a75: lch(0% 0 0 / 0.75);
+    --color-interactive-primary: lch(55% 42 172);
+    --color-interactive-hover: lch(45% 42 172);
+  }
 }
 
 :root[data-theme="admin"] {
-  --primary: #b55fe6;
-  --primary-2: #8b2fc9;
-  --accent: #06b6d4;
-  --bg: #050308;
-  --bg-2: #0b0714;
-  --surface-recessed: #0a0614;
-  --surface: #151024;
-  --surface-elevated: #1e1732;
-  --surface-2: #1e1732;
-  --surface-hover: #281f44;
-  --border: rgba(255, 255, 255, 0.06);
-  --border-strong: rgba(255, 255, 255, 0.12);
-
-  --shadow-elevated: inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    0 8px 24px -4px rgba(0, 0, 0, 0.4);
-
-  --shadow-elevated-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.25),
-    0 4px 8px rgba(0, 0, 0, 0.35),
-    0 14px 36px -4px rgba(0, 0, 0, 0.5),
-    var(--glow);
-
-  --shadow-recessed: inset 0 2px 4px 0 rgba(0, 0, 0, 0.5),
-    inset 0 -1px 0 0 rgba(255, 255, 255, 0.06);
-
-  --shadow-recessed-focus: inset 0 2px 4px 0 rgba(0, 0, 0, 0.55),
-    inset 0 -1px 0 0 rgba(255, 255, 255, 0.12),
-    0 0 0 2px rgba(181, 95, 230, 0.3);
-
-  --shadow: var(--shadow-elevated);
-  --glow: 0 0 32px -8px rgba(181, 95, 230, 0.16);
-  --glow-strong: 0 0 40px -4px rgba(181, 95, 230, 0.3);
-
-  --surface-grad: linear-gradient(175deg, #1a142d, #110d20);
-  --surface-2-grad: linear-gradient(175deg, #231b3b, #171228);
-  --recessed-grad: linear-gradient(175deg, #07040e, #0d091a);
-
-  --card-hover-border: rgba(181, 95, 230, 0.4);
-  --card-hover-shadow: var(--shadow-elevated-hover);
-  --cta-bg: linear-gradient(175deg, rgba(181, 95, 230, 0.14), rgba(181, 95, 230, 0.04));
-  --cta-border: rgba(181, 95, 230, 0.25);
-  --cta-hover-bg: linear-gradient(175deg, rgba(181, 95, 230, 0.24), rgba(181, 95, 230, 0.1));
-  --cta-hover-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2), var(--glow-strong);
+  --primary: lch(62% 75 308);
+  --primary-2: lch(48% 75 308);
+  --accent: lch(70% 42 214);
+  --bg: lch(5% 10 265);
+  --bg-2: lch(6% 12 265);
+  --surface-recessed: lch(7% 12 265);
+  --surface: lch(9% 14 265);
+  --surface-elevated: lch(12% 16 265);
+  --surface-2: lch(12% 16 265);
 }
 
 * {
@@ -251,26 +171,17 @@
   outline-offset: 2px;
 }
 
-
 html,
 body {
   margin: 0;
   padding: 0;
-  background: radial-gradient(1200px 600px at 10% -10%, rgba(0, 224, 164, 0.12), transparent 60%),
-    radial-gradient(900px 500px at 100% 0%, rgba(255, 176, 32, 0.10), transparent 60%),
-    var(--bg);
+  background: var(--bg);
   color: var(--text);
-  font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'IBM Plex Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   line-height: 1.55;
   min-height: 100vh;
   transition: background 0.3s ease;
-}
-
-:root[data-theme="admin"] body {
-  background: radial-gradient(1200px 600px at 10% -10%, rgba(181, 95, 230, 0.16), transparent 60%),
-    radial-gradient(900px 500px at 100% 0%, rgba(6, 182, 212, 0.12), transparent 60%),
-    var(--bg);
 }
 
 a {
@@ -284,7 +195,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
   letter-spacing: -0.02em;
 }
 
@@ -309,7 +220,7 @@ h6 {
   transform: translateX(-50%);
   opacity: 0;
   transition: opacity 0.2s, visibility 0.2s;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 8px 24px lch(0% 0 0 / 0.45);
   font-size: 11px;
   line-height: 1.4;
   white-space: normal;
@@ -336,58 +247,58 @@ h6 {
 
 /* Ticket Status Pills */
 .status-pill-open {
-  background: rgba(0, 224, 164, 0.12) !important;
-  color: #00e0a4 !important;
-  border: 1px solid rgba(0, 224, 164, 0.25) !important;
+  background: lch(68% 52 155 / 0.12) !important;
+  color: lch(68% 52 155) !important;
+  border: 1px solid lch(68% 52 155 / 0.25) !important;
 }
 
 .status-pill-inprogress {
-  background: rgba(255, 176, 32, 0.12) !important;
-  color: #ffb020 !important;
-  border: 1px solid rgba(255, 176, 32, 0.25) !important;
+  background: lch(72% 70 75 / 0.12) !important;
+  color: lch(72% 70 75) !important;
+  border: 1px solid lch(72% 70 75 / 0.25) !important;
 }
 
 .status-pill-resolved {
-  background: rgba(6, 182, 212, 0.12) !important;
-  color: #06b6d4 !important;
-  border: 1px solid rgba(6, 182, 212, 0.25) !important;
+  background: lch(72% 45 225 / 0.12) !important;
+  color: lch(72% 45 225) !important;
+  border: 1px solid lch(72% 45 225 / 0.25) !important;
 }
 
 .status-pill-closed {
-  background: rgba(154, 166, 207, 0.12) !important;
-  color: #9aa6cf !important;
-  border: 1px solid rgba(154, 166, 207, 0.25) !important;
+  background: lch(67% 18 265 / 0.12) !important;
+  color: lch(67% 18 265) !important;
+  border: 1px solid lch(67% 18 265 / 0.25) !important;
 }
 
 /* Ticket Category Tags */
 .category-tag-general {
-  background: rgba(255, 255, 255, 0.05) !important;
+  background: lch(100% 0 0 / 0.05) !important;
   color: var(--muted) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid lch(100% 0 0 / 0.1) !important;
 }
 
 .category-tag-accountissue {
-  background: rgba(255, 176, 32, 0.15) !important;
-  color: #ffb020 !important;
-  border: 1px solid rgba(255, 176, 32, 0.25) !important;
+  background: lch(72% 70 75 / 0.15) !important;
+  color: lch(72% 70 75) !important;
+  border: 1px solid lch(72% 70 75 / 0.25) !important;
 }
 
 .category-tag-paymentissue {
-  background: rgba(0, 224, 164, 0.15) !important;
-  color: #00e0a4 !important;
-  border: 1px solid rgba(0, 224, 164, 0.25) !important;
+  background: lch(68% 52 155 / 0.15) !important;
+  color: lch(68% 52 155) !important;
+  border: 1px solid lch(68% 52 155 / 0.25) !important;
 }
 
 .category-tag-technical {
-  background: rgba(6, 182, 212, 0.15) !important;
-  color: #06b6d4 !important;
-  border: 1px solid rgba(6, 182, 212, 0.25) !important;
+  background: lch(72% 45 225 / 0.15) !important;
+  color: lch(72% 45 225) !important;
+  border: 1px solid lch(72% 45 225 / 0.25) !important;
 }
 
 .category-tag-other {
-  background: rgba(181, 95, 230, 0.15) !important;
-  color: #b55fe6 !important;
-  border: 1px solid rgba(181, 95, 230, 0.25) !important;
+  background: lch(62% 55 280 / 0.15) !important;
+  color: lch(62% 55 280) !important;
+  border: 1px solid lch(62% 55 280 / 0.25) !important;
 }
 
 /* Timeline Date Separators */
@@ -403,7 +314,7 @@ h6 {
 .timeline-date-line {
   flex: 1;
   height: 1px;
-  background: rgba(255, 255, 255, 0.08);
+  background: lch(100% 0 0 / 0.08);
 }
 
 /* Hide number input up/down spinner controls */
@@ -418,7 +329,7 @@ input[type="number"] {
   appearance: textfield;
 }
 
-/* Global Tactile Form Controls (Recessed Appearance) */
+/* Global Tactile Form Controls */
 input[type="text"],
 input[type="number"],
 input[type="email"],
@@ -427,7 +338,7 @@ input[type="search"],
 input[type="date"],
 select,
 textarea {
-  background: var(--surface-recessed, #0a0f22);
+  background: var(--surface-recessed, lch(7% 12 265));
   box-shadow: var(--shadow-recessed);
   border: 1px solid var(--border);
   color: var(--text);
@@ -499,12 +410,10 @@ textarea:focus {
     opacity: 0.4;
     transform: scale(1);
   }
-
   20% {
     opacity: 1;
     transform: scale(1.3);
   }
-
   100% {
     opacity: 0.4;
     transform: scale(1);

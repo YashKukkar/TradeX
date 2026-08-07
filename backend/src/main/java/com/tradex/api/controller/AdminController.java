@@ -19,7 +19,9 @@ import com.tradex.api.service.UserService;
 import com.tradex.api.service.SystemSettingService;
 import com.tradex.api.service.ReferralService;
 import com.tradex.api.service.seed.SeedDataService;
+import com.tradex.api.util.SecurityUtils;
 import com.tradex.api.service.WalletService;
+import com.tradex.api.exception.AppException;
 import com.tradex.api.exception.AppException.BadRequestException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -47,20 +49,23 @@ public class AdminController {
     private final WalletService walletService;
 
     private String currentAdminEmail(Authentication auth) {
+        if (auth == null || auth.getName() == null || auth.getName().isBlank()) {
+            throw new AppException.UnauthorizedException("Admin authentication required");
+        }
         return auth.getName();
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_USERS')")
     @GetMapping("/users")
     public ResponseEntity<List<UserDTO>> getAllUsers(Authentication auth) {
-        List<UserDTO> users = userService.getAllUsers(auth.getName());
+        List<UserDTO> users = userService.getAllUsers(currentAdminEmail(auth));
         return ResponseEntity.ok(users);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_USERS')")
     @GetMapping("/users/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id, Authentication auth) {
-        return ResponseEntity.ok(userService.getUserById(id, auth.getName()));
+        return ResponseEntity.ok(userService.getUserById(id, currentAdminEmail(auth)));
     }
 
     public record StatusActionRequest(AdminAction action) {
@@ -72,7 +77,7 @@ public class AdminController {
             @PathVariable Long id,
             @RequestBody StatusActionRequest request,
             Authentication auth) {
-        String adminEmail = currentAdminEmail(auth);
+        String adminEmail = SecurityUtils.getAuthenticatedEmail(auth);
         UserDTO result = switch (request.action()) {
             case LOCK -> adminUserService.lockUser(adminEmail, id);
             case UNLOCK -> adminUserService.unlockUser(adminEmail, id);
@@ -89,7 +94,7 @@ public class AdminController {
     public ResponseEntity<Void> sendPasswordResetEmail(
             @PathVariable Long id,
             Authentication auth) {
-        adminUserService.sendPasswordResetEmail(currentAdminEmail(auth), id);
+        adminUserService.sendPasswordResetEmail(SecurityUtils.getAuthenticatedEmail(auth), id);
         return ResponseEntity.ok().build();
     }
 
@@ -99,7 +104,7 @@ public class AdminController {
             @PathVariable Long id,
             @Valid @RequestBody AdminAdjustPointsRequest request,
             Authentication auth) {
-        return ResponseEntity.ok(adminUserService.adjustPoints(currentAdminEmail(auth), id, request));
+        return ResponseEntity.ok(adminUserService.adjustPoints(SecurityUtils.getAuthenticatedEmail(auth), id, request));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'PERM_MANAGE_DEPOSITS', 'PERM_MANAGE_WITHDRAWALS')")
@@ -108,7 +113,7 @@ public class AdminController {
             @PathVariable Long id,
             @Valid @RequestBody AdminAdjustWalletRequest request,
             Authentication auth) {
-        return ResponseEntity.ok(adminUserService.adjustWallet(currentAdminEmail(auth), id, request));
+        return ResponseEntity.ok(adminUserService.adjustWallet(SecurityUtils.getAuthenticatedEmail(auth), id, request));
     }
 
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EMPLOYEE')")

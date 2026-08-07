@@ -35,17 +35,21 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.util.List;
 
 /**
- * Service handling user account lifecycle, authentication, profile updates, and bank details.
+ * Service handling user account lifecycle, authentication, profile updates, and
+ * bank details.
  * 
  * COMPLIANCE & AUDIT POLICY:
- * Account records with financial transaction histories MUST NOT be physically deleted from the database
- * to satisfy financial regulations and audit trail integrity. To delete a user/employee, use a soft-delete
- * by disabling/locking the account (i.e. setting enabled=false, locked=true) instead of executing SQL DELETEs.
+ * Account records with financial transaction histories MUST NOT be physically
+ * deleted from the database
+ * to satisfy financial regulations and audit trail integrity. To delete a
+ * user/employee, use a soft-delete
+ * by disabling/locking the account (i.e. setting enabled=false, locked=true)
+ * instead of executing SQL DELETEs.
  */
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("null")
+
 public class UserService {
 
     private final UserRepository userRepository;
@@ -310,7 +314,8 @@ public class UserService {
 
         String newName = request.fullName();
         if (newName != null && !newName.equals(user.getFullName())) {
-            // Future design consideration: if (user.isKycVerified()) throw new ForbiddenException("Cannot update name after KYC verification");
+            // Future design consideration: if (user.isKycVerified()) throw new
+            // ForbiddenException("Cannot update name after KYC verification");
             user.setFullName(newName);
         }
 
@@ -341,7 +346,7 @@ public class UserService {
 
         user.getBankDetails().add(bank);
         User saved = userRepository.save(user);
-        log.info("Added bank account {} for user {}", request.accountNumber(), email);
+        log.info("Added bank account ending in {} for user {}", com.tradex.api.util.DataFormatter.maskAccountNumber(request.accountNumber()), email);
         return userMapper.toDTO(saved);
     }
 

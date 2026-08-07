@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("null")
+
 public class SystemSettingService {
 
     private static final Long SETTINGS_ID = 1L;
@@ -44,49 +44,43 @@ public class SystemSettingService {
     }
 
     public SystemSettingDTO toDTO(SystemSetting settings) {
-        String maskedPassword = (settings.getSmtpPassword() != null && !settings.getSmtpPassword().isEmpty()) ? "********" : "";
+        String maskedPassword = (settings.getSmtpPassword() != null && !settings.getSmtpPassword().isEmpty())
+                ? "********"
+                : "";
         return new SystemSettingDTO(
-            new SystemSettingDTO.WelcomeSettings(
-                settings.isWelcomeCoinsEnabled(),
-                settings.getWelcomeCoinsAmount()
-            ),
-            new SystemSettingDTO.ReferralSettings(
-                settings.isReferralCoinsEnabled(),
-                settings.getReferralCoinsL1Amount(),
-                settings.getReferralCoinsL2Amount(),
-                settings.getReferralCoinsL3Amount(),
-                settings.isReferralCoinsSubsequentEnabled(),
-                settings.getReferralCoinsSubsequentAmount(),
-                settings.getReferralCoinsLimitTier()
-            ),
-            new SystemSettingDTO.VerificationSettings(
-                settings.isEmailVerificationEnabled(),
-                settings.isPhoneVerificationEnabled()
-            ),
-            new SystemSettingDTO.DepositRewardSettings(
-                settings.isFirstDepositRewardEnabled(),
-                settings.getFirstDepositRewardAmount(),
-                settings.getFirstDepositRewardThreshold()
-            ),
-            new SystemSettingDTO.PointsConversionSettings(
-                settings.isPointsConversionEnabled(),
-                settings.getPointsToCashConversionRate()
-            ),
-            new SystemSettingDTO.EmailSettings(
-                settings.getSmtpHost(),
-                settings.getSmtpPort(),
-                settings.getSmtpUsername(),
-                maskedPassword,
-                settings.getSmtpFromEmail(),
-                settings.getSmtpFromName(),
-                settings.isEmailNotificationsEnabled(),
-                settings.getRedirectEmailAddress()
-            ),
-            new SystemSettingDTO.GeneralSettings(
-                settings.getAppTimezone(),
-                settings.getAppCurrency()
-            )
-        );
+                new SystemSettingDTO.WelcomeSettings(
+                        settings.isWelcomeCoinsEnabled(),
+                        settings.getWelcomeCoinsAmount()),
+                new SystemSettingDTO.ReferralSettings(
+                        settings.isReferralCoinsEnabled(),
+                        settings.getReferralCoinsL1Amount(),
+                        settings.getReferralCoinsL2Amount(),
+                        settings.getReferralCoinsL3Amount(),
+                        settings.isReferralCoinsSubsequentEnabled(),
+                        settings.getReferralCoinsSubsequentAmount(),
+                        settings.getReferralCoinsLimitTier()),
+                new SystemSettingDTO.VerificationSettings(
+                        settings.isEmailVerificationEnabled(),
+                        settings.isPhoneVerificationEnabled()),
+                new SystemSettingDTO.DepositRewardSettings(
+                        settings.isFirstDepositRewardEnabled(),
+                        settings.getFirstDepositRewardAmount(),
+                        settings.getFirstDepositRewardThreshold()),
+                new SystemSettingDTO.PointsConversionSettings(
+                        settings.isPointsConversionEnabled(),
+                        settings.getPointsToCashConversionRate()),
+                new SystemSettingDTO.EmailSettings(
+                        settings.getSmtpHost(),
+                        settings.getSmtpPort(),
+                        settings.getSmtpUsername(),
+                        maskedPassword,
+                        settings.getSmtpFromEmail(),
+                        settings.getSmtpFromName(),
+                        settings.isEmailNotificationsEnabled(),
+                        settings.getRedirectEmailAddress()),
+                new SystemSettingDTO.GeneralSettings(
+                        settings.getAppTimezone(),
+                        settings.getAppCurrency()));
     }
 
     @Transactional
@@ -128,7 +122,8 @@ public class SystemSettingService {
         setting.setSmtpFromEmail(dto.email().smtpFromEmail());
         setting.setSmtpFromName(dto.email().smtpFromName());
         setting.setEmailNotificationsEnabled(dto.email().emailNotificationsEnabled());
-        setting.setRedirectEmailAddress(dto.email().redirectEmailAddress() != null ? dto.email().redirectEmailAddress() : "");
+        setting.setRedirectEmailAddress(
+                dto.email().redirectEmailAddress() != null ? dto.email().redirectEmailAddress() : "");
 
         // General settings
         setting.setAppTimezone(dto.general().appTimezone());

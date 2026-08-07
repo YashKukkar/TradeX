@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("null")
+
 class WalletTransactionHelperTest {
 
     @Mock
@@ -48,8 +48,7 @@ class WalletTransactionHelperTest {
                 new BigDecimal("100.00"),
                 new BigDecimal("50.00"),
                 WalletTransactionType.WITHDRAWAL,
-                "Withdrawal failed: Limit exceeded"
-        );
+                "Withdrawal failed: Limit exceeded");
 
         ArgumentCaptor<WalletTransaction> transactionCaptor = ArgumentCaptor.forClass(WalletTransaction.class);
         verify(walletTransactionRepository, times(1)).save(transactionCaptor.capture());
@@ -68,15 +67,12 @@ class WalletTransactionHelperTest {
     void testLogFailedTransactionUserNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () ->
-                walletTransactionHelper.logFailedTransaction(
-                        1L,
-                        new BigDecimal("100.00"),
-                        BigDecimal.ZERO,
-                        WalletTransactionType.WITHDRAWAL,
-                        "Test"
-                )
-        );
+        assertThrows(IllegalArgumentException.class, () -> walletTransactionHelper.logFailedTransaction(
+                1L,
+                new BigDecimal("100.00"),
+                BigDecimal.ZERO,
+                WalletTransactionType.WITHDRAWAL,
+                "Test"));
         verify(walletTransactionRepository, never()).save(any());
     }
 }

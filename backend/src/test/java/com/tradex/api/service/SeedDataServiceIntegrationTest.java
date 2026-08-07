@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
+@SuppressWarnings("null")
 class SeedDataServiceIntegrationTest {
 
     @Autowired
@@ -32,7 +33,7 @@ class SeedDataServiceIntegrationTest {
     private ReferralRewardRepository referralRewardRepository;
 
     @Test
-    @SuppressWarnings("null")
+
     void testSeedTestDataIntegrity() {
         // Run seed
         seedDataService.seedTestData();
@@ -56,7 +57,8 @@ class SeedDataServiceIntegrationTest {
         assertEquals(1800L, u1Txs.stream().mapToLong(PointsTransaction::getAmount).sum());
 
         List<PointsTransaction> u2Txs = pointsTransactionRepository.findByUserOrderByCreatedAtDesc(u2);
-        // Welcome bonus (1000) + Referral L1 (500) + Referral L2 (200) + Referral L3 (100) = 4 transactions
+        // Welcome bonus (1000) + Referral L1 (500) + Referral L2 (200) + Referral L3
+        // (100) = 4 transactions
         assertEquals(4, u2Txs.size());
         assertEquals(1800L, u2Txs.stream().mapToLong(PointsTransaction::getAmount).sum());
 

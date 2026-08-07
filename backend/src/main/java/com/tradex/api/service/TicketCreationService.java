@@ -22,7 +22,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("null")
+
 public class TicketCreationService {
 
     private final SupportTicketRepository supportTicketRepository;
@@ -56,7 +56,8 @@ public class TicketCreationService {
 
         if (files != null && !files.isEmpty()) {
             if (files.size() > 5) {
-                log.warn("Failed ticket creation: User {} uploaded {} files, exceeding max limit of 5", userEmail, files.size());
+                log.warn("Failed ticket creation: User {} uploaded {} files, exceeding max limit of 5", userEmail,
+                        files.size());
                 throw new BadRequestException("Maximum of 5 attachments allowed per ticket");
             }
             ticketAttachmentService.processAndAttachFiles(ticket, files);

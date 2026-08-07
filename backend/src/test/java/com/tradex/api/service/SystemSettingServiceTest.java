@@ -16,7 +16,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("null")
+
 class SystemSettingServiceTest {
 
     @Mock
@@ -57,17 +57,17 @@ class SystemSettingServiceTest {
         when(systemSettingRepository.save(any(SystemSetting.class))).thenReturn(existing);
 
         SystemSettingDTO dto = new SystemSettingDTO(
-            new SystemSettingDTO.WelcomeSettings(true, 2000L),
-            new SystemSettingDTO.ReferralSettings(true, 500L, 200L, 100L, true, 50L, 3),
-            new SystemSettingDTO.VerificationSettings(false, false),
-            new SystemSettingDTO.DepositRewardSettings(true, new java.math.BigDecimal("100.00"), new java.math.BigDecimal("500.00")),
-            new SystemSettingDTO.PointsConversionSettings(true, new java.math.BigDecimal("10.00")),
-            new SystemSettingDTO.EmailSettings("smtp.gmail.com", 587, "", "", "noreply@tradex.com", "TradeX", false),
-            new SystemSettingDTO.GeneralSettings("Asia/Kolkata", "INR")
-        );
+                new SystemSettingDTO.WelcomeSettings(true, 2000L),
+                new SystemSettingDTO.ReferralSettings(true, 500L, 200L, 100L, true, 50L, 3),
+                new SystemSettingDTO.VerificationSettings(false, false),
+                new SystemSettingDTO.DepositRewardSettings(true, new java.math.BigDecimal("100.00"),
+                        new java.math.BigDecimal("500.00")),
+                new SystemSettingDTO.PointsConversionSettings(true, new java.math.BigDecimal("10.00")),
+                new SystemSettingDTO.EmailSettings("smtp.gmail.com", 587, "", "", "noreply@tradex.com", "TradeX",
+                        false),
+                new SystemSettingDTO.GeneralSettings("Asia/Kolkata", "INR"));
         SystemSettingDTO updated = systemSettingService.updateSettings(dto);
 
         assertEquals(2000L, updated.welcome().welcomeCoinsAmount());
     }
 }
-
