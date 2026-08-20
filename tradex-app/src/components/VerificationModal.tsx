@@ -76,9 +76,9 @@ export default function VerificationModal({
         {/* TODO-PROD: Remove sandbox OTP label once notification server is connected. */}
         <div
           style={{
-            background: "rgba(255, 179, 0, 0.1)",
-            border: "1px solid rgba(255, 179, 0, 0.25)",
-            color: "#ffb300",
+            background: "var(--warning-bg)",
+            border: "1px solid var(--warning-border)",
+            color: "var(--warning)",
             borderRadius: "8px",
             padding: "8px 10px",
             fontSize: "11.5px",
@@ -143,7 +143,7 @@ export default function VerificationModal({
             style={{
               background: "none",
               border: "none",
-              color: cooldown > 0 || resendLoading || isSuccess ? "#888" : "#3b82f6",
+              color: cooldown > 0 || resendLoading || isSuccess ? "var(--muted)" : "var(--primary)",
               cursor: cooldown > 0 || resendLoading || isSuccess ? "default" : "pointer",
               fontWeight: "600",
               textDecoration: cooldown > 0 || resendLoading || isSuccess ? "none" : "underline",
@@ -153,7 +153,7 @@ export default function VerificationModal({
             {resendLoading ? "Sending..." : cooldown > 0 ? `Resend in ${cooldown}s` : "Resend Code"}
           </button>
           {resendError && (
-            <div style={{ color: "#ef4444", fontSize: "11.5px", marginTop: "4px" }} role="alert">
+            <div style={{ color: "var(--danger)", fontSize: "11.5px", marginTop: "4px" }} role="alert">
               {resendError}
             </div>
           )}

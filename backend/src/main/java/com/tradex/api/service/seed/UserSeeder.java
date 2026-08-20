@@ -53,10 +53,10 @@ public class UserSeeder {
                                         new BigDecimal("4750.00"), new BigDecimal("200.00")),
                         new SeedUserConfig("u3@test.com", "Aditya Verma", 1700L, "U3REFCODE", 1, 5, 11, 5,
                                         "+919999999903", "ACCU103",
-                                        new BigDecimal("2000.00"), BigDecimal.ZERO),
+                                        BigDecimal.ZERO, BigDecimal.ZERO),
                         new SeedUserConfig("u4@test.com", "Dia Sen", 1500L, "U4REFCODE", 2, 2, 18, 48, "+919999999904",
                                         "ACCU104",
-                                        new BigDecimal("500.00"), BigDecimal.ZERO),
+                                        BigDecimal.ZERO, BigDecimal.ZERO),
                         new SeedUserConfig("u5@test.com", "Ananya Rao", 1000L, "U5REFCODE", 3, 1, 10, 21,
                                         "+919999999905", "ACCU105",
                                         BigDecimal.ZERO, BigDecimal.ZERO));

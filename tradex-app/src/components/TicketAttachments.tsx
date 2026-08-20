@@ -10,10 +10,26 @@ interface Attachment {
   fileName: string;
   fileSize: number;
   contentType: string;
+  url?: string;
 }
 
 interface TicketAttachmentsProps {
   attachments: Attachment[];
+}
+
+function resolveAttachmentUrl(attachmentId: number, accessUrl?: string): string {
+  if (accessUrl) {
+    if (accessUrl.startsWith("http://") || accessUrl.startsWith("https://")) {
+      return accessUrl;
+    }
+    try {
+      const origin = new URL(config.apiUrl).origin;
+      return `${origin}${accessUrl.startsWith("/") ? accessUrl : `/${accessUrl}`}`;
+    } catch {
+      return accessUrl;
+    }
+  }
+  return `${config.apiUrl}/tickets/attachments/${attachmentId}`;
 }
 
 export default function TicketAttachments({ attachments }: TicketAttachmentsProps) {
@@ -31,7 +47,7 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
 
     const fetchImage = async (attId: number) => {
       try {
-        const response = await axios.get(`${config.apiUrl}/tickets/attachments/${attId}`, {
+        const response = await axios.get(resolveAttachmentUrl(attId, attachments.find((a) => a.id === attId)?.url), {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -61,7 +77,7 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
   const handleDownload = async (attId: number, fileName: string) => {
     const token = safeStorage.getItem("token");
     try {
-      const response = await axios.get(`${config.apiUrl}/tickets/attachments/${attId}`, {
+      const response = await axios.get(resolveAttachmentUrl(attId, attachments.find((a) => a.id === attId)?.url), {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -78,7 +94,7 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
       window.URL.revokeObjectURL(url);
       a.remove();
     } catch (err) {
-      showToast("Failed to download file. The attachment might not exist on the storage server.", "error");
+      showToast("Failed to download file. The attachment might not exist.", "error");
     }
   };
 
@@ -221,29 +237,29 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
             background: "linear-gradient(to bottom, rgba(0,0,0,0.5), transparent)",
             zIndex: 100000
           }}>
-            <span style={{ color: "#fff", fontSize: "13px", fontWeight: "500" }}>
+            <span style={{ color: "var(--text)", fontSize: "13px", fontWeight: "500" }}>
               Screenshot {activeImageIndex + 1} of {images.length}
             </span>
             <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
               <button
                 onClick={() => setZoomLevel(prev => Math.max(0.5, prev - 0.25))}
-                style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center" }}
+                style={{ background: "none", border: "none", color: "var(--text)", cursor: "pointer", display: "flex", alignItems: "center" }}
               >
                 <Icon name="zoom_out" style={{ fontSize: "20px" }} />
               </button>
               <button
                 onClick={() => setZoomLevel(prev => Math.min(3, prev + 0.25))}
-                style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center" }}
+                style={{ background: "none", border: "none", color: "var(--text)", cursor: "pointer", display: "flex", alignItems: "center" }}
               >
                 <Icon name="zoom_in" style={{ fontSize: "20px" }} />
               </button>
               <button
                 onClick={() => { setZoomLevel(1); setActiveImageIndex(null); }}
                 style={{
-                  background: "rgba(255,255,255,0.1)",
-                  border: "none",
+                  background: "var(--surface-elevated)",
+                  border: "1px solid var(--border)",
                   borderRadius: "50%",
-                  color: "#fff",
+                  color: "var(--text)",
                   width: "36px",
                   height: "36px",
                   cursor: "pointer",
@@ -264,10 +280,10 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
               style={{
                 position: "absolute",
                 left: "24px",
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.1)",
+                background: "var(--surface-elevated)",
+                border: "1px solid var(--border)",
                 borderRadius: "50%",
-                color: "#fff",
+                color: "var(--text)",
                 width: "48px",
                 height: "48px",
                 cursor: "pointer",
@@ -288,10 +304,10 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
               style={{
                 position: "absolute",
                 right: "24px",
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.1)",
+                background: "var(--surface-elevated)",
+                border: "1px solid var(--border)",
                 borderRadius: "50%",
-                color: "#fff",
+                color: "var(--text)",
                 width: "48px",
                 height: "48px",
                 cursor: "pointer",

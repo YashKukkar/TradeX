@@ -114,58 +114,61 @@ export default function DashboardFilters({ onChange, onExport, isExporting }: Da
         Custom Range
       </button>
 
-      {filterType === "custom" && (
-        <div className={styles.customDateContainer}>
-          <div className={styles.dateFieldGroup}>
-            <span className={styles.dateLabel}>From:</span>
-            <input
-              type="date"
-              value={customStart}
-              max={customEnd}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (!val || !customEnd || val <= customEnd) {
-                  setCustomStart(val);
-                }
-              }}
-              className={styles.dateInput}
-            />
+      <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        {filterType === "custom" && (
+          <div className={styles.customDateContainer} style={{ marginLeft: 0 }}>
+            <div className={styles.dateFieldGroup}>
+              <span className={styles.dateLabel}>From:</span>
+              <input
+                type="date"
+                value={customStart}
+                max={customEnd}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (!val || !customEnd || val <= customEnd) {
+                    setCustomStart(val);
+                  }
+                }}
+                className={styles.dateInput}
+              />
+            </div>
+            <span style={{ color: "var(--muted)", opacity: 0.5 }}>➔</span>
+            <div className={styles.dateFieldGroup}>
+              <span className={styles.dateLabel}>To:</span>
+              <input
+                type="date"
+                value={customEnd}
+                min={customStart}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (!val || !customStart || val >= customStart) {
+                    setCustomEnd(val);
+                  }
+                }}
+                className={styles.dateInput}
+              />
+            </div>
           </div>
-          <span style={{ color: "var(--muted)", opacity: 0.5 }}>➔</span>
-          <div className={styles.dateFieldGroup}>
-            <span className={styles.dateLabel}>To:</span>
-            <input
-              type="date"
-              value={customEnd}
-              min={customStart}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (!val || !customStart || val >= customStart) {
-                  setCustomEnd(val);
-                }
-              }}
-              className={styles.dateInput}
-            />
-          </div>
-        </div>
-      )}
+        )}
 
+        {onExport && (
+          <ActionButton
+            iconName="download"
+            loading={!!isExporting}
+            loadingText="Exporting..."
+            onClick={onExport}
+            className={styles.exportBtn}
+            title="Export Analytics CSV"
+          >
+            Export CSV
+          </ActionButton>
+        )}
+      </div>
 
-
-      {onExport && (
-        <ActionButton
-          iconName="download"
-          loading={!!isExporting}
-          loadingText="Exporting..."
-          onClick={onExport}
-          className={styles.filterBtn}
-          style={{ marginLeft: "auto" }}
-          title="Export Analytics CSV"
-        >
-          Export CSV
-        </ActionButton>
-      )}
-
+      <div style={{ width: "100%", marginTop: "2px", fontSize: "11.5px", color: "var(--muted)", display: "flex", alignItems: "center", gap: "6px" }}>
+        <Icon name="info" style={{ fontSize: "13px", color: "var(--primary)" }} />
+        <span>Telemetry period: <strong>{filterType === "today" ? "Today (Live)" : filterType === "yesterday" ? "Yesterday" : filterType === "7days" ? "Last 7 Days" : filterType === "30days" ? "Last 30 Days" : filterType === "thisMonth" ? "This Month" : "Custom Range"}</strong></span>
+      </div>
     </div>
   );
 }

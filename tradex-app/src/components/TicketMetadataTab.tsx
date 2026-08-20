@@ -2,8 +2,10 @@ import PermissionsTooltip from "./PermissionsTooltip";
 import SegmentedControl from "./SegmentedControl";
 import SearchablePopover from "./SearchablePopover";
 import ActionButton from "./ActionButton";
+import Icon from "./Icon";
 import { formatDateTime } from "../utils/dashboardHelpers";
 import { ALL_PERMISSIONS, ROUTE_QUEUE_LABELS } from "../utils/permissions";
+import { getTicketSlaInfo } from "../utils/slaHelpers";
 import styles from "./TicketDetailDrawer.module.css";
 
 interface TicketMetadataTabProps {
@@ -35,10 +37,10 @@ interface TicketMetadataTabProps {
 }
 
 const statusOptions = [
-  { value: "OPEN", label: "Open", activeColor: "#00e0a4", activeBg: "rgba(0, 224, 164, 0.12)" },
-  { value: "IN_PROGRESS", label: "In Progress", activeColor: "#ffb020", activeBg: "rgba(255, 176, 32, 0.12)" },
-  { value: "RESOLVED", label: "Resolved", activeColor: "#b55fe6", activeBg: "rgba(181, 95, 230, 0.12)" },
-  { value: "CLOSED", label: "Closed", activeColor: "var(--text)", activeBg: "var(--surface-3)" },
+  { value: "OPEN", label: "Open", activeColor: "var(--warning)", activeBg: "var(--warning-bg)" },
+  { value: "IN_PROGRESS", label: "In Progress", activeColor: "var(--primary)", activeBg: "var(--primary-bg)" },
+  { value: "RESOLVED", label: "Resolved", activeColor: "var(--success)", activeBg: "var(--success-bg)" },
+  { value: "CLOSED", label: "Closed", activeColor: "var(--muted)", activeBg: "var(--surface-elevated)" },
 ];
 
 export default function TicketMetadataTab({
@@ -53,13 +55,15 @@ export default function TicketMetadataTab({
   onCloseTicket,
   isClosePending,
 }: TicketMetadataTabProps) {
+  const sla = getTicketSlaInfo(ticket.createdAt, ticket.status, ticket.resolvedAt);
+
   const getPermissionColor = (perm: string) => {
     switch (perm) {
-      case "MANAGE_DEPOSITS": return "#00e0a4";
-      case "MANAGE_WITHDRAWALS": return "#ff5a6a";
-      case "MANAGE_USERS": return "#0096ff";
-      case "MANAGE_POINTS": return "#ffb200";
-      case "MANAGE_SETTINGS": return "#ff7b00";
+      case "MANAGE_DEPOSITS": return "var(--success)";
+      case "MANAGE_WITHDRAWALS": return "var(--danger)";
+      case "MANAGE_USERS": return "var(--clr-sky)";
+      case "MANAGE_POINTS": return "var(--clr-amber)";
+      case "MANAGE_SETTINGS": return "var(--warning)";
       default: return "var(--muted)";
     }
   };
@@ -100,6 +104,29 @@ export default function TicketMetadataTab({
             </span>
           )}
         </div>
+
+        {/* SLA / Resolution Turnaround */}
+        <div className={styles.infoRow}>
+          <span className={styles.infoLabel}>SLA Status</span>
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "4px",
+              fontSize: "11px",
+              fontWeight: 700,
+              padding: "3px 8px",
+              borderRadius: "6px",
+              color: sla.color,
+              background: sla.bg,
+              border: `1px solid ${sla.border}`,
+            }}
+          >
+            <Icon name={sla.icon} style={{ fontSize: "13px" }} />
+            {sla.label}
+          </span>
+        </div>
+
         <div className={styles.infoRow}>
           <span className={styles.infoLabel}>Category</span>
           <span className={`category-tag-${ticket.category.toLowerCase().replace("_", "")}`} style={{
@@ -183,7 +210,7 @@ export default function TicketMetadataTab({
             loading={isClosePending}
             loadingText="Closing..."
             iconName="check_circle"
-            style={{ width: "100%", justifyContent: "center",  }}
+            style={{ width: "100%", justifyContent: "center" }}
           >
             Close This Ticket
           </ActionButton>

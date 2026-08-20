@@ -1,164 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Products — TradeX</title>
-<meta name="description" content="Trade Indian equities, derivatives, commodities and global indices on TradeX — with unified risk and reporting." />
-<script>
-  (function() {
-    var token = localStorage.getItem("token");
-    if (token) {
-      window.location.href = "http://localhost:5173/dashboard";
-    }
-  })();
-</script>
-<link rel="icon" type="image/svg+xml" href="../assets/logo.svg" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/styles.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Products — TradeX</title>
+  <meta name="description"
+    content="Trade Indian equities, derivatives, commodities and global indices on TradeX — with unified risk and reporting." />
+  <script>
+    (function () {
+      var token = localStorage.getItem("token");
+      if (token) {
+        window.location.href = "https://control.tradenows.com/dashboard";
+      }
+    })();
+  </script>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css" />
 </head>
+
 <body>
 
-<header class="site-header">
-  <div class="container nav">
-    <a href="/" class="brand">
-      <img src="../assets/logo.svg" alt="" class="logo" />
-      <span class="brand-name">Trade<span>X</span></span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="/">Home</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="products.html">Products</a></li>
-      <li><a href="features.html">Features</a></li>
-      <li><a href="contact.html">Contact</a></li>
-    </ul>
-    <div class="nav-cta">
-      <a href="#" class="btn btn-ghost">Login</a>
-      <a href="contact.html" class="btn btn-primary">Open Account</a>
-      <button class="mobile-toggle" aria-label="Toggle menu">☰</button>
-    </div>
-  </div>
-</header>
-
-<div class="page-header">
-  <div class="container">
-    <div class="breadcrumb"><a href="/">Home</a> / Products</div>
-    <h1>One account. Every market.</h1>
-    <p>From Nifty to NASDAQ — trade the full spectrum of listed products with unified risk and reporting.</p>
-  </div>
-</div>
-
-<section>
-  <div class="container grid-4">
-    <div class="product">
-      <div class="p-icon">📈</div>
-      <h3>Stocks &amp; ETFs</h3>
-      <p>7,000+ Indian equities and ETFs listed on NSE and BSE. Free delivery investing.</p>
-      <a href="contact.html">Open Account →</a>
-    </div>
-    <div class="product">
-      <div class="p-icon">🧮</div>
-      <h3>Futures &amp; Options</h3>
-      <p>Multi-leg order builder, options chain analytics, greeks and payoff visualiser.</p>
-      <a href="contact.html">Open Account →</a>
-    </div>
-    <div class="product">
-      <div class="p-icon">🌾</div>
-      <h3>Commodities (MCX)</h3>
-      <p>Gold, silver, crude, natural gas and agri-commodities with transparent margins.</p>
-      <a href="contact.html">Open Account →</a>
-    </div>
-    <div class="product">
-      <div class="p-icon">💱</div>
-      <h3>Currency Derivatives</h3>
-      <p>Hedge forex risk or trade USD/INR, EUR/INR and other currency pairs.</p>
-      <a href="contact.html">Open Account →</a>
-    </div>
-    <div class="product">
-      <div class="p-icon">🌐</div>
-      <h3>Global Indices</h3>
-      <p>S&amp;P 500, NASDAQ, DAX and more via regulated international partners.</p>
-      <a href="contact.html">Open Account →</a>
-    </div>
-    <div class="product">
-      <div class="p-icon">🪙</div>
-      <h3>Bullion (COMEX)</h3>
-      <p>Access gold and silver on COMEX with institutional-grade liquidity.</p>
-      <a href="contact.html">Open Account →</a>
-    </div>
-    <div class="product">
-      <div class="p-icon">📦</div>
-      <h3>Mutual Funds</h3>
-      <p>Direct-plan mutual funds with zero commission. SIPs from ₹500/month.</p>
-      <a href="contact.html">Open Account →</a>
-    </div>
-    <div class="product">
-      <div class="p-icon">📜</div>
-      <h3>Bonds &amp; G-Secs</h3>
-      <p>Invest in government securities, T-bills and corporate bonds online.</p>
-      <a href="contact.html">Open Account →</a>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="container">
-    <div class="section-head">
-      <span class="pill">Market insights</span>
-      <h2>Research that actually helps</h2>
-      <p>Daily notes, sector spotlights, and structured research — curated by veteran analysts.</p>
-    </div>
-    <div class="grid-3">
-      <div class="card"><h3>Morning Pulse</h3><p>Daily pre-market note with global cues, F&amp;O build-up and key stocks to watch.</p></div>
-      <div class="card"><h3>Options Watch</h3><p>Weekly options strategies and open-interest signals on Nifty &amp; Bank Nifty.</p></div>
-      <div class="card"><h3>Thematic Baskets</h3><p>Ready-to-invest baskets across themes — EVs, semiconductors, defense and more.</p></div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="container">
-    <div class="cta-band">
-      <div>
-        <h2>Ready to diversify across markets?</h2>
-        <p>Open one account. Trade everything. Free onboarding, instant activation.</p>
-      </div>
-      <div class="btn-row">
-        <a href="contact.html" class="btn btn-primary btn-lg">Open Free Account</a>
+  <header class="site-header">
+    <div class="container nav">
+      <a href="/" class="brand">
+        <img src="../assets/logo.svg" alt="" class="logo" />
+        <span class="brand-name">Trade<span>X</span></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="features.html">Features</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="#" class="btn btn-ghost">Login</a>
+        <a href="contact.html" class="btn btn-primary">Open Account</a>
+        <button class="mobile-toggle" aria-label="Toggle menu">☰</button>
       </div>
     </div>
-  </div>
-</section>
+  </header>
 
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <a href="/" class="brand">
-          <img src="../assets/logo.svg" alt="" class="logo" />
-          <span class="brand-name">Trade<span>X</span></span>
-        </a>
-        <p>India's modern trading platform for stocks, derivatives, commodities and global markets.</p>
-        <div class="socials"><a href="#">𝕏</a><a href="#">f</a><a href="#">◎</a><a href="#">▶</a><a href="#">✈</a></div>
-      </div>
-      <div class="footer-col"><h4>Company</h4><ul>
-        <li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li>
-      </ul></div>
-      <div class="footer-col"><h4>Products</h4><ul>
-        <li><a href="products.html">Stocks</a></li><li><a href="products.html">F&amp;O</a></li><li><a href="products.html">Commodities</a></li>
-      </ul></div>
-      <div class="footer-col"><h4>Resources</h4><ul>
-        <li><a href="features.html">Platform</a></li><li><a href="features.html#pricing">Pricing</a></li>
-      </ul></div>
-      <div class="footer-col"><h4>Legal</h4><ul>
-        <li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Use</a></li><li><a href="#">Risk Disclosure</a></li>
-      </ul></div>
+  <div class="page-header">
+    <div class="container">
+      <div class="breadcrumb"><a href="/">Home</a> / Products</div>
+      <h1>One account. Every market.</h1>
+      <p>From Nifty to NASDAQ — trade the full spectrum of listed products with unified risk and reporting.</p>
     </div>
-    <div class="footer-bottom"><div>© 2026 TradeX.</div><div>Template for demo purposes only.</div></div>
   </div>
-</footer>
-<script src="../js/main.js"></script>
+
+  <section>
+    <div class="container grid-4">
+      <div class="product">
+        <div class="p-icon">📈</div>
+        <h3>Stocks &amp; ETFs</h3>
+        <p>7,000+ Indian equities and ETFs listed on NSE and BSE. Free delivery investing.</p>
+        <a href="contact.html">Open Account →</a>
+      </div>
+      <div class="product">
+        <div class="p-icon">🧮</div>
+        <h3>Futures &amp; Options</h3>
+        <p>Multi-leg order builder, options chain analytics, greeks and payoff visualiser.</p>
+        <a href="contact.html">Open Account →</a>
+      </div>
+      <div class="product">
+        <div class="p-icon">🌾</div>
+        <h3>Commodities (MCX)</h3>
+        <p>Gold, silver, crude, natural gas and agri-commodities with transparent margins.</p>
+        <a href="contact.html">Open Account →</a>
+      </div>
+      <div class="product">
+        <div class="p-icon">💱</div>
+        <h3>Currency Derivatives</h3>
+        <p>Hedge forex risk or trade USD/INR, EUR/INR and other currency pairs.</p>
+        <a href="contact.html">Open Account →</a>
+      </div>
+      <div class="product">
+        <div class="p-icon">🌐</div>
+        <h3>Global Indices</h3>
+        <p>S&amp;P 500, NASDAQ, DAX and more via regulated international partners.</p>
+        <a href="contact.html">Open Account →</a>
+      </div>
+      <div class="product">
+        <div class="p-icon">🪙</div>
+        <h3>Bullion (COMEX)</h3>
+        <p>Access gold and silver on COMEX with institutional-grade liquidity.</p>
+        <a href="contact.html">Open Account →</a>
+      </div>
+      <div class="product">
+        <div class="p-icon">📦</div>
+        <h3>Mutual Funds</h3>
+        <p>Direct-plan mutual funds with zero commission. SIPs from ₹500/month.</p>
+        <a href="contact.html">Open Account →</a>
+      </div>
+      <div class="product">
+        <div class="p-icon">📜</div>
+        <h3>Bonds &amp; G-Secs</h3>
+        <p>Invest in government securities, T-bills and corporate bonds online.</p>
+        <a href="contact.html">Open Account →</a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="section-head">
+        <span class="pill">Market insights</span>
+        <h2>Research that actually helps</h2>
+        <p>Daily notes, sector spotlights, and structured research — curated by veteran analysts.</p>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Morning Pulse</h3>
+          <p>Daily pre-market note with global cues, F&amp;O build-up and key stocks to watch.</p>
+        </div>
+        <div class="card">
+          <h3>Options Watch</h3>
+          <p>Weekly options strategies and open-interest signals on Nifty &amp; Bank Nifty.</p>
+        </div>
+        <div class="card">
+          <h3>Thematic Baskets</h3>
+          <p>Ready-to-invest baskets across themes — EVs, semiconductors, defense and more.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="cta-band">
+        <div>
+          <h2>Ready to diversify across markets?</h2>
+          <p>Open one account. Trade everything. Free onboarding, instant activation.</p>
+        </div>
+        <div class="btn-row">
+          <a href="contact.html" class="btn btn-primary btn-lg">Open Free Account</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="brand">
+            <img src="../assets/logo.svg" alt="" class="logo" />
+            <span class="brand-name">Trade<span>X</span></span>
+          </a>
+          <p>India's modern trading platform for stocks, derivatives, commodities and global markets.</p>
+          <div class="socials"><a href="#">𝕏</a><a href="#">f</a><a href="#">◎</a><a href="#">▶</a><a href="#">✈</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Products</h4>
+          <ul>
+            <li><a href="products.html">Stocks</a></li>
+            <li><a href="products.html">F&amp;O</a></li>
+            <li><a href="products.html">Commodities</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="features.html">Platform</a></li>
+            <li><a href="features.html#pricing">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Use</a></li>
+            <li><a href="#">Risk Disclosure</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>© 2026 TradeX.</div>
+        <div>Template for demo purposes only.</div>
+      </div>
+    </div>
+  </footer>
+  <script src="../js/main.js"></script>
 </body>
+
 </html>

@@ -31,8 +31,8 @@ public class TicketAttachment {
     @Column(name = "file_size", nullable = false)
     private Long fileSize;
 
-    @Column(name = "storage_key", nullable = false, length = 100)
-    private String storageKey; // references UUID in AttachmentData or path in future cloud storage
+    @Column(name = "storage_key", nullable = false, length = 255)
+    private String storageKey; // relative filename under tradex.storage.location
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default

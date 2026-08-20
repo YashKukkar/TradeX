@@ -31,6 +31,8 @@ function formatDuration(seconds: number): string {
   return remainingMins > 0 ? `${hours}h ${remainingMins}m` : `${hours}h`;
 }
 
+import LoadingState from "./LoadingState";
+
 export default function EmployeePerformanceTable({ data, isLoading }: EmployeePerformanceTableProps) {
   if (isLoading) {
     return (
@@ -39,21 +41,62 @@ export default function EmployeePerformanceTable({ data, isLoading }: EmployeePe
           <Icon name="badge" className={styles.perfIcon} />
           <h2 className={styles.perfTitle}>Employee Performance</h2>
         </div>
-        <div style={{ padding: "20px", textAlign: "center", color: "var(--muted)" }}>
-          Loading performance telemetry...
-        </div>
+        <LoadingState message="Loading performance telemetry..." padding="24px 0" />
       </div>
     );
   }
 
+  const totalTickets = data.reduce((s, e) => s + (e.ticketsResolved || 0), 0);
+  const totalTx = data.reduce((s, e) => s + (e.depositApprovals || 0) + (e.withdrawalApprovals || 0), 0);
+
   return (
     <div className={styles.perfSection}>
-      <div className={styles.perfHeader} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div className={styles.perfHeader} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <Icon name="badge" className={styles.perfIcon} style={{ color: "var(--accent)" }} />
-          <h2 className={styles.perfTitle}>Employee Performance</h2>
+          <Icon name="analytics" className={styles.perfIcon} style={{ color: "var(--clr-indigo)" }} />
+          <h2 className={styles.perfTitle}>Staff Operational Performance</h2>
         </div>
-        <span className={styles.badgeMuted}>{data.length} Staff Members</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+          <span
+            style={{
+              fontSize: "11px",
+              fontWeight: 750,
+              padding: "3px 8px",
+              borderRadius: "6px",
+              background: "var(--clr-indigo-a10)",
+              color: "var(--clr-indigo)",
+              border: "1px solid var(--clr-indigo)",
+            }}
+          >
+            {data.length} Staff Members
+          </span>
+          <span
+            style={{
+              fontSize: "11px",
+              fontWeight: 750,
+              padding: "3px 8px",
+              borderRadius: "6px",
+              background: "var(--surface-2)",
+              color: "var(--clr-sky)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            {totalTickets} Tickets Resolved
+          </span>
+          <span
+            style={{
+              fontSize: "11px",
+              fontWeight: 750,
+              padding: "3px 8px",
+              borderRadius: "6px",
+              background: "var(--surface-2)",
+              color: "var(--success)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            {totalTx} Transactions Approved
+          </span>
+        </div>
       </div>
 
       <div className={styles.tableWrapper}>
@@ -63,11 +106,11 @@ export default function EmployeePerformanceTable({ data, isLoading }: EmployeePe
               <th rowSpan={2} className={styles.tableColDivider} style={{ verticalAlign: "middle" }}>
                 Employee
               </th>
-              <th colSpan={2} className={`${styles.tableGroupHeader} ${styles.tableColDivider}`} style={{ color: "#60a5fa" }}>
+              <th colSpan={2} className={`${styles.tableGroupHeader} ${styles.tableColDivider}`} style={{ color: "var(--clr-sky)" }}>
                 <Icon name="support_agent" style={{ fontSize: "14px", verticalAlign: "middle", marginRight: "6px" }} />
                 Support Operations
               </th>
-              <th colSpan={3} className={styles.tableGroupHeader} style={{ color: "#4caf50" }}>
+              <th colSpan={3} className={styles.tableGroupHeader} style={{ color: "var(--success)" }}>
                 <Icon name="payments" style={{ fontSize: "14px", verticalAlign: "middle", marginRight: "6px" }} />
                 Transaction Operations
               </th>
@@ -116,7 +159,7 @@ export default function EmployeePerformanceTable({ data, isLoading }: EmployeePe
                       </div>
                     </td>
                     <td>
-                      <span className={styles.metricPill} style={{ color: emp.ticketsResolved > 0 ? "#60a5fa" : "var(--text)" }}>
+                      <span className={emp.ticketsResolved > 0 ? styles.ticketPill : styles.metricPill}>
                         {emp.ticketsResolved}
                       </span>
                     </td>
@@ -132,7 +175,7 @@ export default function EmployeePerformanceTable({ data, isLoading }: EmployeePe
                     </td>
                     <td>
                       {hasDepositPerm ? (
-                        <span className={styles.metricPill} style={{ color: emp.depositApprovals > 0 ? "#4caf50" : "var(--text)" }}>
+                        <span className={emp.depositApprovals > 0 ? styles.depositPill : styles.metricPill}>
                           {emp.depositApprovals}
                         </span>
                       ) : (
@@ -141,7 +184,7 @@ export default function EmployeePerformanceTable({ data, isLoading }: EmployeePe
                     </td>
                     <td>
                       {hasWithdrawalPerm ? (
-                        <span className={styles.metricPill} style={{ color: emp.withdrawalApprovals > 0 ? "#ab47bc" : "var(--text)" }}>
+                        <span className={emp.withdrawalApprovals > 0 ? styles.withdrawalPill : styles.metricPill}>
                           {emp.withdrawalApprovals}
                         </span>
                       ) : (
@@ -150,7 +193,7 @@ export default function EmployeePerformanceTable({ data, isLoading }: EmployeePe
                     </td>
                     <td>
                       {hasTxPerm && emp.avgTxProcessingTimeSeconds > 0 ? (
-                        <span className={styles.durationBadge} style={{ background: "rgba(76, 175, 80, 0.08)", color: "#4caf50", borderColor: "rgba(76, 175, 80, 0.2)" }}>
+                        <span className={styles.durationBadge} style={{ background: "var(--success-bg)", color: "var(--success)", borderColor: "var(--success-border)" }}>
                           <Icon name="timer" style={{ fontSize: "12px" }} />
                           {formatDuration(emp.avgTxProcessingTimeSeconds)}
                         </span>

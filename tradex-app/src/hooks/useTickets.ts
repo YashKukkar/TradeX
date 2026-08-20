@@ -39,14 +39,13 @@ export interface Ticket {
   claimedAt?: string;
   createdAt: string;
   updatedAt: string;
+  resolvedAt?: string;
 }
-
 
 export interface TicketDetail extends Ticket {
   description: string;
   adminNotes?: string;
   resolvedByEmail?: string;
-  resolvedAt?: string;
   attachments: TicketAttachment[];
   comments: TicketComment[];
   history?: TicketHistory[];
@@ -54,34 +53,54 @@ export interface TicketDetail extends Ticket {
   reopenCount?: number;
 }
 
+export const ticketKeys = {
+  all: ["tickets"] as const,
+  myTickets: () => ["myTickets"] as const,
+  adminTickets: () => ["adminTickets"] as const,
+  detail: (id: number | null) => ["ticketDetail", id] as const,
+  activeByUser: (email: string | null) => ["userActiveTickets", email] as const,
+};
+
+function isStorageFailure(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false;
+  const msg = ((err as { message?: string }).message || "").toLowerCase();
+  return (
+    msg.includes("upload attachment") ||
+    msg.includes("store attachment") ||
+    msg.includes("storage") ||
+    msg.includes("attachment")
+  );
+}
+
 export function useMyTickets() {
   return useQuery<Ticket[]>({
-    queryKey: ["myTickets"],
-    queryFn: () => api("/tickets")
+    queryKey: ticketKeys.myTickets(),
+    queryFn: () => api("/tickets"),
+    staleTime: 30_000,
   });
 }
 
 export function useTicketDetail(ticketId: number | null) {
   const queryClient = useQueryClient();
   return useQuery<TicketDetail>({
-    queryKey: ["ticketDetail", ticketId],
+    queryKey: ticketKeys.detail(ticketId),
     queryFn: () => api(`/tickets/${ticketId}`),
     enabled: ticketId !== null,
     placeholderData: () => {
       if (!ticketId) return undefined;
-      const adminTickets = queryClient.getQueryData<Ticket[]>(["adminTickets"]);
-      const myTickets = queryClient.getQueryData<Ticket[]>(["myTickets"]);
-      const t = adminTickets?.find(x => x.id === ticketId) || myTickets?.find(x => x.id === ticketId);
+      const adminTickets = queryClient.getQueryData<Ticket[]>(ticketKeys.adminTickets());
+      const myTickets = queryClient.getQueryData<Ticket[]>(ticketKeys.myTickets());
+      const t = adminTickets?.find((x) => x.id === ticketId) || myTickets?.find((x) => x.id === ticketId);
       if (t) {
         return {
           ...t,
           description: "Loading ticket details...",
           comments: [],
-          attachments: []
+          attachments: [],
         } as TicketDetail;
       }
       return undefined;
-    }
+    },
   });
 }
 
@@ -93,20 +112,10 @@ export function useCreateTicket() {
         const res = await api("/tickets", {
           method: "POST",
           body: formData,
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
         });
         return res;
-      } catch (err: any) {
-        const errMsg = err.message || "";
-        const isUploadFailure = errMsg.toLowerCase().includes("upload attachment") || 
-                                errMsg.toLowerCase().includes("storage server") || 
-                                errMsg.toLowerCase().includes("supabase") ||
-                                errMsg.toLowerCase().includes("nosuchbucket") ||
-                                errMsg.toLowerCase().includes("s3");
-
-        if (isUploadFailure && formData.has("files")) {
+      } catch (err: unknown) {
+        if (isStorageFailure(err) && formData.has("files")) {
           const fallbackFormData = new FormData();
           const ticketPart = formData.get("ticket");
           if (ticketPart) {
@@ -115,9 +124,6 @@ export function useCreateTicket() {
           const res = await api("/tickets", {
             method: "POST",
             body: fallbackFormData,
-            headers: {
-              "Content-Type": "multipart/form-data"
-            }
           });
           return { ...res, uploadFailed: true };
         }
@@ -125,8 +131,8 @@ export function useCreateTicket() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["myTickets"] });
-    }
+      queryClient.invalidateQueries({ queryKey: ticketKeys.myTickets() });
+    },
   });
 }
 
@@ -141,23 +147,15 @@ export function useAddComment(ticketId: number) {
         try {
           const res = await api(`/tickets/${ticketId}/comments`, {
             method: "POST",
-            headers: { "Content-Type": "multipart/form-data" },
-            body: formData
+            body: formData,
           });
           return res;
-        } catch (err: any) {
-          const errMsg = err.message || "";
-          const isUploadFailure = errMsg.toLowerCase().includes("upload attachment") || 
-                                  errMsg.toLowerCase().includes("storage server") || 
-                                  errMsg.toLowerCase().includes("supabase") ||
-                                  errMsg.toLowerCase().includes("nosuchbucket") ||
-                                  errMsg.toLowerCase().includes("s3");
-
-          if (isUploadFailure) {
+        } catch (err: unknown) {
+          if (isStorageFailure(err)) {
             const fallbackRes = await api(`/tickets/${ticketId}/comments`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ message })
+              body: JSON.stringify({ message }),
             });
             return { ...fallbackRes, uploadFailed: true };
           }
@@ -167,83 +165,75 @@ export function useAddComment(ticketId: number) {
         return api(`/tickets/${ticketId}/comments`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message })
+          body: JSON.stringify({ message }),
         });
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticketDetail", ticketId] });
-    }
-  });
-}
-
-function useUserTicketMutation(ticketId: number, action: "reopen" | "close") {
-  const queryClient = useQueryClient();
-  return useMutation<TicketDetail, Error, void>({
-    mutationFn: () => {
-      return api(`/tickets/${ticketId}/${action}`, {
-        method: "POST"
-      });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.detail(ticketId) });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.adminTickets() });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.myTickets() });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticketDetail", ticketId] });
-      queryClient.invalidateQueries({ queryKey: ["myTickets"] });
-      queryClient.invalidateQueries({ queryKey: ["adminTickets"] });
-    }
   });
 }
 
-function useAdminTicketMutation<TVariables>(ticketId: number, action: "status" | "assign" | "claim", method: "PATCH" | "POST" = "PATCH") {
+function useTicketMutation<TVariables = void>(
+  ticketId: number,
+  endpoint: string,
+  method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE" = "POST"
+) {
   const queryClient = useQueryClient();
   return useMutation<TicketDetail, Error, TVariables>({
     mutationFn: (body) => {
-      return api(`/admin/tickets/${ticketId}/${action}`, {
+      return api(endpoint, {
         method,
-        body: body ? JSON.stringify(body) : undefined
+        body: body ? JSON.stringify(body) : undefined,
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ticketDetail", ticketId] });
-      queryClient.invalidateQueries({ queryKey: ["adminTickets"] });
-    }
+      queryClient.invalidateQueries({ queryKey: ticketKeys.detail(ticketId) });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.myTickets() });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.adminTickets() });
+      queryClient.invalidateQueries({ queryKey: ["dashboardMetrics"] });
+    },
   });
 }
 
 export function useReopenTicket(ticketId: number) {
-  return useUserTicketMutation(ticketId, "reopen");
+  return useTicketMutation(ticketId, `/tickets/${ticketId}/reopen`);
 }
 
 export function useCloseTicket(ticketId: number) {
-  return useUserTicketMutation(ticketId, "close");
+  return useTicketMutation(ticketId, `/tickets/${ticketId}/close`);
 }
-
 
 // Admin Hooks
 export function useAdminTickets(isAdmin: boolean) {
   return useQuery<Ticket[]>({
-    queryKey: ["adminTickets"],
+    queryKey: ticketKeys.adminTickets(),
     queryFn: () => api("/admin/tickets"),
-    enabled: isAdmin
+    enabled: isAdmin,
+    staleTime: 30_000,
   });
 }
 
 export function useUpdateTicketStatus(ticketId: number) {
-  return useAdminTicketMutation<{ status: string }>(ticketId, "status");
+  return useTicketMutation<{ status: string }>(ticketId, `/admin/tickets/${ticketId}/status`, "PATCH");
 }
 
-
 export function useAssignTicket(ticketId: number) {
-  return useAdminTicketMutation<{ assignedToPermission: string | null }>(ticketId, "assign");
+  return useTicketMutation<{ assignedToPermission: string | null }>(ticketId, `/admin/tickets/${ticketId}/assign`, "PATCH");
 }
 
 export function useClaimTicket(ticketId: number) {
-  return useAdminTicketMutation<void>(ticketId, "claim");
+  return useTicketMutation<void>(ticketId, `/admin/tickets/${ticketId}/claim`, "PATCH");
 }
 
 export function useUserActiveTickets(email: string | null) {
   return useQuery<Ticket[]>({
-    queryKey: ["userActiveTickets", email],
+    queryKey: ticketKeys.activeByUser(email),
     queryFn: () => api(`/admin/tickets/active?email=${encodeURIComponent(email || "")}`),
-    enabled: !!email
+    enabled: !!email,
+    staleTime: 30_000,
   });
 }

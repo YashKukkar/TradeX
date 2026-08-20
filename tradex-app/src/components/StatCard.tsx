@@ -1,3 +1,4 @@
+import Card from "./Card";
 import Icon from "./Icon";
 import styles from "./StatCard.module.css";
 
@@ -21,7 +22,7 @@ export default function StatCard({
   footer,
 }: StatCardProps) {
   return (
-    <div className={styles.card}>
+    <Card className={styles.card}>
       <Icon
         name={icon}
         className={styles.icon}
@@ -36,6 +37,6 @@ export default function StatCard({
       </div>
       <div className={styles.label}>{label}</div>
       {footer && <div className={styles.footer}>{footer}</div>}
-    </div>
+    </Card>
   );
 }

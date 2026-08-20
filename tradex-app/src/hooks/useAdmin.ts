@@ -49,7 +49,8 @@ export function usePendingTransactions() {
   return useQuery<PendingTransaction[]>({
     queryKey: ["pendingTransactions"],
     queryFn: () => api("/admin/transactions/pending"),
-    refetchInterval: 5000,
+    staleTime: 15000,
+    refetchInterval: 15000,
   });
 }
 
@@ -58,7 +59,8 @@ export function useAllTransactions(enabled: boolean) {
     queryKey: ["allTransactions"],
     queryFn: () => api("/admin/transactions"),
     enabled,
-    refetchInterval: 5000,
+    staleTime: 15000,
+    refetchInterval: 15000,
   });
 }
 
@@ -182,6 +184,7 @@ export function useApproveTransaction(options?: {
       queryClient.invalidateQueries({ queryKey: ["pendingTransactions"] });
       queryClient.invalidateQueries({ queryKey: ["allTransactions"] });
       queryClient.invalidateQueries({ queryKey: ["adminTelemetry"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardMetrics"] });
       options?.onSuccess?.();
     },
   });
@@ -201,6 +204,7 @@ export function useRejectTransaction(options?: {
       queryClient.invalidateQueries({ queryKey: ["pendingTransactions"] });
       queryClient.invalidateQueries({ queryKey: ["allTransactions"] });
       queryClient.invalidateQueries({ queryKey: ["adminTelemetry"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardMetrics"] });
       options?.onSuccess?.();
     },
   });
@@ -259,7 +263,11 @@ export function useUpdateEmployeePermissions(options?: {
         method: "PUT",
         body: JSON.stringify({ permissions }),
       }),
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
+      queryClient.setQueryData<UserInfo[]>(["employeesList"], (old) => {
+        if (!old) return old;
+        return old.map((e) => (e.id === variables.employeeId ? { ...e, permissions: variables.permissions } : e));
+      });
       queryClient.invalidateQueries({ queryKey: ["employeesList"] });
       options?.onSuccess?.(data);
     },
@@ -365,7 +373,11 @@ export function useUpdateEmployeeTeams(options?: { onSuccess?: () => void; onErr
         method: "PUT",
         body: JSON.stringify({ teams }),
       }),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      queryClient.setQueryData<UserInfo[]>(["employeesList"], (old) => {
+        if (!old) return old;
+        return old.map((e) => (e.id === variables.employeeId ? { ...e, teams: variables.teams } : e));
+      });
       queryClient.invalidateQueries({ queryKey: ["employeesList"] });
       options?.onSuccess?.();
     },

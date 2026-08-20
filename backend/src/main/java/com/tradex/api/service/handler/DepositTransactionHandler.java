@@ -58,8 +58,7 @@ public class DepositTransactionHandler implements TransactionHandler {
                 actor,
                 target,
                 AdminAction.APPROVE_DEPOSIT,
-                "Deposit approved: amount=" + tx.getAmount().stripTrailingZeros().toPlainString() + " | Notes: "
-                        + tx.getNotes());
+                "₹" + tx.getAmount().stripTrailingZeros().toPlainString() + " deposit approved for " + target.getEmail());
         adminAuditLogRepository.save(auditLog);
 
         applyFirstDepositBonus(target, tx.getAmount(), isFirstDeposit);
@@ -82,8 +81,8 @@ public class DepositTransactionHandler implements TransactionHandler {
                 actor,
                 target,
                 AdminAction.REJECT_DEPOSIT,
-                "Deposit rejected: amount=" + tx.getAmount().stripTrailingZeros().toPlainString() + " | Reason: "
-                        + reason);
+                "₹" + tx.getAmount().stripTrailingZeros().toPlainString() + " deposit rejected for " + target.getEmail()
+                        + (reason != null && !reason.isBlank() ? " • " + reason : ""));
         adminAuditLogRepository.save(auditLog);
     }
 

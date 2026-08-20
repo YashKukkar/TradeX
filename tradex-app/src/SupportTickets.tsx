@@ -8,6 +8,7 @@ import TicketDetailModal from "./components/TicketDetailModal";
 import StatCard from "./components/StatCard";
 import Card from "./components/Card";
 import { formatDateTime } from "./utils/dashboardHelpers";
+import { getTicketSlaInfo } from "./utils/slaHelpers";
 import { useToast } from "./context/ToastContext";
 
 
@@ -99,73 +100,41 @@ export default function SupportTickets() {
         })()}
       </header>
 
-      {(() => {
-        const activeTicketsCount = tickets.filter(t => t.status === "OPEN" || t.status === "IN_PROGRESS").length;
-        if (activeTicketsCount >= 3) {
-          return (
-            <div style={{
-              background: "rgba(255, 179, 0, 0.1)",
-              border: "1px solid rgba(255, 179, 0, 0.2)",
-              color: "#ffb300",
-              padding: "12px 16px",
-              borderRadius: "8px",
-              marginBottom: "20px",
-              fontSize: "14px",
-              display: "flex",
-              alignItems: "center",
-              gap: "10px"
-            }}>
-              <Icon name="warning" style={{ fontSize: "20px" }} />
-              <span>You currently have {activeTicketsCount} active support tickets. You must wait for them to be resolved before raising a new one.</span>
-            </div>
-          );
-        }
-        return null;
-      })()}
-
-      {/* Stats Cards Row */}
-      <div className={styles.statsGrid}>
+      {/* Stats Summary Bar */}
+      <div className={styles.statsRow}>
         <StatCard
-          icon="support_agent"
-          label="Total Raised"
+          icon="confirmation_number"
+          label="Total Tickets"
           value={totalCount}
           isLoading={isLoading}
         />
         <StatCard
-          icon="hourglass_empty"
-          label="Active Tickets"
+          icon="pending_actions"
+          label="In Progress / Open"
           value={openCount}
-          iconColor="var(--accent)"
-          valueColor="var(--accent)"
           isLoading={isLoading}
-        />
-        <StatCard
-          icon="task_alt"
-          label="Resolved Tickets"
-          value={resolvedCount}
-          iconColor="#06b6d4"
-          valueColor="#06b6d4"
-          isLoading={isLoading}
+          valueColor={openCount > 0 ? "var(--warning)" : undefined}
         />
         <StatCard
           icon="check_circle"
-          label="Closed Tickets"
+          label="Resolved"
+          value={resolvedCount}
+          isLoading={isLoading}
+          valueColor={resolvedCount > 0 ? "var(--success)" : undefined}
+        />
+        <StatCard
+          icon="archive"
+          label="Closed"
           value={closedCount}
-          iconColor="var(--muted)"
-          valueColor="var(--muted)"
           isLoading={isLoading}
         />
-
       </div>
 
-
-
       {/* Main Content Layout */}
-      <div className={styles.contentGrid}>
-        {/* Filters Sidebar */}
-        <Card className={styles.filterCard}>
+      <div className={styles.layout}>
+        {/* Left Filters Sidebar */}
+        <Card className={styles.filterSidebar}>
           <div className={styles.filterGroup}>
-
             <h4>Filter Status</h4>
             <button 
               className={`${styles.filterBtn} ${statusFilter === "ALL" ? styles.filterBtnActive : ""}`}
@@ -179,14 +148,18 @@ export default function SupportTickets() {
               onClick={() => setStatusFilter("OPEN")}
             >
               <span>Open</span>
-              <span className={styles.filterCount}>{tickets.filter(t => t.status === "OPEN").length}</span>
+              <span className={styles.filterCount}>
+                {tickets.filter((t) => t.status === "OPEN").length}
+              </span>
             </button>
             <button 
               className={`${styles.filterBtn} ${statusFilter === "IN_PROGRESS" ? styles.filterBtnActive : ""}`}
               onClick={() => setStatusFilter("IN_PROGRESS")}
             >
               <span>In Progress</span>
-              <span className={styles.filterCount}>{tickets.filter(t => t.status === "IN_PROGRESS").length}</span>
+              <span className={styles.filterCount}>
+                {tickets.filter((t) => t.status === "IN_PROGRESS").length}
+              </span>
             </button>
             <button 
               className={`${styles.filterBtn} ${statusFilter === "RESOLVED" ? styles.filterBtnActive : ""}`}
@@ -202,7 +175,6 @@ export default function SupportTickets() {
               <span>Closed</span>
               <span className={styles.filterCount}>{closedCount}</span>
             </button>
-
           </div>
 
 
@@ -255,33 +227,54 @@ export default function SupportTickets() {
 
           {!isLoading && filteredTickets.length > 0 && (
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {filteredTickets.map((ticket) => (
-                <div 
-                  key={ticket.id} 
-                  className={styles.ticketCard}
-                  onClick={() => setSelectedTicketId(ticket.id)}
-                >
-                  <div className={styles.ticketMeta}>
-                    <span className={styles.ticketId}>{ticket.ticketNumber}</span>
-                    <span className={`${styles.categoryTag} category-tag-${ticket.category.toLowerCase().replace("_", "")}`}>
-                      {ticket.category.replace("_", " ")}
-                    </span>
+              {filteredTickets.map((ticket) => {
+                const sla = getTicketSlaInfo(ticket.createdAt, ticket.status, ticket.resolvedAt);
+                return (
+                  <div 
+                    key={ticket.id} 
+                    className={styles.ticketCard}
+                    onClick={() => setSelectedTicketId(ticket.id)}
+                  >
+                    <div className={styles.ticketMeta}>
+                      <span className={styles.ticketId}>{ticket.ticketNumber}</span>
+                      <span className={`${styles.categoryTag} category-tag-${ticket.category.toLowerCase().replace("_", "")}`}>
+                        {ticket.category.replace("_", " ")}
+                      </span>
+                    </div>
+                    <div className={styles.ticketMain}>
+                      <h3 className={styles.ticketSubject}>{ticket.subject}</h3>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                        <span className={styles.ticketTime}>
+                          Updated {formatDateTime(ticket.updatedAt)}
+                        </span>
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            fontSize: "11px",
+                            fontWeight: 600,
+                            padding: "2px 6px",
+                            borderRadius: "4px",
+                            color: sla.color,
+                            background: sla.bg,
+                            border: `1px solid ${sla.border}`,
+                          }}
+                        >
+                          <Icon name={sla.icon} style={{ fontSize: "12px" }} />
+                          {sla.label}
+                        </span>
+                      </div>
+                    </div>
+                    <div className={styles.ticketActions}>
+                      <span className={`${styles.statusBadge} status-pill-${ticket.status.toLowerCase().replace("_", "")}`}>
+                        {ticket.status.replace("_", " ")}
+                      </span>
+                      <Icon name="chevron_right" style={{ color: "var(--muted)" }} />
+                    </div>
                   </div>
-                  <div className={styles.ticketMain}>
-                    <h3 className={styles.ticketSubject}>{ticket.subject}</h3>
-                    <span className={styles.ticketTime}>
-                      Updated {formatDateTime(ticket.updatedAt)}
-                    </span>
-
-                  </div>
-                  <div className={styles.ticketActions}>
-                    <span className={`${styles.statusBadge} status-pill-${ticket.status.toLowerCase().replace("_", "")}`}>
-                      {ticket.status.replace("_", " ")}
-                    </span>
-                    <Icon name="chevron_right" style={{ color: "var(--muted)" }} />
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </main>

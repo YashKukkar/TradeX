@@ -44,7 +44,7 @@ export default function DataTable<T>({
   clickableRow = true,
   emptyMessage = "No data found.",
   dense = true,
-  pageSize,
+  pageSize = 10,
   rowClassName,
 }: DataTableProps<T>) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -58,10 +58,12 @@ export default function DataTable<T>({
     return <div className={styles.emptyState}>{emptyMessage}</div>;
   }
 
-  const totalPages = pageSize ? Math.max(1, Math.ceil(data.length / pageSize)) : 1;
+  const effectivePageSize = pageSize || 10;
+  const totalPages = Math.max(1, Math.ceil(data.length / effectivePageSize));
   const activePage = Math.min(currentPage, totalPages);
-  const startIndex = (activePage - 1) * (pageSize || 0);
-  const paginatedData = pageSize ? data.slice(startIndex, startIndex + pageSize) : data;
+  const startIndex = (activePage - 1) * effectivePageSize;
+  const endIndex = Math.min(startIndex + effectivePageSize, data.length);
+  const paginatedData = data.slice(startIndex, endIndex);
 
   const tableClass = dense
     ? `${styles.table} ${styles.denseTable}`
@@ -69,7 +71,7 @@ export default function DataTable<T>({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
-      <div className={styles.tableWrap}>
+      <div className={styles.tableWrap} style={{ maxHeight: "650px", overflowY: "auto" }}>
         <table className={tableClass}>
           <thead>
             <tr>
@@ -97,7 +99,11 @@ export default function DataTable<T>({
                 {columns.map((col, i) => (
                   <td
                     key={i}
-                    style={{ textAlign: col.align ?? "left" }}
+                    style={{
+                      width: col.width,
+                      maxWidth: col.width,
+                      textAlign: col.align ?? "left",
+                    }}
                   >
                     {col.render
                       ? col.render(row)
@@ -112,29 +118,34 @@ export default function DataTable<T>({
         </table>
       </div>
 
-      {pageSize && totalPages > 1 && (
+      {totalPages > 1 && (
         <div className={styles.pagination}>
-          <button
-            type="button"
-            disabled={activePage === 1}
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            className={styles.pageBtn}
-          >
-            <Icon name="chevron_left" style={{ fontSize: "16px" }} />
-            Previous
-          </button>
-          <span className={styles.pageInfo}>
-            Page {activePage} of {totalPages}
+          <span className={styles.pageInfo} style={{ fontSize: "12px", color: "var(--muted)" }}>
+            Showing {startIndex + 1}–{endIndex} of {data.length} records
           </span>
-          <button
-            type="button"
-            disabled={activePage === totalPages}
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            className={styles.pageBtn}
-          >
-            Next
-            <Icon name="chevron_right" style={{ fontSize: "16px" }} />
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <button
+              type="button"
+              disabled={activePage === 1}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              className={styles.pageBtn}
+            >
+              <Icon name="chevron_left" style={{ fontSize: "16px" }} />
+              Previous
+            </button>
+            <span className={styles.pageInfo}>
+              Page {activePage} of {totalPages}
+            </span>
+            <button
+              type="button"
+              disabled={activePage === totalPages}
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              className={styles.pageBtn}
+            >
+              Next
+              <Icon name="chevron_right" style={{ fontSize: "16px" }} />
+            </button>
+          </div>
         </div>
       )}
     </div>

@@ -1,6 +1,7 @@
 package com.tradex.api.service;
 
 import com.tradex.api.mapper.UserMapper;
+import com.tradex.api.config.AppProperties;
 import com.tradex.api.dto.AddBankAccountRequest;
 import com.tradex.api.dto.AuthRequest;
 import com.tradex.api.dto.AuthResponse;
@@ -22,7 +23,15 @@ import com.tradex.api.exception.AppException.ResourceNotFoundException;
 import com.tradex.api.repository.PointsTransactionRepository;
 import com.tradex.api.repository.UserRepository;
 import com.tradex.api.security.JwtUtil;
-import java.util.*;
+import com.tradex.api.util.AuthUtils;
+import com.tradex.api.util.DataFormatter;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -31,8 +40,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-
-import java.util.List;
 
 /**
  * Service handling user account lifecycle, authentication, profile updates, and
@@ -60,6 +67,7 @@ public class UserService {
     private final VerificationService verificationService;
     private final JwtUtil jwtUtil;
     private final UserMapper userMapper;
+    private final AppProperties appProperties;
 
     // ── User Retrieval & Profiling ───────────────────────────────────────────
 
@@ -126,29 +134,79 @@ public class UserService {
         return buildAuthResponse(user);
     }
 
-    @Transactional(readOnly = true)
+    private static final String DUMMY_BCRYPT_HASH = "$2a$10$wI8w6fD5EaQGz1L2m4K1vOuX8jA5qV0eY6rW3sT9bU2cM7pI1nK4y";
+
+    @Transactional
     public AuthResponse login(AuthRequest request) {
-        User user = userRepository.findByEmail(request.email())
+        String normalizedEmail = AuthUtils.normalizeEmail(request.email());
+        User user = userRepository.findByEmail(normalizedEmail)
                 .orElseGet(() -> {
-                    log.warn("Failed login attempt: User not found for email {}", request.email());
+                    passwordEncoder.matches(request.password(), DUMMY_BCRYPT_HASH);
+                    log.warn("[AUTH_FAILED] User not found for email {}", AuthUtils.maskEmail(normalizedEmail));
                     throw new BadCredentialsException("Invalid email or password");
                 });
 
-        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            log.warn("Failed login attempt: Incorrect password for email {}", request.email());
-            throw new BadCredentialsException("Invalid email or password");
+        if (user.isLocked()) {
+            if (user.getLockedUntil() != null && LocalDateTime.now().isAfter(user.getLockedUntil())) {
+                user.setLocked(false);
+                user.setLockedUntil(null);
+                user.setFailedLoginAttempts(0);
+                userRepository.save(user);
+                log.info("[AUTH_AUTO_UNLOCK] Lockout expired for {}. Account auto-unlocked.",
+                        AuthUtils.maskEmail(normalizedEmail));
+            } else {
+                if (user.getLockedUntil() != null) {
+                    long minutesRemaining = Math.max(1,
+                            Duration.between(LocalDateTime.now(), user.getLockedUntil()).toMinutes() + 1);
+                    log.warn("[AUTH_BLOCKED] Attempted login on locked account {} (expires in ~{}m)",
+                            AuthUtils.maskEmail(normalizedEmail), minutesRemaining);
+                    throw new ForbiddenException(
+                            "Your account is locked due to multiple failed login attempts. Please try again in "
+                                    + minutesRemaining + " minute(s) or contact support.");
+                } else {
+                    log.warn("[AUTH_BLOCKED] Attempted login on admin-locked account {}",
+                            AuthUtils.maskEmail(normalizedEmail));
+                    throw new ForbiddenException("Your account has been locked. Please contact support.");
+                }
+            }
         }
 
-        if (user.isLocked()) {
-            log.warn("Failed login attempt: Account locked for email {}", user.getEmail());
-            throw new ForbiddenException("Your account has been locked. Please contact support.");
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            int attempts = user.getFailedLoginAttempts() + 1;
+            user.setFailedLoginAttempts(attempts);
+            int maxAttempts = appProperties.getAuth().getMaxFailedLoginAttempts();
+            int lockoutMinutes = appProperties.getAuth().getLockoutDurationMinutes();
+
+            if (attempts >= maxAttempts) {
+                user.setLocked(true);
+                user.setLockedUntil(LocalDateTime.now().plusMinutes(lockoutMinutes));
+                userRepository.save(user);
+                log.warn("[AUTH_LOCKOUT] Account {} locked for {} minutes after {} failed attempts",
+                        AuthUtils.maskEmail(normalizedEmail), lockoutMinutes, attempts);
+                throw new ForbiddenException("Account locked for " + lockoutMinutes + " minutes due to " + attempts
+                        + " consecutive failed login attempts. Please try again later or contact support.");
+            } else {
+                userRepository.save(user);
+                int remaining = maxAttempts - attempts;
+                log.warn("[AUTH_FAILED] Incorrect password for {} (Attempt {} of {})",
+                        AuthUtils.maskEmail(normalizedEmail), attempts, maxAttempts);
+                throw new BadCredentialsException(
+                        "Invalid email or password. " + remaining + " attempt(s) remaining before account lockout.");
+            }
         }
+
+        if (user.getFailedLoginAttempts() > 0 || user.getLockedUntil() != null) {
+            user.setFailedLoginAttempts(0);
+            user.setLockedUntil(null);
+            userRepository.save(user);
+        }
+
         if (!user.isEnabled()) {
-            log.warn("Failed login attempt: Account disabled for email {}", user.getEmail());
+            log.warn("[AUTH_BLOCKED] Account disabled for email {}", AuthUtils.maskEmail(normalizedEmail));
             throw new ForbiddenException("Your account has been disabled. Please contact support.");
         }
         if (user.isCredentialsExpired()) {
-            log.warn("Failed login attempt: Credentials expired for email {}", user.getEmail());
+            log.warn("[AUTH_BLOCKED] Credentials expired for email {}", AuthUtils.maskEmail(normalizedEmail));
             throw new ForbiddenException("Your login credentials have expired. Please reset your password.");
         }
 
@@ -168,7 +226,8 @@ public class UserService {
                 .filter(a -> !a.startsWith("ROLE_"))
                 .map(a -> a.startsWith("PERM_") ? a.substring(5) : a)
                 .toList();
-        log.info("User logged in: {} | Role: {} | Permissions: {}", user.getEmail(), user.getRole(), logPermissions);
+        log.info("[AUTH_SUCCESS] User logged in: {} | Role: {} | Permissions: {}",
+                AuthUtils.maskEmail(normalizedEmail), user.getRole(), logPermissions);
 
         return buildAuthResponse(user);
     }
@@ -346,7 +405,8 @@ public class UserService {
 
         user.getBankDetails().add(bank);
         User saved = userRepository.save(user);
-        log.info("Added bank account ending in {} for user {}", com.tradex.api.util.DataFormatter.maskAccountNumber(request.accountNumber()), email);
+        log.info("Added bank account ending in {} for user {}",
+                DataFormatter.maskAccountNumber(request.accountNumber()), email);
         return userMapper.toDTO(saved);
     }
 

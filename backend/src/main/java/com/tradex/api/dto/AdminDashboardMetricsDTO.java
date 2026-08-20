@@ -12,6 +12,7 @@ public record AdminDashboardMetricsDTO(
     long totalWithdrawalsCount,
     long openTickets,
     long resolvedTickets,
+    Double avgTicketResolutionHours,
     long pendingDepositsCount,
     BigDecimal pendingDepositsAmount,
     long pendingWithdrawalsCount,

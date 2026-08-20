@@ -15,6 +15,8 @@ import org.springframework.http.MediaType;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import com.tradex.api.dto.AdminSystemHealthDTO;
+
 @RestController
 @RequestMapping("/api/admin/dashboard")
 @RequiredArgsConstructor
@@ -25,6 +27,12 @@ public class AdminDashboardController {
     private final AnalyticsExportService analyticsExportService;
 
     @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @GetMapping("/health")
+    public ResponseEntity<AdminSystemHealthDTO> getSystemHealth() {
+        return ResponseEntity.ok(adminDashboardService.getSystemHealth());
+    }
+
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @GetMapping("/metrics")
     public ResponseEntity<AdminDashboardMetricsDTO> getDashboardMetrics(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
@@ -32,9 +40,10 @@ public class AdminDashboardController {
 
         log.info("Super Admin requested dashboard metrics. startDate: {}, endDate: {}", startDate, endDate);
 
-        // Default to Today if no parameters are specified
-        LocalDateTime start = startDate != null ? startDate : LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        LocalDateTime end = endDate != null ? endDate : LocalDateTime.now();
+        // Default to Today if no parameters are specified (normalized to second boundaries for cache hits)
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start = startDate != null ? startDate.withNano(0) : now.withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime end = endDate != null ? endDate.withNano(0) : now.withSecond(0).withNano(0);
 
         AdminDashboardMetricsDTO metrics = adminDashboardService.getDashboardMetrics(start, end);
         return ResponseEntity.ok(metrics);

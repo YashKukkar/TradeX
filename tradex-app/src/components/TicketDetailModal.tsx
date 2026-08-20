@@ -158,7 +158,7 @@ export default function TicketDetailModal({ isOpen, onClose, ticketId, isAdmin }
       setReplyText={setReplyText}
       selectedFiles={selectedFiles}
       setSelectedFiles={setSelectedFiles}
-      errorMsg={addCommentMutation.error ? (isAdmin ? addCommentMutation.error.message : addCommentMutation.error.message.replace(/supabase/gi, "storage server")) : null}
+      errorMsg={addCommentMutation.error ? addCommentMutation.error.message : null}
       attachmentsCount={ticket.attachments?.length || 0}
       isAdmin={isAdmin}
       reopenCount={ticket.reopenCount || 0}
@@ -264,7 +264,7 @@ export default function TicketDetailModal({ isOpen, onClose, ticketId, isAdmin }
         setReplyText={setReplyText}
         selectedFiles={selectedFiles}
         setSelectedFiles={setSelectedFiles}
-        errorMsg={addCommentMutation.error ? (isAdmin ? addCommentMutation.error.message : addCommentMutation.error.message.replace(/supabase/gi, "storage server")) : null}
+        errorMsg={addCommentMutation.error ? addCommentMutation.error.message : null}
         attachmentsCount={ticket.attachments?.length || 0}
         isAdmin={isAdmin}
         reopenCount={ticket.reopenCount || 0}

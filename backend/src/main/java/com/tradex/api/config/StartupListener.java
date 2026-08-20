@@ -6,8 +6,10 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Component
 @RequiredArgsConstructor
@@ -15,8 +17,7 @@ import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
 public class StartupListener {
 
     private final Environment env;
-    private final SupabaseProperties supabaseProperties;
-    private final S3Client s3Client;
+    private final AppProperties appProperties;
 
     @EventListener(ApplicationReadyEvent.class)
     public void onReady() {
@@ -26,17 +27,15 @@ public class StartupListener {
         String datasourceUrl = env.getProperty("spring.datasource.url", "not set");
         String dbType = datasourceUrl != null && datasourceUrl.contains("h2") ? "H2 In-Memory" : "Remote MySQL";
 
-        String supabaseStatus;
+        Path storageRoot = Paths.get(appProperties.getStorage().getLocation()).toAbsolutePath().normalize();
+        String storageStatus;
         try {
-            String bucket = supabaseProperties.getBucket();
-            if (bucket != null && !bucket.isBlank()) {
-                s3Client.headBucket(HeadBucketRequest.builder().bucket(bucket).build());
-                supabaseStatus = "\u001B[32mCONNECTED\u001B[0m (" + bucket + ")";
-            } else {
-                supabaseStatus = "Not Configured";
-            }
+            Files.createDirectories(storageRoot);
+            storageStatus = Files.isWritable(storageRoot)
+                    ? "\u001B[32mREADY\u001B[0m (" + storageRoot + ")"
+                    : "\u001B[31mNOT WRITABLE\u001B[0m (" + storageRoot + ")";
         } catch (Exception e) {
-            supabaseStatus = "\u001B[31mFAILED\u001B[0m (" + supabaseProperties.getBucket() + " | Error: " + e.getMessage() + ")";
+            storageStatus = "\u001B[31mFAILED\u001B[0m (" + storageRoot + " | Error: " + e.getMessage() + ")";
         }
 
         log.info("");
@@ -46,8 +45,9 @@ public class StartupListener {
         log.info("  Profile  : {}", activeProfile);
         log.info("  DDL Auto : {}", ddlAuto);
         log.info("  Database : {}", dbType);
-        log.info("  Supabase : {}", supabaseStatus);
-        log.info("  Port     : http://localhost:8080");
+        log.info("  Storage  : {}", storageStatus);
+        log.info("  Access   : {}", appProperties.getStorage().getAccessEndpoint());
+        log.info("  Port     : http://localhost:{}", env.getProperty("server.port", "8080"));
         log.info("=======================================================");
         log.info("");
     }

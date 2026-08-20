@@ -36,7 +36,7 @@ public class EmployeeService {
     private final TeamRepository teamRepository;
 
     @Transactional
-    @AdminAudited(action = AdminAction.CREATE_EMPLOYEE, details = "'Created employee account for ' + #request.email")
+    @AdminAudited(action = AdminAction.CREATE_EMPLOYEE, details = "'Created staff profile for ' + #request.email + ' (' + (#request.permissions != null ? #request.permissions.size() : 0) + ' direct authorities)'")
     public UserDTO createEmployee(CreateEmployeeRequest request) {
         if (userRepository.findByEmail(request.email().trim().toLowerCase()).isPresent()) {
             log.warn("Failed employee creation: Email {} already exists", request.email());
@@ -76,7 +76,7 @@ public class EmployeeService {
     }
 
     @Transactional
-    @AdminAudited(action = AdminAction.UPDATE_EMPLOYEE_PERMISSIONS, details = "'Updated permissions for employee ID ' + #employeeId + ' to ' + #request.permissions")
+    @AdminAudited(action = AdminAction.UPDATE_EMPLOYEE_PERMISSIONS, details = "'Updated authorities for ' + #target.email + ' → ' + (#request.permissions != null ? #request.permissions : 'None')")
     public UserDTO updatePermissions(Long employeeId, UpdatePermissionsRequest request) {
         User employee = userRepository.findById(employeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found: " + employeeId));
@@ -95,7 +95,7 @@ public class EmployeeService {
     }
 
     @Transactional
-    @AdminAudited(action = AdminAction.DISABLE_EMPLOYEE, details = "'Disabled employee account for ID ' + #employeeId")
+    @AdminAudited(action = AdminAction.DISABLE_EMPLOYEE, details = "'Suspended staff console access for ' + #target.email")
     public void deleteEmployee(Long employeeId) {
         User employee = userRepository.findById(employeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found: " + employeeId));

@@ -1,110 +1,114 @@
 :root {
   /* ════════════════════════════════════════════════════════════════
-     1. MINIMALIST LCH SEMANTIC DESIGN SYSTEM TOKENS
-     Hue Anchors:
-       265 = Slate/Charcoal (neutrals)
-       172 = Teal (primary interactive accent)
-       155 = Emerald (success)
-        75 = Amber (warning)
-        25 = Crimson (danger)
-       280 = Indigo (user ops)
-       225 = Sky Blue (settings ops)
+     1. LAYER 1: LCH PRIMITIVE PALETTE & STATE GRAMMAR
+     Perceptually uniform color primitives with distinct hue steps:
+       265° = Neutral Slate (Backgrounds & Structural Chrome)
+       165° = Groww Mint Teal (Brand & Primary Interactive Triggers)
+       145° = Emerald Green (Successful / Approved / Settled States)
+        75° = Warm Amber (Pending / Processing / Attention Queues)
+        22° = Rose Crimson (Failed / Rejected / Error States)
+       280° = Indigo / Slate (User Ops & Identity Roles)
+       225° = Sky Blue (System Ops & Telemetry Metadata)
      ════════════════════════════════════════════════════════════════ */
-  --color-bg-app: lch(2.5% 6 265);              /* Deep pitch obsidian background */
-  --color-bg-surface: lch(5.5% 10 265);          /* Dark charcoal surface */
-  --color-bg-surface-elevated: lch(8% 12 265);   /* Deep elevated surface */
-  --color-bg-surface-recessed: lch(3.8% 8 265);  /* Obsidian recessed panel */
+  --lch-neutral-950: lch(2.5% 6 265);
+  --lch-neutral-900: lch(3.8% 8 265);
+  --lch-neutral-850: lch(5.5% 10 265);
+  --lch-neutral-800: lch(8% 12 265);
+  --lch-neutral-700: lch(10% 14 265);
+  --lch-neutral-400: lch(48% 18 265);
+  --lch-neutral-200: lch(67% 18 265);
+  --lch-neutral-50: lch(97% 2 265);
 
-  --color-text-primary: lch(97% 2 265);         /* Crisp white text (WCAG AA > 15:1) */
-  --color-text-muted: lch(67% 18 265);          /* Soft slate text (WCAG AA > 5.2:1) */
-  --color-text-placeholder: lch(48% 18 265);    /* Muted placeholder text (WCAG AA > 4.5:1) */
-
-  --color-border-subtle: lch(100% 0 0 / 0.07);
-  --color-border-strong: lch(100% 0 0 / 0.14);
-
-  --color-interactive-primary: lch(68% 42 172); /* Refined teal accent */
-  --color-interactive-hover: lch(55% 42 172);   /* Deep interactive hover */
-
-  --color-status-success: lch(68% 52 155);      /* Emerald success */
-  --color-status-warning: lch(72% 70 75);       /* Warm amber warning */
-  --color-status-danger: lch(58% 72 25);        /* Crimson danger */
+  /* Groww Official Harmonized LCH Palette Primitives (Matched L~64-66%, C~70-72) */
+  --lch-mint-500: lch(74% 54 165);            /* Groww Primary Mint Teal (Brand & Action) */
+  --lch-mint-400: lch(88% 62 165);            /* Groww Bright Logo Mint */
+  --lch-mint-600: lch(64% 54 165);            /* Deep Mint Hover */
+  --lch-emerald-500: lch(64% 72 132);          /* Groww Profit & Success Green (L=64, C=72, H=132) */
+  --lch-amber-500: lch(66% 70 75);            /* Harmonized Warning Amber (L=66, C=70, H=75) */
+  --lch-crimson-500: lch(64% 72 25);           /* Harmonized Danger Crimson (L=64, C=72, H=25) */
+  --lch-indigo-500: lch(50% 82 280);          /* Groww Brand Blue */
+  --lch-sky-500: lch(72% 45 225);             /* System Ops Sky */
+  --lch-slate-700: lch(32% 12 280);           /* Groww Cool Slate */
 
   /* ════════════════════════════════════════════════════════════════
-     2. ALIASED COMPONENT MAPPINGS
+     2. LAYER 2: SEMANTIC ROLES (CONSUMED BY COMPONENTS)
      ════════════════════════════════════════════════════════════════ */
-  --bg: var(--color-bg-app);
-  --bg-2: lch(3.8% 8 265);
-  --surface-recessed: var(--color-bg-surface-recessed);
-  --surface: var(--color-bg-surface);
-  --surface-elevated: var(--color-bg-surface-elevated);
-  --surface-2: var(--color-bg-surface-elevated);
-  --surface-hover: lch(10% 14 265);
+  --bg: var(--lch-neutral-950);
+  --surface-recessed: var(--lch-neutral-900);
+  --surface: var(--lch-neutral-850);
+  --surface-elevated: var(--lch-neutral-800);
+  --surface-2: var(--surface-elevated);
+  --surface-hover: var(--lch-neutral-700);
 
-  --text: var(--color-text-primary);
-  --muted: var(--color-text-muted);
-  --clr-muted-a45: var(--color-text-placeholder);
-  --primary: var(--color-interactive-primary);
-  --primary-2: var(--color-interactive-hover);
-  --accent: var(--color-status-warning);
-  --danger: var(--color-status-danger);
-  --border: var(--color-border-subtle);
-  --border-strong: var(--color-border-strong);
+  --text: var(--lch-neutral-50);
+  --muted: var(--lch-neutral-200);
+  --clr-muted-a45: var(--lch-neutral-400);
 
-  --success: var(--color-status-success);
-  --success-bg: lch(68% 52 155 / 0.08);
-  --success-border: lch(68% 52 155 / 0.18);
+  /* Interactive Brand Roles (Mint Teal) */
+  --primary: var(--lch-mint-500);
+  --primary-2: var(--lch-mint-600);
+  --primary-bg: lch(74% 54 165 / 0.10);
+  --primary-border: lch(74% 54 165 / 0.22);
+  --on-primary: lch(12% 16 165);
 
-  --warning: var(--color-status-warning);
-  --warning-bg: lch(72% 70 75 / 0.08);
-  --warning-border: lch(72% 70 75 / 0.18);
+  /* Secondary Highlight Role (Amber Gold) */
+  --accent: var(--lch-amber-500);
 
-  --danger-bg: lch(58% 72 25 / 0.08);
-  --danger-border: lch(58% 72 25 / 0.18);
+  /* Completed / Positive Status — Deep Emerald */
+  --success: var(--lch-emerald-500);
+  --warning: var(--lch-amber-500);
+  --danger: var(--lch-crimson-500);
 
-  /* LCH Palette tokens for permission badges & telemetry tags */
-  --clr-indigo: lch(62% 55 280);
+  --border: lch(100% 0 0 / 0.07);
+  --border-strong: lch(32% 12 280 / 0.4);
+
+  /* Translucent Status Surface Variants (10% Surface Opacity & 22% Border) */
+  --success-bg: lch(64% 72 132 / 0.10);
+  --success-border: lch(64% 72 132 / 0.22);
+  --warning-bg: lch(66% 70 75 / 0.10);
+  --warning-border: lch(66% 70 75 / 0.22);
+  --danger-bg: lch(64% 72 25 / 0.10);
+  --danger-border: lch(64% 72 25 / 0.22);
+
+  /* Category Ops Badges */
+  --clr-indigo: var(--lch-indigo-500);
   --clr-indigo-a10: lch(62% 55 280 / 0.12);
-  --clr-indigo-a20: lch(62% 55 280 / 0.25);
-
-  --clr-sky: lch(72% 45 225);
+  --clr-sky: var(--lch-sky-500);
   --clr-sky-a10: lch(72% 45 225 / 0.12);
-  --clr-sky-a20: lch(72% 45 225 / 0.25);
-
-  --clr-amber: lch(72% 70 75);
+  --clr-amber: var(--lch-amber-500);
   --clr-amber-a10: lch(72% 70 75 / 0.12);
-  --clr-amber-a20: lch(72% 70 75 / 0.25);
 
-  --clr-green: lch(68% 52 155);
-  --clr-green-a10: lch(68% 52 155 / 0.12);
-  --clr-green-a20: lch(68% 52 155 / 0.25);
-
-  --clr-red-alt: lch(58% 72 25);
-  --clr-red-alt-a10: lch(58% 72 25 / 0.12);
-  --clr-red-a20: lch(58% 72 25 / 0.25);
-
+  /* ════════════════════════════════════════════════════════════════
+     3. SYSTEMIC BUTTON & CONTRAST PRIMITIVES
+     ════════════════════════════════════════════════════════════════ */
   --radius: 12px;
   --radius-lg: 16px;
 
   /* ── LCH Shadow System ── */
   --shadow-elevated:
     inset 0 1px 0 0 lch(100% 0 0 / 0.08),
-    0 2px 4px lch(0% 0 0 / 0.25),
-    0 8px 24px -4px lch(0% 0 0 / 0.35);
-
-  --shadow-elevated-hover:
-    inset 0 1px 0 0 lch(100% 0 0 / 0.15),
-    0 4px 8px lch(0% 0 0 / 0.3),
-    0 14px 36px -4px lch(0% 0 0 / 0.45);
-
+    0 12px 32px -4px lch(0% 0 0 / 0.5);
+  --shadow:
+    inset 0 1px 0 0 lch(100% 0 0 / 0.06),
+    0 4px 16px -2px lch(0% 0 0 / 0.35);
+  --shadow-sm:
+    0 2px 6px -1px lch(0% 0 0 / 0.25);
   --shadow-recessed:
     inset 0 2px 4px 0 lch(0% 0 0 / 0.45),
     inset 0 -1px 0 0 lch(100% 0 0 / 0.06);
 
-  --shadow-recessed-focus:
-    inset 0 2px 4px 0 lch(0% 0 0 / 0.5),
-    0 0 0 2px lch(68% 42 172 / 0.25);
 
-  --shadow: var(--shadow-elevated);
+  /* ════════════════════════════════════════════════════════════════
+     3. REUSABLE GRADIENT & GLOW SYSTEM TOKENS
+     ════════════════════════════════════════════════════════════════ */
+  --grad-primary: linear-gradient(135deg, var(--primary), var(--primary-2));
+  --grad-surface: linear-gradient(160deg, var(--surface), var(--surface-elevated));
+  --grad-indigo: linear-gradient(135deg, var(--primary), var(--clr-indigo));
+  --grad-glass: linear-gradient(165deg, lch(12% 16 265 / 0.88), lch(6% 10 265 / 0.94));
+
+  --glow-primary: none;
+  --glow-indigo: none;
+  --glow: none;
 
   --surface-grad: linear-gradient(175deg, lch(9% 14 265), lch(7% 12 265));
   --surface-2-grad: linear-gradient(175deg, lch(12% 16 265), lch(9% 14 265));
@@ -138,9 +142,12 @@
     --color-bg-surface-elevated: lch(96% 2 265);
     --color-bg-surface-recessed: lch(92% 3 265);
 
-    --color-text-primary: lch(12% 16 265);       /* WCAG AA contrast > 15:1 */
-    --color-text-muted: lch(38% 18 265);         /* WCAG AA contrast > 7:1 */
-    --color-text-placeholder: lch(48% 18 265);   /* WCAG AA contrast > 4.5:1 */
+    --color-text-primary: lch(12% 16 265);
+    /* WCAG AA contrast > 15:1 */
+    --color-text-muted: lch(38% 18 265);
+    /* WCAG AA contrast > 7:1 */
+    --color-text-placeholder: lch(48% 18 265);
+    /* WCAG AA contrast > 4.5:1 */
 
     --color-border-subtle: lch(0% 0 0 / 0.08);
     --color-border-strong: lch(0% 0 0 / 0.16);
@@ -410,12 +417,73 @@ textarea:focus {
     opacity: 0.4;
     transform: scale(1);
   }
+
   20% {
     opacity: 1;
     transform: scale(1.3);
   }
+
   100% {
     opacity: 0.4;
     transform: scale(1);
   }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   GLOBAL BUTTON & BADGE UTILITIES
+   Ingrained systemic consistency (No gray buttons or low contrast)
+   ════════════════════════════════════════════════════════════════ */
+
+/* Primary Action Buttons (Groww Mint Teal + AAA Dark Text) */
+.btn-primary,
+.btnPrimary {
+  background: var(--primary) !important;
+  color: var(--on-primary) !important;
+  font-weight: 750 !important;
+  border: none !important;
+}
+
+.btn-primary:hover:not(:disabled),
+.btnPrimary:hover:not(:disabled) {
+  background: var(--primary-2) !important;
+  color: var(--on-primary) !important;
+}
+
+/* Secondary & Cancel Buttons (Surface Elevated + Mint Border Sheen) */
+.btn-secondary,
+.btnSecondary,
+.secondaryBtn,
+.cancelBtn {
+  background: var(--surface-elevated) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  font-weight: 700 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-secondary:hover:not(:disabled),
+.btnSecondary:hover:not(:disabled),
+.secondaryBtn:hover:not(:disabled),
+.cancelBtn:hover:not(:disabled) {
+  background: var(--surface-hover) !important;
+  border-color: var(--primary-border) !important;
+  color: var(--text) !important;
+}
+
+/* Action Link / Outline Buttons (Translucent Mint Tint) */
+.linkBtn,
+.btn-link {
+  background: var(--primary-bg) !important;
+  border: 1px solid var(--primary-border) !important;
+  color: var(--primary) !important;
+  font-weight: 750 !important;
+  border-radius: 8px !important;
+  padding: 6px 14px !important;
+  transition: all 0.2s ease !important;
+}
+
+.linkBtn:hover,
+.btn-link:hover {
+  background: lch(74% 54 165 / 0.2) !important;
+  border-color: var(--primary) !important;
 }

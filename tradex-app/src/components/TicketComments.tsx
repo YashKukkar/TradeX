@@ -86,7 +86,7 @@ export default function TicketComments({
       for (let i = 0; i < email.length; i++) {
         hash = email.charCodeAt(i) + ((hash << 5) - hash);
       }
-      const colors = ["#00e0a4", "#ffb200", "#ff5a6a", "#0096ff", "#b55fe6", "#ff7b00"];
+      const colors = ["var(--primary)", "var(--success)", "var(--warning)", "var(--danger)"];
       return colors[Math.abs(hash) % colors.length];
     };
 
@@ -96,16 +96,15 @@ export default function TicketComments({
       const yesterday = new Date();
       yesterday.setDate(today.getDate() - 1);
 
-      const timeString = date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+      const timeString = date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
 
       if (date.toDateString() === today.toDateString()) {
         return timeString;
       } else if (date.toDateString() === yesterday.toDateString()) {
         return `Yesterday • ${timeString}`;
       } else {
-        const month = date.toLocaleString("en-US", { month: "short" });
-        const day = date.getDate();
-        return `${month} ${day} • ${timeString}`;
+        const formattedDate = date.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+        return `${formattedDate} • ${timeString}`;
       }
     };
 
@@ -144,7 +143,7 @@ export default function TicketComments({
                       {getInitials(comment.authorEmail)}
                     </div>
                   ) : (
-                    <div style={{ width: "36px", flexShrink: 0 }} />
+                    <div style={{ width: "30px", flexShrink: 0 }} />
                   )}
 
                   <div className={styles.postContent}>
@@ -173,7 +172,7 @@ export default function TicketComments({
                       {groupWithPrevious && (
                         <span className={styles.hoverTime}>
                           {new Date(typeof comment.createdAt === "number" ? comment.createdAt * 1000 : comment.createdAt)
-                            .toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}
+                            .toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true })}
                         </span>
                       )}
                     </div>
@@ -291,7 +290,7 @@ export default function TicketComments({
                           top: "-4px",
                           right: "-4px",
                           background: "var(--danger)",
-                          color: "#fff",
+                          color: "var(--text)",
                           border: "none",
                           borderRadius: "50%",
                           width: "14px",
@@ -362,7 +361,7 @@ export default function TicketComments({
                   );
                 })()}
                 {!isAdmin && selectedFiles.length > 0 && (
-                  <span style={{ fontSize: "11px", color: "#00e0a4", fontWeight: "600" }}>
+                  <span style={{ fontSize: "11px", color: "var(--success)", fontWeight: "600" }}>
                     {selectedFiles.length} file(s)
                   </span>
                 )}

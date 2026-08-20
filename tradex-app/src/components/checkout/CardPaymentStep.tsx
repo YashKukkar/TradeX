@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styles from "../PaymentGatewayModal.module.css";
+import styles from "../WalletModal.module.css";
 
 interface CardPaymentStepProps {
   onSubmit: (cardData: { number: string; expiry: string; cvv: string; name: string }) => void;

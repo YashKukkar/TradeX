@@ -13,5 +13,6 @@ public class TicketAttachmentDTO {
     private String fileName;
     private String contentType;
     private Long fileSize;
+    private String url;
     private LocalDateTime createdAt;
 }

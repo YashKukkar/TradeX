@@ -43,5 +43,11 @@ public class AppException extends RuntimeException {
             super(HttpStatus.UNAUTHORIZED, message);
         }
     }
+
+    public static class TooManyRequestsException extends AppException {
+        public TooManyRequestsException(String message) {
+            super(HttpStatus.TOO_MANY_REQUESTS, message);
+        }
+    }
 }
 

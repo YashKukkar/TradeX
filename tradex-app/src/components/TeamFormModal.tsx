@@ -49,7 +49,7 @@ export default function TeamFormModal({
             onChange={(e) => setTeamName(e.target.value)}
             placeholder="e.g. Support Operations"
             className={styles.input}
-            style={editingTeam ? { backgroundColor: "#f3f4f6", cursor: "not-allowed" } : undefined}
+            style={editingTeam ? { backgroundColor: "var(--surface-recessed)", cursor: "not-allowed" } : undefined}
           />
         </div>
 

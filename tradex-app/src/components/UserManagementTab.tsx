@@ -44,7 +44,7 @@ export default function UserManagementTab({ user, users, adminLoading }: UserMan
             className={`${styles.adminTab} ${subTab === "employees" ? styles.adminTabActive : ""}`}
           >
             <Icon name="badge" className={styles.adminTabIcon} />
-            Console Employees
+            Staff & Teams
           </button>
         </div>
       )}

@@ -73,6 +73,8 @@ public class AdminAuditAspect {
             for (int i = 0; i < parameterNames.length; i++) {
                 context.setVariable(parameterNames[i], args[i]);
             }
+            context.setVariable("target", target);
+            context.setVariable("actor", actor);
             context.setVariable("result", result);
             try {
                 details = parser.parseExpression(details).getValue(context, String.class);

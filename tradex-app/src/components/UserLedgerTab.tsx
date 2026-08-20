@@ -27,14 +27,11 @@ interface WalletTx {
   createdAt: number;
 }
 
+import ActionBadge from "./ActionBadge";
+import ActionButton from "./ActionButton";
+
 function TxStatusBadge({ status }: { status: string }) {
-  if (status === "SUCCESS") {
-    return <span className={`${styles.statusPill} ${styles.pillActive}`} style={{ padding: "2px 8px", fontSize: "10px" }}>Success</span>;
-  }
-  if (status === "PENDING") {
-    return <span className={`${styles.statusPill} ${styles.pillLocked}`} style={{ padding: "2px 8px", fontSize: "10px" }}>Pending</span>;
-  }
-  return <span className={`${styles.statusPill} ${styles.pillDisabled}`} style={{ padding: "2px 8px", fontSize: "10px" }}>Failed</span>;
+  return <ActionBadge action={status} style={{ padding: "2px 8px", fontSize: "10px" }} />;
 }
 
 export default function UserLedgerTab({ userId, type }: UserLedgerTabProps) {
@@ -80,7 +77,7 @@ export default function UserLedgerTab({ userId, type }: UserLedgerTabProps) {
               >
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
                   <span style={{ fontWeight: 700, color: "var(--text)" }}>{tx.type.replace(/_/g, " ")}</span>
-                  <span style={{ fontWeight: 800, color: tx.amount >= 0 ? "#00e0a4" : "#ff5a6a" }}>
+                  <span style={{ fontWeight: 800, color: tx.amount >= 0 ? "var(--success)" : "var(--danger)" }}>
                     {tx.amount >= 0 ? "+" : ""}₹{tx.amount.toLocaleString("en-IN")}
                   </span>
                 </div>
@@ -103,7 +100,32 @@ export default function UserLedgerTab({ userId, type }: UserLedgerTabProps) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-      <p className={styles.drawerSectionTitle}>Points History</p>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <p className={styles.drawerSectionTitle} style={{ margin: 0 }}>Points History</p>
+        <ActionButton
+          iconName="download"
+          onClick={async () => {
+            try {
+              const { exportCsvReport } = await import("../utils/api");
+              await exportCsvReport("admin/transactions/export/conversions", "PointsConversions");
+            } catch (err) {
+              console.error("Failed to export conversions CSV", err);
+            }
+          }}
+          style={{
+            background: "var(--primary-bg)",
+            border: "1px solid var(--primary-border)",
+            color: "var(--primary)",
+            padding: "4px 10px",
+            borderRadius: "6px",
+            fontSize: "12px",
+            fontWeight: 700,
+          }}
+          title="Export points conversions to CSV"
+        >
+          Export Conversions CSV
+        </ActionButton>
+      </div>
       {pointsLoading ? (
         <LoadingState message="Querying points..." padding="40px 0" />
       ) : !pointsHistory || pointsHistory.length === 0 ? (
@@ -123,7 +145,7 @@ export default function UserLedgerTab({ userId, type }: UserLedgerTabProps) {
             >
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
                 <span style={{ fontWeight: 700, color: "var(--text)" }}>{tx.type.replace(/_/g, " ")}</span>
-                <span style={{ fontWeight: 800, color: tx.amount >= 0 ? "var(--accent)" : "#ff5a6a" }}>
+                <span style={{ fontWeight: 800, color: tx.amount >= 0 ? "var(--success)" : "var(--danger)" }}>
                   {tx.amount >= 0 ? "+" : ""}{tx.amount.toLocaleString()} pts
                 </span>
               </div>

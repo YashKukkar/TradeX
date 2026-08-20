@@ -62,7 +62,7 @@ public class AdminUserService {
     // ── Lock / Unlock ────────────────────────────────────────────────────────
 
     @Transactional
-    @AdminAudited(action = AdminAction.LOCK, details = "'Account locked by admin'")
+    @AdminAudited(action = AdminAction.LOCK, details = "'Locked account ' + #target.email")
     public UserDTO lockUser(String adminEmail, Long userId) {
         User target = loadTargetForUpdate(userId);
         selfActionGuard(adminEmail, target, "lock");
@@ -78,7 +78,7 @@ public class AdminUserService {
     }
 
     @Transactional
-    @AdminAudited(action = AdminAction.UNLOCK, details = "'Account unlocked by admin'")
+    @AdminAudited(action = AdminAction.UNLOCK, details = "'Unlocked account ' + #target.email")
     public UserDTO unlockUser(String adminEmail, Long userId) {
         User target = loadTargetForUpdate(userId);
 
@@ -89,13 +89,15 @@ public class AdminUserService {
         }
 
         target.setLocked(false);
+        target.setLockedUntil(null);
+        target.setFailedLoginAttempts(0);
         return userMapper.toDTO(target);
     }
 
     // ── Enable / Disable ─────────────────────────────────────────────────────
 
     @Transactional
-    @AdminAudited(action = AdminAction.DISABLE, details = "'Account disabled by admin'")
+    @AdminAudited(action = AdminAction.DISABLE, details = "'Deactivated account ' + #target.email")
     public UserDTO disableUser(String adminEmail, Long userId) {
         User target = loadTargetForUpdate(userId);
         selfActionGuard(adminEmail, target, "disable");
@@ -111,7 +113,7 @@ public class AdminUserService {
     }
 
     @Transactional
-    @AdminAudited(action = AdminAction.ENABLE, details = "'Account enabled by admin'")
+    @AdminAudited(action = AdminAction.ENABLE, details = "'Reactivated account ' + #target.email")
     public UserDTO enableUser(String adminEmail, Long userId) {
         User target = loadTargetForUpdate(userId);
 
@@ -128,7 +130,7 @@ public class AdminUserService {
     // ── Force Email Verification ──────────────────────────────────────────────
 
     @Transactional
-    @AdminAudited(action = AdminAction.FORCE_EMAIL_VERIFY, details = "'Email manually verified by admin'")
+    @AdminAudited(action = AdminAction.FORCE_EMAIL_VERIFY, details = "'Verified email for ' + #target.email")
     public UserDTO forceVerifyEmail(String adminEmail, Long userId) {
         User target = loadTargetForUpdate(userId);
 
@@ -145,7 +147,7 @@ public class AdminUserService {
     // ── Password Reset Email ──────────────────────────────────────────────────
 
     @Transactional
-    @AdminAudited(action = AdminAction.PASSWORD_RESET_EMAIL_SENT, details = "'Password reset email triggered by admin'")
+    @AdminAudited(action = AdminAction.PASSWORD_RESET_EMAIL_SENT, details = "'Dispatched password reset token to ' + #target.email")
     public void sendPasswordResetEmail(String adminEmail, Long userId) {
         Instant now = Instant.now();
         Instant lastReset = passwordResetCooldowns.getIfPresent(userId);
@@ -168,7 +170,7 @@ public class AdminUserService {
     // ── Adjust Points ─────────────────────────────────────────────────────────
 
     @Transactional
-    @AdminAudited(action = AdminAction.POINTS_ADJUSTMENT, details = "'Points adjusted by ' + #request.delta + ' (new balance: ' + #result.pointsBalance + '). Reason: ' + #request.reason")
+    @AdminAudited(action = AdminAction.POINTS_ADJUSTMENT, details = "(#request.delta >= 0 ? '+' : '') + #request.delta + ' pts (' + #target.email + ') • ' + #request.reason")
     public UserDTO adjustPoints(String adminEmail, Long userId, AdminAdjustPointsRequest request) {
         User target = loadTargetForUpdate(userId);
 
@@ -199,7 +201,7 @@ public class AdminUserService {
     }
 
     @Transactional
-    @AdminAudited(action = AdminAction.WALLET_ADJUSTMENT, details = "'Wallet adjusted: type=' + #request.walletType + ', delta=' + #request.delta + '. Reason: ' + #request.reason")
+    @AdminAudited(action = AdminAction.WALLET_ADJUSTMENT, details = "(#request.delta >= 0 ? '+₹' : '-₹') + #request.delta.abs() + ' ' + #request.walletType.toLowerCase() + ' (' + #target.email + ') • ' + #request.reason")
     public UserDTO adjustWallet(String adminEmail, Long userId, AdminAdjustWalletRequest request) {
         User target = loadTargetForUpdate(userId);
 

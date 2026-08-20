@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import styles from "../PaymentGatewayModal.module.css";
+import styles from "../WalletModal.module.css";
 
 interface UPIPaymentStepProps {
   amount: number;

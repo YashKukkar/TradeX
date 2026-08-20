@@ -123,7 +123,7 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
       },
       onError: (err: any) => {
         const rawMsg = err.message || "Failed to create support ticket.";
-        setErrorMsg(rawMsg.replace(/supabase/gi, "storage server"));
+        setErrorMsg(rawMsg);
       }
     });
   };

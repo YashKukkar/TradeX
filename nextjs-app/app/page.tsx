@@ -6,12 +6,13 @@ export default function Home() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      window.location.href = "http://localhost:5173/dashboard";
+      window.location.href = "https://control.tradenows.com/dashboard";
     }
   }, []);
 
   return (
-    <main dangerouslySetInnerHTML={{ __html: `
+    <main dangerouslySetInnerHTML={{
+      __html: `
 <header class="site-header">
   <div class="container nav">
     <a href="/" class="brand">
@@ -26,7 +27,7 @@ export default function Home() {
       <li><a href="/pages/contact.html">Contact</a></li>
     </ul>
     <div class="nav-cta">
-      <a href="http://localhost:5173/login" class="btn btn-ghost">Login</a>
+      <a href="https://control.tradenows.com/login" class="btn btn-ghost">Login</a>
       <a href="/signup" class="btn btn-primary">Open Account</a>
       <button class="mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button>
     </div>

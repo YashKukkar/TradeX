@@ -46,7 +46,7 @@ public class WithdrawalTransactionHandler implements TransactionHandler {
                 actor,
                 target,
                 AdminAction.APPROVE_WITHDRAWAL,
-                "Withdrawal approved: amount=" + tx.getAmount().stripTrailingZeros().toPlainString() + " | Notes: " + tx.getNotes()
+                "₹" + tx.getAmount().stripTrailingZeros().toPlainString() + " withdrawal approved for " + target.getEmail()
         );
         adminAuditLogRepository.save(auditLog);
     }
@@ -71,7 +71,8 @@ public class WithdrawalTransactionHandler implements TransactionHandler {
                 actor,
                 target,
                 AdminAction.REJECT_WITHDRAWAL,
-                "Withdrawal rejected: amount=" + tx.getAmount().stripTrailingZeros().toPlainString() + " | Reason: " + reason
+                "₹" + tx.getAmount().stripTrailingZeros().toPlainString() + " withdrawal rejected for " + target.getEmail()
+                        + (reason != null && !reason.isBlank() ? " • " + reason : "")
         );
         adminAuditLogRepository.save(auditLog);
     }

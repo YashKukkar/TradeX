@@ -45,6 +45,20 @@ public class CacheConfig {
                         .maximumSize(500)
                         .build());
 
+        // (30 Seconds TTL) Aggregated Dashboard Metrics
+        cacheManager.registerCustomCache("dashboardMetrics",
+                Caffeine.newBuilder()
+                        .expireAfterWrite(30, TimeUnit.SECONDS)
+                        .maximumSize(500)
+                        .build());
+
+        // (30 Seconds TTL) System Health Ping
+        cacheManager.registerCustomCache("systemHealth",
+                Caffeine.newBuilder()
+                        .expireAfterWrite(30, TimeUnit.SECONDS)
+                        .maximumSize(50)
+                        .build());
+
         return cacheManager;
     }
 }

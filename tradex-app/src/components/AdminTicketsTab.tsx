@@ -10,6 +10,7 @@ import { ROUTE_QUEUE_LABELS } from "../utils/permissions";
 import PermissionsTooltip from "./PermissionsTooltip";
 import LoadingState from "./LoadingState";
 import DataTable, { type ColumnDef } from "./DataTable";
+import { getTicketSlaInfo } from "../utils/slaHelpers";
 
 interface AdminTicketsTabProps {
   user: UserProfile;
@@ -30,7 +31,7 @@ const TICKET_COLUMNS: ColumnDef<Ticket>[] = [
   {
     label: "Ticket #",
     render: (t) => <span className={styles.idBadge}>{t.ticketNumber}</span>,
-    width: "110px",
+    width: "100px",
   },
   {
     label: "User Email",
@@ -46,7 +47,7 @@ const TICKET_COLUMNS: ColumnDef<Ticket>[] = [
         {getCategoryLabel(t.category)}
       </span>
     ),
-    width: "100px",
+    width: "95px",
   },
   {
     label: "Subject",
@@ -59,14 +60,41 @@ const TICKET_COLUMNS: ColumnDef<Ticket>[] = [
         {t.status.replace("_", " ")}
       </span>
     ),
-    width: "100px",
+    width: "95px",
+  },
+  {
+    label: "SLA / Age",
+    width: "140px",
+    render: (t) => {
+      const sla = getTicketSlaInfo(t.createdAt, t.status, t.resolvedAt);
+      return (
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "5px",
+            fontSize: "11px",
+            fontWeight: 700,
+            padding: "3px 8px",
+            borderRadius: "6px",
+            color: sla.color,
+            background: sla.bg,
+            border: `1px solid ${sla.border}`,
+            whiteSpace: "nowrap",
+          }}
+        >
+          <Icon name={sla.icon} style={{ fontSize: "13px" }} />
+          {sla.label}
+        </span>
+      );
+    },
   },
   {
     label: "Assigned To",
     render: (t) => (
       <div style={{ display: "flex", flexDirection: "column", gap: "4px", alignItems: "flex-start" }}>
         {t.assignedToPermission && (
-          <span style={{ fontSize: "11px", fontWeight: 600, background: "rgba(181, 95, 230, 0.15)", color: "#b55fe6", padding: "4px 8px", borderRadius: "6px" }}>
+          <span style={{ fontSize: "11px", fontWeight: 600, background: "var(--primary-bg)", color: "var(--primary)", border: "1px solid var(--primary-border)", padding: "3px 8px", borderRadius: "6px" }}>
             {ROUTE_QUEUE_LABELS[t.assignedToPermission] || t.assignedToPermission}
           </span>
         )}
@@ -91,12 +119,12 @@ const TICKET_COLUMNS: ColumnDef<Ticket>[] = [
         {formatDateTime(t.createdAt)}
       </span>
     ),
-    width: "130px",
+    width: "125px",
   },
   {
     label: "Open",
     align: "center",
-    width: "60px",
+    width: "50px",
     noHeader: true,
     render: () => (
       <Icon name="open_in_new" style={{ fontSize: "16px", color: "var(--primary)" }} />
@@ -111,9 +139,22 @@ export default function AdminTicketsTab({ user }: AdminTicketsTabProps) {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [categoryFilter, setCategoryFilter] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
+  const [overdueOnly, setOverdueOnly] = useState(false);
+
+  const overdueCount = useMemo(() => {
+    return tickets.filter((t) => {
+      const isPending = t.status === "OPEN" || t.status === "IN_PROGRESS";
+      if (!isPending) return false;
+      return getTicketSlaInfo(t.createdAt, t.status, t.resolvedAt).isOverdue;
+    }).length;
+  }, [tickets]);
 
   const sortedTickets = useMemo(() => {
     const filtered = tickets.filter((t) => {
+      const sla = getTicketSlaInfo(t.createdAt, t.status, t.resolvedAt);
+      if (overdueOnly && (!sla.isOverdue || (t.status !== "OPEN" && t.status !== "IN_PROGRESS"))) {
+        return false;
+      }
       const matchStatus = statusFilter === "ALL" || t.status === statusFilter;
       const matchCategory = categoryFilter === "ALL" || t.category === categoryFilter;
       const matchSearch =
@@ -125,6 +166,8 @@ export default function AdminTicketsTab({ user }: AdminTicketsTabProps) {
     });
 
     const getTicketPriority = (t: Ticket) => {
+      const sla = getTicketSlaInfo(t.createdAt, t.status, t.resolvedAt);
+      if (sla.isOverdue && (t.status === "OPEN" || t.status === "IN_PROGRESS")) return 0;
       if (t.assignedToUserEmail === user?.email) return 1;
       if (t.assignedToPermission && user?.permissions?.includes(t.assignedToPermission)) return 2;
       return 3;
@@ -136,7 +179,7 @@ export default function AdminTicketsTab({ user }: AdminTicketsTabProps) {
       if (priorityA !== priorityB) return priorityA - priorityB;
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
-  }, [tickets, searchQuery, statusFilter, categoryFilter, user]);
+  }, [tickets, searchQuery, statusFilter, categoryFilter, overdueOnly, user]);
 
   return (
     <div className={styles.tableSection}>
@@ -145,6 +188,46 @@ export default function AdminTicketsTab({ user }: AdminTicketsTabProps) {
         <h2 className={styles.tableTitle} style={{ marginRight: "auto" }}>Support Ticket Management</h2>
 
         <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+          {/* Overdue Quick Filter Chip */}
+          <button
+            type="button"
+            onClick={() => setOverdueOnly((prev) => !prev)}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "7px 12px",
+              borderRadius: "8px",
+              fontSize: "12px",
+              fontWeight: 700,
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              background: overdueOnly ? "var(--danger)" : overdueCount > 0 ? "var(--danger-bg)" : "var(--surface-2)",
+              color: overdueOnly ? "var(--clr-white-a95)" : overdueCount > 0 ? "var(--danger)" : "var(--muted)",
+              border: `1px solid ${overdueOnly ? "var(--danger)" : overdueCount > 0 ? "var(--danger-border)" : "var(--border)"}`,
+              alignSelf: "flex-end",
+              height: "35px",
+            }}
+          >
+            <Icon name="warning" style={{ fontSize: "15px", color: overdueOnly ? "var(--clr-white-a95)" : overdueCount > 0 ? "var(--danger)" : "var(--muted)" }} />
+            <span>Overdue Only</span>
+            <span
+              style={{
+                background: overdueOnly ? "var(--clr-white-a25)" : overdueCount > 0 ? "var(--danger)" : "var(--surface-3)",
+                color: overdueOnly || overdueCount > 0 ? "var(--clr-white-a95)" : "var(--muted)",
+                padding: "1px 6px",
+                borderRadius: "10px",
+                fontSize: "10px",
+                fontWeight: 800,
+                minWidth: "16px",
+                textAlign: "center",
+                display: "inline-block",
+              }}
+            >
+              {overdueCount ?? 0}
+            </span>
+          </button>
+
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             <span style={{ fontSize: "11px", color: "var(--muted)", textTransform: "uppercase" }}>Search</span>
             <div style={{ position: "relative", display: "flex", alignItems: "center" }}>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useToast } from "../context/ToastContext";
 import {
   useEmployees,
@@ -16,48 +16,72 @@ export function useEmployeeData() {
   const { data: teams = [] } = useTeams();
   const { showToast } = useToast();
 
-  const [selectedEmployee, setSelectedEmployee] = useState<UserInfo | null>(null);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null);
 
-  const liveEmployee = selectedEmployee
-    ? employees.find((e) => e.id === selectedEmployee.id) || selectedEmployee
-    : null;
+  const selectedEmployee = useMemo(() => {
+    if (!selectedEmployeeId) return null;
+    return employees.find((e) => e.id === selectedEmployeeId) || null;
+  }, [employees, selectedEmployeeId]);
+
+  const liveEmployee = selectedEmployee;
+
+  const setSelectedEmployee = (emp: UserInfo | null) => {
+    setSelectedEmployeeId(emp ? emp.id : null);
+  };
+
+  const [pendingPermissionKey, setPendingPermissionKey] = useState<string | null>(null);
+  const [pendingTeamName, setPendingTeamName] = useState<string | null>(null);
 
   const updatePermissionsMutation = useUpdateEmployeePermissions({
-    onSuccess: () => showToast("Employee permissions updated!", "success"),
-    onError: (err) => showToast(err.message || "Failed to update permissions.", "error"),
+    onSuccess: () => {
+      showToast("Employee permissions updated!", "success");
+      setPendingPermissionKey(null);
+    },
+    onError: (err) => {
+      showToast(err.message || "Failed to update permissions.", "error");
+      setPendingPermissionKey(null);
+    },
   });
 
   const deleteEmployeeMutation = useDeleteEmployee({
     onSuccess: () => {
       showToast("Employee deactivated!", "success");
-      setSelectedEmployee(null);
+      setSelectedEmployeeId(null);
     },
     onError: (err) => showToast(err.message || "Failed to deactivate employee.", "error"),
   });
 
   const updateEmployeeTeamsMutation = useUpdateEmployeeTeams({
-    onSuccess: () => showToast("Employee team assignment updated!", "success"),
-    onError: (err) => showToast(err.message || "Failed to update employee teams.", "error"),
+    onSuccess: () => {
+      showToast("Employee team assignment updated!", "success");
+      setPendingTeamName(null);
+    },
+    onError: (err) => {
+      showToast(err.message || "Failed to update employee teams.", "error");
+      setPendingTeamName(null);
+    },
   });
 
   const toggleEmployeeTeam = (emp: UserInfo, tName: string) => {
-    const currentTeams = emp.teams || [];
+    setPendingTeamName(tName);
+    const latestEmp = employees.find((e) => e.id === emp.id) || emp;
+    const currentTeams = latestEmp.teams || [];
     const nextTeams = currentTeams.includes(tName)
       ? currentTeams.filter((t) => t !== tName)
       : [...currentTeams, tName];
     
-    updateEmployeeTeamsMutation.mutate({ employeeId: emp.id, teams: nextTeams });
-    setSelectedEmployee({ ...emp, teams: nextTeams });
+    updateEmployeeTeamsMutation.mutate({ employeeId: latestEmp.id, teams: nextTeams });
   };
 
   const toggleEmployeePermission = (emp: UserInfo, perm: string) => {
-    const currentPerms = emp.permissions || [];
+    setPendingPermissionKey(perm);
+    const latestEmp = employees.find((e) => e.id === emp.id) || emp;
+    const currentPerms = latestEmp.permissions || [];
     const nextPerms = currentPerms.includes(perm)
       ? currentPerms.filter((p) => p !== perm)
       : [...currentPerms, perm];
 
-    updatePermissionsMutation.mutate({ employeeId: emp.id, permissions: nextPerms });
-    setSelectedEmployee({ ...emp, permissions: nextPerms });
+    updatePermissionsMutation.mutate({ employeeId: latestEmp.id, permissions: nextPerms });
   };
 
   const getPermissionLabel = (permKey: string) => {
@@ -78,5 +102,8 @@ export function useEmployeeData() {
     toggleEmployeeTeam,
     toggleEmployeePermission,
     getPermissionLabel,
+    pendingPermissionKey,
+    pendingTeamName,
+    isDeactivating: deleteEmployeeMutation.isPending,
   };
 }

@@ -1,8 +1,10 @@
 import { useState, useMemo } from "react";
-import { formatDateTime, type WalletTransaction } from "../utils/dashboardHelpers";
+import { type WalletTransaction } from "../utils/dashboardHelpers";
+import { formatDateTime, formatCurrency, formatTxType } from "../utils/formatters";
 import styles from "../Dashboard.module.css";
 import adminStyles from "../AdminUsers.module.css";
 import DataTable, { type ColumnDef } from "./DataTable";
+import SegmentedControl from "./SegmentedControl";
 import { useCurrentUser } from "../hooks/useDashboard";
 
 interface WalletActivityLogProps {
@@ -19,8 +21,20 @@ const COLUMNS: ColumnDef<WalletTransaction>[] = [
         t.type === "FIRST_DEPOSIT_BONUS" ||
         t.type === "POINTS_CONVERSION";
       return (
-        <span className={`${styles.verifiedPill} ${isCredit ? styles.pillVerified : styles.pillUnverified}`}>
-          {t.type}
+        <span
+          style={{
+            display: "inline-block",
+            padding: "4px 10px",
+            borderRadius: "6px",
+            fontSize: "11px",
+            fontWeight: "750",
+            textTransform: "uppercase",
+            color: isCredit ? "var(--primary)" : "var(--danger)",
+            background: isCredit ? "var(--primary-bg)" : "var(--danger-bg)",
+            border: `1px solid ${isCredit ? "var(--primary-border)" : "var(--danger-border)"}`,
+          }}
+        >
+          {formatTxType(t.type)}
         </span>
       );
     },
@@ -29,32 +43,31 @@ const COLUMNS: ColumnDef<WalletTransaction>[] = [
     label: "Status",
     width: "120px",
     render: (t) => {
-      const color =
-        t.status === "SUCCESS"
-          ? "var(--primary)"
-          : t.status === "FAILED"
+      const isSuccess = t.status === "SUCCESS";
+      const isFailed = t.status === "FAILED";
+      const color = isSuccess
+        ? "var(--success)"
+        : isFailed
           ? "var(--danger)"
-          : "var(--accent)";
-      const bg =
-        t.status === "SUCCESS"
-          ? "rgba(34, 197, 94, 0.1)"
-          : t.status === "FAILED"
-          ? "rgba(255, 87, 87, 0.1)"
-          : "rgba(181, 95, 230, 0.1)";
-      const border =
-        t.status === "SUCCESS"
-          ? "rgba(34, 197, 94, 0.2)"
-          : t.status === "FAILED"
-          ? "rgba(255, 87, 87, 0.2)"
-          : "rgba(181, 95, 230, 0.2)";
+          : "var(--warning)";
+      const bg = isSuccess
+        ? "var(--success-bg)"
+        : isFailed
+          ? "var(--danger-bg)"
+          : "var(--warning-bg)";
+      const border = isSuccess
+        ? "var(--success-border)"
+        : isFailed
+          ? "var(--danger-border)"
+          : "var(--warning-border)";
       return (
         <span
           style={{
             display: "inline-block",
-            padding: "4px 8px",
+            padding: "4px 10px",
             borderRadius: "6px",
-            fontSize: "10px",
-            fontWeight: "700",
+            fontSize: "11px",
+            fontWeight: "750",
             textTransform: "uppercase",
             color,
             background: bg,
@@ -72,7 +85,7 @@ const COLUMNS: ColumnDef<WalletTransaction>[] = [
     render: (t) => {
       const isSuccess = t.status === "SUCCESS";
       const isDebit = t.type === "WITHDRAWAL";
-      
+
       let color = "var(--primary)";
       if (!isSuccess) {
         color = "var(--muted)";
@@ -84,7 +97,7 @@ const COLUMNS: ColumnDef<WalletTransaction>[] = [
 
       return (
         <span style={{ fontWeight: "700", color }}>
-          {prefix}₹{t.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          {prefix}{formatCurrency(t.amount)}
         </span>
       );
     },
@@ -98,7 +111,7 @@ const COLUMNS: ColumnDef<WalletTransaction>[] = [
       }
       return (
         <span style={{ fontWeight: "600" }}>
-          ₹{t.balanceAfter.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          {formatCurrency(t.balanceAfter)}
         </span>
       );
     },
@@ -129,27 +142,27 @@ export default function WalletActivityLog({ transactions }: WalletActivityLogPro
   const withdrawableBalance = user?.withdrawableBalance ?? 0;
   const bonusBalance = user?.bonusBalance ?? 0;
 
-  const totalDeposits = useMemo(() => 
+  const totalDeposits = useMemo(() =>
     transactions.filter(t => t.type === "DEPOSIT" && t.status === "SUCCESS").reduce((acc, t) => acc + t.amount, 0),
     [transactions]
   );
 
-  const totalWithdrawals = useMemo(() => 
+  const totalWithdrawals = useMemo(() =>
     transactions.filter(t => t.type === "WITHDRAWAL" && t.status === "SUCCESS").reduce((acc, t) => acc + t.amount, 0),
     [transactions]
   );
 
-  const totalBonusesEarned = useMemo(() => 
+  const totalBonusesEarned = useMemo(() =>
     transactions.filter(t => (t.type === "FIRST_DEPOSIT_BONUS" || t.type === "POINTS_CONVERSION") && t.status === "SUCCESS").reduce((acc, t) => acc + t.amount, 0),
     [transactions]
   );
 
-  const totalPointsConverted = useMemo(() => 
+  const totalPointsConverted = useMemo(() =>
     transactions.filter(t => t.type === "POINTS_CONVERSION" && t.status === "SUCCESS").reduce((acc, t) => acc + t.amount, 0),
     [transactions]
   );
 
-  const firstDepositBonusTotal = useMemo(() => 
+  const firstDepositBonusTotal = useMemo(() =>
     transactions.filter(t => t.type === "FIRST_DEPOSIT_BONUS" && t.status === "SUCCESS").reduce((acc, t) => acc + t.amount, 0),
     [transactions]
   );
@@ -185,47 +198,15 @@ export default function WalletActivityLog({ transactions }: WalletActivityLogPro
             Wallet Activity log
           </h2>
 
-          <div
-            style={{
-              display: "flex",
-              background: "rgba(255, 255, 255, 0.04)",
-              padding: "4px",
-              borderRadius: "10px",
-              border: "1px solid var(--border)",
-            }}
-          >
-            <button
-              onClick={() => setActiveTab("cash")}
-              style={{
-                background: activeTab === "cash" ? "var(--accent)" : "transparent",
-                color: activeTab === "cash" ? "#ffffff" : "var(--muted)",
-                border: "none",
-                padding: "8px 16px",
-                borderRadius: "8px",
-                fontSize: "12.5px",
-                fontWeight: "700",
-                cursor: "pointer",
-                transition: "all 0.25s ease",
-              }}
-            >
-              Cash Wallet
-            </button>
-            <button
-              onClick={() => setActiveTab("bonus")}
-              style={{
-                background: activeTab === "bonus" ? "var(--accent)" : "transparent",
-                color: activeTab === "bonus" ? "#ffffff" : "var(--muted)",
-                border: "none",
-                padding: "8px 16px",
-                borderRadius: "8px",
-                fontSize: "12.5px",
-                fontWeight: "700",
-                cursor: "pointer",
-                transition: "all 0.25s ease",
-              }}
-            >
-              Bonus Wallet
-            </button>
+          <div style={{ width: "260px" }}>
+            <SegmentedControl
+              options={[
+                { value: "cash", label: "Cash Wallet" },
+                { value: "bonus", label: "Bonus Wallet" },
+              ]}
+              value={activeTab}
+              onChange={(val) => setActiveTab(val as "cash" | "bonus")}
+            />
           </div>
         </div>
 

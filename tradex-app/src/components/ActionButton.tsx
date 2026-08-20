@@ -3,14 +3,14 @@ import Icon from "./Icon";
 
 interface ActionButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   iconName?: string;
-  loading: boolean;
+  loading?: boolean;
   loadingText?: string;
   children: React.ReactNode;
 }
 
 export default function ActionButton({
   iconName,
-  loading,
+  loading = false,
   loadingText,
   children,
   style,

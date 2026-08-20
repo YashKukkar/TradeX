@@ -13,6 +13,10 @@ import java.util.List;
 public interface PointsTransactionRepository extends JpaRepository<PointsTransaction, Long> {
     List<PointsTransaction> findByUserOrderByCreatedAtDesc(User user);
 
+    List<PointsTransaction> findAllByOrderByCreatedAtDesc();
+
+    List<PointsTransaction> findByCreatedAtBetweenOrderByCreatedAtDesc(java.time.LocalDateTime start, java.time.LocalDateTime end);
+
     @Query("SELECT COALESCE(SUM(pt.amount), 0) FROM PointsTransaction pt WHERE pt.user = :user AND pt.amount > 0")
     Long sumPositivePointsByUser(@Param("user") User user);
 

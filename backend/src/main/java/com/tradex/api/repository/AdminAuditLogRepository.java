@@ -18,6 +18,10 @@ public interface AdminAuditLogRepository extends JpaRepository<AdminAuditLog, Lo
 
     Page<AdminAuditLog> findByTargetEmailOrderByCreatedAtDesc(String email, Pageable pageable);
 
+    List<AdminAuditLog> findByTargetEmailOrderByCreatedAtDesc(String email);
+
+    List<AdminAuditLog> findAllByOrderByCreatedAtDesc();
+
     default Page<AdminAuditLog> findByTargetEmail(String email, Pageable pageable) {
         return findByTargetEmailOrderByCreatedAtDesc(email, pageable);
     }

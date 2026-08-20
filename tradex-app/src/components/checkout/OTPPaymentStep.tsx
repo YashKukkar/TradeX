@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Icon from "../Icon";
-import styles from "../PaymentGatewayModal.module.css";
+import styles from "../WalletModal.module.css";
 
 interface OTPPaymentStepProps {
   onSubmit: (otp: string) => void;

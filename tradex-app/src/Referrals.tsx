@@ -87,7 +87,7 @@ export default function Referrals() {
           icon="redeem"
           label="Welcome Bonus"
           value={welcomeCoins.toLocaleString()}
-          iconColor="#6082ff"
+          iconColor="var(--accent)"
           isLoading={loading}
         />
       </div>

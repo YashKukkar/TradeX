@@ -7,8 +7,11 @@
  * is often the best choice for production.
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "/api" : "http://localhost:8080/api");
-const WEBSITE_URL = import.meta.env.VITE_WEBSITE_URL || (import.meta.env.PROD ? "/" : "http://localhost:3000");
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.PROD ? "https://api.tradenows.com/api" : "http://localhost:8080/api");
+
+const WEBSITE_URL = import.meta.env.VITE_WEBSITE_URL || 
+  (import.meta.env.PROD ? "https://tradenows.com" : "http://localhost:3000");
 
 export const config = {
   apiUrl: API_BASE_URL,

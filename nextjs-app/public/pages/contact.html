@@ -1,133 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Contact — TradeX</title>
-<meta name="description" content="Talk to TradeX — support, sales and partnership enquiries." />
-<script>
-  (function() {
-    var token = localStorage.getItem("token");
-    if (token) {
-      window.location.href = "http://localhost:5173/dashboard";
-    }
-  })();
-</script>
-<link rel="icon" type="image/svg+xml" href="../assets/logo.svg" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/styles.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact — TradeX</title>
+  <meta name="description" content="Talk to TradeX — support, sales and partnership enquiries." />
+  <script>
+    (function () {
+      var token = localStorage.getItem("token");
+      if (token) {
+        window.location.href = "https://control.tradenows.com/dashboard";
+      }
+    })();
+  </script>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css" />
 </head>
+
 <body>
 
-<header class="site-header">
-  <div class="container nav">
-    <a href="/" class="brand">
-      <img src="../assets/logo.svg" alt="" class="logo" />
-      <span class="brand-name">Trade<span>X</span></span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="/">Home</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="products.html">Products</a></li>
-      <li><a href="features.html">Features</a></li>
-      <li><a href="contact.html">Contact</a></li>
-    </ul>
-    <div class="nav-cta">
-      <a href="#" class="btn btn-ghost">Login</a>
-      <a href="contact.html" class="btn btn-primary">Open Account</a>
-      <button class="mobile-toggle" aria-label="Toggle menu">☰</button>
-    </div>
-  </div>
-</header>
-
-<div class="page-header">
-  <div class="container">
-    <div class="breadcrumb"><a href="/">Home</a> / Contact</div>
-    <h1>Talk to us</h1>
-    <p>Questions about the platform, partnerships, or account opening? We usually reply within one business day.</p>
-  </div>
-</div>
-
-<section>
-  <div class="container form-grid">
-    <form id="contactForm" class="form" novalidate>
-      <div class="field">
-        <label for="name">Full name</label>
-        <input id="name" name="name" type="text" required autocomplete="name" />
-      </div>
-      <div class="field">
-        <label for="email">Email</label>
-        <input id="email" name="email" type="email" required autocomplete="email" />
-      </div>
-      <div class="field">
-        <label for="phone">Phone</label>
-        <input id="phone" name="phone" type="tel" autocomplete="tel" />
-      </div>
-      <div class="field">
-        <label for="topic">I'm interested in</label>
-        <select id="topic" name="topic">
-          <option>Opening a trading account</option>
-          <option>Upgrading my plan</option>
-          <option>Partnership / IB programme</option>
-          <option>API / algo trading</option>
-          <option>Something else</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="message">Message</label>
-        <textarea id="message" name="message" placeholder="Tell us a little about what you're looking for…"></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">Send message</button>
-      <p id="formStatus" style="margin-top:14px;font-size:14px;color:var(--muted);"></p>
-    </form>
-
-    <div class="contact-info">
-      <div class="card">
-        <h3>Customer Support</h3>
-        <p>24/7 support for existing customers.<br/>
-        Email: <a href="mailto:support@tradex.example" style="color:var(--primary);">support@tradex.example</a><br/>
-        Phone: +91 22 0000 0000</p>
-      </div>
-      <div class="card">
-        <h3>Sales &amp; Partnerships</h3>
-        <p>Talk to the team about IB programmes, white-labelling or institutional access.<br/>
-        Email: <a href="mailto:sales@tradex.example" style="color:var(--primary);">sales@tradex.example</a></p>
-      </div>
-      <div class="card">
-        <h3>Registered Office</h3>
-        <p>TradeX Technologies Pvt. Ltd.<br/>
-        Level 12, Innovation Tower<br/>
-        Bandra-Kurla Complex, Mumbai 400051<br/>
-        Maharashtra, India</p>
-      </div>
-      <div class="card">
-        <h3>Grievance Officer</h3>
-        <p>Name: Rajesh Nair<br/>
-        Email: grievance@tradex.example<br/>
-        Hours: Mon–Fri, 10am–6pm IST</p>
+  <header class="site-header">
+    <div class="container nav">
+      <a href="/" class="brand">
+        <img src="../assets/logo.svg" alt="" class="logo" />
+        <span class="brand-name">Trade<span>X</span></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="features.html">Features</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="#" class="btn btn-ghost">Login</a>
+        <a href="contact.html" class="btn btn-primary">Open Account</a>
+        <button class="mobile-toggle" aria-label="Toggle menu">☰</button>
       </div>
     </div>
-  </div>
-</section>
+  </header>
 
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <a href="/" class="brand"><img src="../assets/logo.svg" alt="" class="logo" /><span class="brand-name">Trade<span>X</span></span></a>
-        <p>India's modern trading platform for stocks, derivatives, commodities and global markets.</p>
-        <div class="socials"><a href="#">𝕏</a><a href="#">f</a><a href="#">◎</a><a href="#">▶</a><a href="#">✈</a></div>
-      </div>
-      <div class="footer-col"><h4>Company</h4><ul><li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li></ul></div>
-      <div class="footer-col"><h4>Products</h4><ul><li><a href="products.html">Stocks</a></li><li><a href="products.html">F&amp;O</a></li><li><a href="products.html">Commodities</a></li></ul></div>
-      <div class="footer-col"><h4>Resources</h4><ul><li><a href="features.html">Platform</a></li><li><a href="features.html#pricing">Pricing</a></li></ul></div>
-      <div class="footer-col"><h4>Legal</h4><ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Use</a></li><li><a href="#">Risk Disclosure</a></li></ul></div>
+  <div class="page-header">
+    <div class="container">
+      <div class="breadcrumb"><a href="/">Home</a> / Contact</div>
+      <h1>Talk to us</h1>
+      <p>Questions about the platform, partnerships, or account opening? We usually reply within one business day.</p>
     </div>
-    <div class="footer-bottom"><div>© 2026 TradeX.</div><div>Template for demo purposes only.</div></div>
   </div>
-</footer>
-<script src="../js/main.js"></script>
+
+  <section>
+    <div class="container form-grid">
+      <form id="contactForm" class="form" novalidate>
+        <div class="field">
+          <label for="name">Full name</label>
+          <input id="name" name="name" type="text" required autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="phone">Phone</label>
+          <input id="phone" name="phone" type="tel" autocomplete="tel" />
+        </div>
+        <div class="field">
+          <label for="topic">I'm interested in</label>
+          <select id="topic" name="topic">
+            <option>Opening a trading account</option>
+            <option>Upgrading my plan</option>
+            <option>Partnership / IB programme</option>
+            <option>API / algo trading</option>
+            <option>Something else</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="message">Message</label>
+          <textarea id="message" name="message"
+            placeholder="Tell us a little about what you're looking for…"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">Send message</button>
+        <p id="formStatus" style="margin-top:14px;font-size:14px;color:var(--muted);"></p>
+      </form>
+
+      <div class="contact-info">
+        <div class="card">
+          <h3>Customer Support</h3>
+          <p>24/7 support for existing customers.<br />
+            Email: <a href="mailto:support@tradex.example"
+              style="color:var(--primary);">support@tradex.example</a><br />
+            Phone: +91 22 0000 0000</p>
+        </div>
+        <div class="card">
+          <h3>Sales &amp; Partnerships</h3>
+          <p>Talk to the team about IB programmes, white-labelling or institutional access.<br />
+            Email: <a href="mailto:sales@tradex.example" style="color:var(--primary);">sales@tradex.example</a></p>
+        </div>
+        <div class="card">
+          <h3>Registered Office</h3>
+          <p>TradeX Technologies Pvt. Ltd.<br />
+            Level 12, Innovation Tower<br />
+            Bandra-Kurla Complex, Mumbai 400051<br />
+            Maharashtra, India</p>
+        </div>
+        <div class="card">
+          <h3>Grievance Officer</h3>
+          <p>Name: Rajesh Nair<br />
+            Email: grievance@tradex.example<br />
+            Hours: Mon–Fri, 10am–6pm IST</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="brand"><img src="../assets/logo.svg" alt="" class="logo" /><span
+              class="brand-name">Trade<span>X</span></span></a>
+          <p>India's modern trading platform for stocks, derivatives, commodities and global markets.</p>
+          <div class="socials"><a href="#">𝕏</a><a href="#">f</a><a href="#">◎</a><a href="#">▶</a><a href="#">✈</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Products</h4>
+          <ul>
+            <li><a href="products.html">Stocks</a></li>
+            <li><a href="products.html">F&amp;O</a></li>
+            <li><a href="products.html">Commodities</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="features.html">Platform</a></li>
+            <li><a href="features.html#pricing">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Use</a></li>
+            <li><a href="#">Risk Disclosure</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>© 2026 TradeX.</div>
+        <div>Template for demo purposes only.</div>
+      </div>
+    </div>
+  </footer>
+  <script src="../js/main.js"></script>
 </body>
+
 </html>

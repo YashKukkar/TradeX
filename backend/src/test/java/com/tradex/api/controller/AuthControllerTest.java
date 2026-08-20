@@ -12,6 +12,10 @@ import com.tradex.api.entity.SystemSetting;
 import com.tradex.api.enums.VerificationType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.HexFormat;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,9 +60,9 @@ class AuthControllerTest {
 
         private String hashOtp(String otp) {
                 try {
-                        java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
-                        byte[] hash = digest.digest(otp.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-                        return java.util.HexFormat.of().formatHex(hash);
+                        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                        byte[] hash = digest.digest(otp.getBytes(StandardCharsets.UTF_8));
+                        return HexFormat.of().formatHex(hash);
                 } catch (Exception e) {
                         throw new RuntimeException(e);
                 }

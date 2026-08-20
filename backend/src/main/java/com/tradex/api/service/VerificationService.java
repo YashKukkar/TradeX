@@ -11,6 +11,7 @@ import com.tradex.api.exception.AppException.ResourceNotFoundException;
 import com.tradex.api.repository.UserRepository;
 import com.tradex.api.repository.VerificationTokenRepository;
 import com.tradex.api.config.AppProperties;
+import com.tradex.api.util.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,16 +40,21 @@ public class VerificationService {
 
     @Transactional
     public void resetPassword(String email, String code, String newPassword) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
+        String normalizedEmail = AuthUtils.normalizeEmail(email);
+        User user = userRepository.findByEmail(normalizedEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + AuthUtils.maskEmail(normalizedEmail)));
 
         VerificationToken token = validateVerificationToken(user, code, VerificationType.PASSWORD_RESET);
 
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setCredentialsExpired(false);
+        user.setLocked(false);
+        user.setLockedUntil(null);
+        user.setFailedLoginAttempts(0);
+        user.setPasswordChangedAt(LocalDateTime.now());
         verificationTokenRepository.delete(token);
 
-        log.info("Password successfully reset for user: {}", email);
+        log.info("[AUTH_PASSWORD_RESET] Password successfully reset and lockout cleared for: {}", AuthUtils.maskEmail(normalizedEmail));
     }
 
     @Transactional

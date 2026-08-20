@@ -4,6 +4,7 @@ import styles from "../AdminUsers.module.css";
 
 import LoadingState from "./LoadingState";
 import { formatDateTime, getDisplayName } from "../utils/dashboardHelpers";
+import { exportCsvReport } from "../utils/api";
 import ResolveTransactionModal from "./ResolveTransactionModal";
 import type { UserProfile } from "../utils/dashboardHelpers";
 import { hasPermission } from "../utils/permissions";
@@ -168,14 +169,23 @@ export default function PendingTransactionsRegistry({ user }: PendingTransaction
     allLoading,
   } = usePendingTransactionsState();
 
+  const handleExport = async (type: "deposits" | "withdrawals") => {
+    const label = type === "deposits" ? "Deposits" : "Withdrawals";
+    try {
+      await exportCsvReport(`admin/transactions/export/${type}`, label);
+    } catch (err) {
+      console.error(`Export ${type} failed`, err);
+    }
+  };
+
   // Action column is only shown in the pending tab
   const actionColumn: ColumnDef<PendingTransaction> = {
     label: "Actions",
     align: "right",
     width: "200px",
     render: (t) => {
-      const noDepositPerm    = t.type === "DEPOSIT"    && !hasPermission(user, "MANAGE_DEPOSITS");
-      const noWithdrawPerm   = t.type === "WITHDRAWAL" && !hasPermission(user, "MANAGE_WITHDRAWALS");
+      const noDepositPerm = t.type === "DEPOSIT" && !hasPermission(user, "MANAGE_DEPOSITS");
+      const noWithdrawPerm = t.type === "WITHDRAWAL" && !hasPermission(user, "MANAGE_WITHDRAWALS");
 
       if (noDepositPerm || noWithdrawPerm) {
         return (
@@ -232,90 +242,74 @@ export default function PendingTransactionsRegistry({ user }: PendingTransaction
           {/* Tab strip */}
           <div style={{ display: "flex", gap: "4px", borderBottom: "1px solid var(--border)", paddingBottom: "4px" }}>
             {(["pending", "all"] as const).map((tab) => (
-            <button
-              key={tab}
-              type="button"
-              onClick={() => setActiveTab(tab)}
-              style={{
-                background: "transparent",
-                border: "none",
-                color: activeTab === tab ? "var(--primary)" : "var(--muted)",
-                fontWeight: 700,
-                fontSize: "14px",
-                cursor: "pointer",
-                padding: "8px 18px",
-                borderBottom: activeTab === tab ? "2px solid var(--primary)" : "2px solid transparent",
-                marginBottom: "-1px",
-                transition: "color 0.2s, border-color 0.2s",
-                letterSpacing: "0.01em",
-              }}
-            >
-              {tab === "pending"
-                ? `Pending (${pendingTransactionsCount})`
-                : `All Transactions (${allLoading && allTransactionsCount === 0 ? "..." : allTransactionsCount})`}
-            </button>
-          ))}
-        </div>
-
-        {/* Right side tools: Fuzzy Search Box + Export CSV ActionButton */}
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <div className={styles.searchBox} style={{ padding: "6px 12px" }}>
-            <Icon name="search" className={styles.searchIcon} style={{ fontSize: "16px" }} />
-            <label htmlFor="transactionSearch" style={{ display: "none" }}>Search Transactions</label>
-            <input
-              id="transactionSearch"
-              name="transactionSearch"
-              type="text"
-              placeholder="Search email, type, amount..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={styles.searchInput}
-              style={{ fontSize: "13px", width: "220px" }}
-            />
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActiveTab(tab)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: activeTab === tab ? "var(--primary)" : "var(--muted)",
+                  fontWeight: 700,
+                  fontSize: "14px",
+                  cursor: "pointer",
+                  padding: "8px 18px",
+                  borderBottom: activeTab === tab ? "2px solid var(--primary)" : "2px solid transparent",
+                  marginBottom: "-1px",
+                  transition: "color 0.2s, border-color 0.2s",
+                  letterSpacing: "0.01em",
+                }}
+              >
+                {tab === "pending"
+                  ? `Pending (${pendingTransactionsCount})`
+                  : `All Transactions (${allLoading && allTransactionsCount === 0 ? "..." : allTransactionsCount})`}
+              </button>
+            ))}
           </div>
-          <ActionButton
-            iconName="download"
-            loading={false}
-            onClick={() => {
-              if (!filteredList || filteredList.length === 0) return;
-              const headers = ["ID", "User Email", "Type", "Status", "Amount", "Balance After", "Created At"];
-              const rows = filteredList.map((t) => [
-                t.id,
-                `"${t.userEmail}"`,
-                `"${t.type}"`,
-                `"${t.status}"`,
-                t.amount,
-                t.balanceAfter || 0,
-                `"${formatDateTime(t.createdAt)}"`,
-              ]);
-              const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
-              const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
 
-              const url = URL.createObjectURL(blob);
-              const link = document.createElement("a");
-              link.setAttribute("href", url);
-              link.setAttribute("download", `tradex-transactions-${activeTab}.csv`);
-              document.body.appendChild(link);
-              link.click();
-              link.remove();
-              URL.revokeObjectURL(url);
-            }}
-            style={{
-              background: "var(--card-bg, #1e222d)",
-              border: "1px solid var(--border)",
-              color: "var(--text)",
-              padding: "6px 12px",
-              borderRadius: "6px",
-              fontSize: "13px",
-              fontWeight: 600,
-            }}
-            title="Export filtered transactions to CSV"
-          >
-            Export CSV
-          </ActionButton>
+          {/* Right side tools: Fuzzy Search Box + Export CSV ActionButton */}
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div className={styles.searchBox} style={{ padding: "6px 12px" }}>
+              <Icon name="search" className={styles.searchIcon} style={{ fontSize: "16px" }} />
+              <label htmlFor="transactionSearch" style={{ display: "none" }}>Search Transactions</label>
+              <input
+                id="transactionSearch"
+                name="transactionSearch"
+                type="text"
+                placeholder="Search email, type, amount..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={styles.searchInput}
+                style={{ fontSize: "13px", width: "220px" }}
+              />
+            </div>
+            {/* Shared Export Button Helper */}
+            {(["deposits", "withdrawals"] as const).map((type) => {
+              const label = type === "deposits" ? "Deposits" : "Withdrawals";
+              return (
+                <ActionButton
+                  key={type}
+                  iconName="download"
+                  loading={false}
+                  onClick={() => handleExport(type)}
+                  style={{
+                    background: "var(--primary-bg)",
+                    border: "1px solid var(--primary-border)",
+                    color: "var(--primary)",
+                    padding: "6px 12px",
+                    borderRadius: "6px",
+                    fontSize: "12.5px",
+                    fontWeight: 700,
+                  }}
+                  title={`Export ${label} report to CSV`}
+                >
+                  Export {label}
+                </ActionButton>
+              );
+            })}
+          </div>
         </div>
       </div>
-    </div>
 
 
       {/* Table / Loading / Error */}

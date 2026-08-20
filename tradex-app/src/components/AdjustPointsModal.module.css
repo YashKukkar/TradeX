@@ -1,0 +1,299 @@
+.headerIconBadge {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--clr-amber-a10);
+  color: var(--warning);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  border: 1px solid var(--warning-border);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 4px;
+}
+
+/* Current Balance Pill */
+.balanceBanner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--surface-recessed);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.balanceLabel {
+  font-size: 12.5px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.balanceValue {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+/* Mode Switcher Segment */
+.modeSegment {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  background: var(--surface-recessed);
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.modeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+  color: var(--muted);
+  transition: all 0.2s ease;
+}
+
+.modeBtnAddActive {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success-border);
+  box-shadow: 0 2px 8px lch(70% 48 145 / 0.12);
+}
+
+.modeBtnDeductActive {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid var(--danger-border);
+  box-shadow: 0 2px 8px lch(58% 72 25 / 0.12);
+}
+
+/* Amount Field & Quick Presets */
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputPrefix {
+  position: absolute;
+  left: 14px;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.inputPrefixAdd { color: var(--success); }
+.inputPrefixDeduct { color: var(--danger); }
+
+.amountInput {
+  width: 100%;
+  padding: 12px 14px 12px 34px;
+  background: var(--surface-recessed);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.amountInput:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px lch(74% 54 165 / 0.2);
+}
+
+.presetContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.presetPill {
+  background: var(--surface-recessed);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.presetPill:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
+}
+
+/* Live Preview Card */
+.previewCard {
+  padding: 14px 16px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--border);
+  background: var(--surface-recessed);
+}
+
+.previewCardError {
+  background: var(--danger-bg);
+  border-color: var(--danger-border);
+}
+
+.previewTitle {
+  font-size: 12.5px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.previewResult {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.previewResultError {
+  color: var(--danger);
+}
+
+/* Preset Reason Chips */
+.reasonChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.reasonChip {
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--surface-recessed);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.reasonChip:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.reasonInput {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--surface-recessed);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 13.5px;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.reasonInput:focus {
+  border-color: var(--primary);
+}
+
+.footer {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancelBtn {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelBtn:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.submitBtnAdd {
+  padding: 10px 22px;
+  border-radius: 10px;
+  border: none;
+  background: var(--success);
+  color: var(--bg);
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px lch(70% 48 145 / 0.25);
+}
+
+.submitBtnAdd:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px lch(70% 48 145 / 0.35);
+}
+
+.submitBtnDeduct {
+  padding: 10px 22px;
+  border-radius: 10px;
+  border: none;
+  background: var(--danger);
+  color: var(--text);
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px lch(58% 72 25 / 0.25);
+}
+
+.submitBtnDeduct:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px lch(58% 72 25 / 0.35);
+}
+
+.submitBtnDisabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}

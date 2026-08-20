@@ -1,3 +1,8 @@
+/* ════════════════════════════════════════════════════════════════
+   SETTINGS & SECURITY COMPONENT MODULE STYLES
+   (Component-specific layout; inherits global primitives from index.css)
+   ════════════════════════════════════════════════════════════════ */
+
 .container {
   min-height: 100vh;
   padding: 0 32px 60px;
@@ -18,27 +23,6 @@
   padding: 28px 0 8px;
   border-bottom: 1px solid var(--border);
   margin-bottom: 28px;
-}
-
-.backBtn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--clr-white-a03);
-  border: 1px solid var(--border);
-  color: var(--muted);
-  padding: 8px 16px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.backBtn:hover {
-  color: var(--primary);
-  border-color: var(--primary);
-  background: var(--clr-white-a05);
 }
 
 .pageTitleSection {
@@ -74,7 +58,7 @@
 }
 
 .settingsCard {
-  background: linear-gradient(160deg, var(--surface), var(--surface-2));
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 24px;
@@ -84,30 +68,114 @@
   gap: 20px;
 }
 
-.formGroup {
+.profileForm {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 18px;
 }
 
-.label {
-  display: block;
-  font-size: 11.5px;
-  font-weight: 800;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.inputRow {
+.formActions {
   display: flex;
-  gap: 12px;
+  justify-content: flex-end;
   align-items: center;
+  margin-top: 10px;
+}
+
+/* ── Button Primitives Scoped to Settings Module ── */
+.primaryBtn,
+.saveBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 20px;
+  background: var(--primary) !important;
+  color: var(--on-primary) !important;
+  border: none !important;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 40px;
+  white-space: nowrap;
+}
+
+.primaryBtn:hover:not(:disabled),
+.saveBtn:hover:not(:disabled) {
+  background: var(--primary-2) !important;
+  color: var(--on-primary) !important;
+  transform: translateY(-1px);
+}
+
+.primaryBtn:disabled,
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.secondaryBtn,
+.cancelBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 18px;
+  background: var(--surface-elevated) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 40px;
+}
+
+.secondaryBtn:hover:not(:disabled),
+.cancelBtn:hover:not(:disabled) {
+  background: var(--surface-hover) !important;
+  border-color: var(--primary-border) !important;
+  color: var(--text) !important;
+}
+
+.secondaryBtn:disabled,
+.cancelBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.linkBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--primary-bg) !important;
+  border: 1px solid var(--primary-border) !important;
+  color: var(--primary) !important;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.linkBtn:hover {
+  background: lch(74% 54 165 / 0.2) !important;
+  border-color: var(--primary) !important;
+}
+
+.fieldLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 6px;
 }
 
 .inputField {
   flex: 1;
-  background: var(--clr-black-a25);
+  background: var(--surface-recessed);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 10px 14px;
@@ -123,118 +191,36 @@
 
 .inputField:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--success-bg);
+  box-shadow: 0 0 0 3px var(--primary-bg);
 }
 
-.inputField::placeholder {
-  color: var(--muted);
-  opacity: 0.5;
-}
-
-.primaryBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 0 18px;
-  background: var(--primary);
-  color: var(--clr-teal-dark);
-  border: 1px solid var(--primary);
-  border-radius: 10px;
-  font-size: 13.5px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  height: 42px;
-  white-space: nowrap;
-}
-
-.primaryBtn:hover:not(:disabled) {
-  background: var(--primary-2);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--clr-teal-a25);
-}
-
-.primaryBtn:disabled {
-  opacity: 0.5;
+.inputField:disabled {
+  opacity: 0.65;
   cursor: not-allowed;
 }
 
-.secondaryBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 0 16px;
-  background: var(--clr-white-a05);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  font-size: 13.5px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  height: 38px;
+.disabledInputContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
-.secondaryBtn:hover:not(:disabled) {
-  background: var(--clr-white-a10);
-}
-
-.secondaryBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.inputGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 12px;
-}
-
-.checkboxRow {
+.fieldHintHidden {
+  font-size: 11.5px;
+  color: var(--warning);
+  font-weight: 600;
+  margin-top: 4px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 12px 0;
 }
 
-.checkboxLabel {
-  font-size: 13px;
-  color: var(--muted);
-  cursor: pointer;
-  user-select: none;
-}
-
-.buttonRow {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  margin-top: 18px;
-}
-
-.alert {
-  padding: 12px 16px;
-  border-radius: 10px;
-  font-size: 13.5px;
-  font-weight: 650;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.alertError {
-  background: var(--danger-bg);
-  border: 1px solid var(--danger-border);
-  color: var(--danger);
-}
-
-.alertSuccess {
-  background: var(--success-bg);
-  border: 1px solid var(--success-border);
-  color: var(--success);
+.disabledInputContainer:hover .fieldHintHidden {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .sectionHeader {
@@ -254,23 +240,7 @@
   letter-spacing: -0.01em;
 }
 
-.linkBtn {
-  background: none;
-  border: none;
-  color: var(--primary);
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  transition: opacity 0.2s;
-}
-
-.linkBtn:hover {
-  opacity: 0.85;
-}
-
+/* ── Bank Accounts Section Specifics ── */
 .bankList {
   display: flex;
   flex-direction: column;
@@ -283,31 +253,30 @@
   font-style: italic;
   text-align: center;
   padding: 24px;
-  background: var(--clr-white-a01);
+  background: var(--surface-recessed);
   border: 1px dashed var(--border);
   border-radius: 12px;
 }
 
 .bankCard {
-  background: var(--clr-white-a02);
+  background: var(--surface-elevated);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 16px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: border-color 0.2s, background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .bankCard:hover {
-  background: var(--clr-white-a03);
-  border-color: var(--clr-teal-a15);
+  background: var(--surface-hover);
+  border-color: var(--primary-border);
 }
 
 .bankCardPrimary {
-  border-color: var(--clr-teal-a50) !important;
-  background: var(--clr-black-a25) !important;
-  box-shadow: inset 0 2px 6px var(--clr-black-a40) !important;
+  border-color: var(--primary-border) !important;
+  background: var(--primary-bg) !important;
 }
 
 .bankLeft {
@@ -359,45 +328,47 @@
 }
 
 .makePrimaryBtn {
-  background: transparent;
+  background: var(--surface-elevated);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 6px 12px;
+  padding: 6px 14px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 750;
   color: var(--text);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .makePrimaryBtn:hover {
-  background: var(--clr-white-a05);
+  background: var(--surface-hover);
   border-color: var(--primary);
+  color: var(--primary);
 }
 
 .deleteBtn {
-  background: var(--clr-red-a05);
-  border: 1px solid var(--clr-red-alt-a10);
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
   border-radius: 8px;
   color: var(--danger);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  transition: all 0.2s;
+  width: 34px;
+  height: 34px;
+  transition: all 0.2s ease;
 }
 
 .deleteBtn:hover {
-  background: var(--clr-red-a12);
+  background: lch(58% 72 25 / 0.16);
   border-color: var(--danger);
 }
 
-.addBankForm {
+.addBankForm,
+.changePasswordForm {
   padding: 18px;
   border-radius: 14px;
-  background: var(--clr-white-a01);
+  background: var(--surface-elevated);
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -417,41 +388,38 @@
   margin: 0 0 4px 0;
 }
 
-.fieldLabel {
-  display: block;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--muted);
-  margin-bottom: 6px;
-}
-
-.changePasswordSection {
-  margin-top: 10px;
-}
-
-.changePasswordForm {
-  padding: 18px;
-  border-radius: 14px;
-  background: var(--clr-white-a01);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
 .bankLogoPlaceholder {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  font-weight: 800;
+  font-size: 13px;
+  font-weight: 850;
   font-family: 'Plus Jakarta Sans', sans-serif;
   flex-shrink: 0;
-  border: 1px solid var(--clr-white-a08);
-  box-shadow: 0 4px 10px var(--clr-black-a15);
+  background: var(--primary-bg);
+  color: var(--primary);
+  border: 1px solid var(--primary-border);
   text-transform: uppercase;
+}
+
+.inputGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkboxLabel {
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
 }

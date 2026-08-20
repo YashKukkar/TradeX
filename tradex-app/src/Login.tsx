@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { config } from "./config";
@@ -17,8 +17,9 @@ export default function Login() {
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
   const [shake, setShake] = useState(false);
-  const [isRedirecting, setIsRedirecting] = useState(false);
   const navigate = useNavigate();
 
   const triggerShake = () => {
@@ -26,32 +27,40 @@ export default function Login() {
     setTimeout(() => setShake(false), 500);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
     if (token) {
       safeStorage.setItem("token", token);
+      window.history.replaceState({}, document.title, window.location.pathname);
       navigate("/dashboard", { replace: true });
     }
   }, [navigate]);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setInterval(() => {
+      setCooldown((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldown]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
     setSuccessMsg("");
+    const normalizedEmail = email.trim().toLowerCase();
+
     try {
       const data = await api("/auth/login", {
         method: "POST",
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email: normalizedEmail, password })
       });
 
       safeStorage.setItem("token", data.token);
       queryClient.clear();
-      setIsRedirecting(true);
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1500);
+      navigate("/dashboard");
     } catch (err: any) {
       setError(err.message || "Invalid email or password.");
       triggerShake();
@@ -60,18 +69,46 @@ export default function Login() {
     }
   };
 
+  const handleSendResetCode = async () => {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail || !normalizedEmail.includes("@")) {
+      setError("Please enter a valid email address first.");
+      triggerShake();
+      return;
+    }
+
+    setIsSendingOtp(true);
+    setError("");
+    setSuccessMsg("");
+    try {
+      await api("/auth/forgot-password", {
+        method: "POST",
+        body: JSON.stringify({ email: normalizedEmail })
+      });
+      setSuccessMsg("If an account exists, a 6-digit verification code has been dispatched to your email.");
+      setCooldown(60);
+    } catch (err: any) {
+      setError(err.message || "Failed to dispatch reset code. Please try again.");
+      triggerShake();
+    } finally {
+      setIsSendingOtp(false);
+    }
+  };
+
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
     setSuccessMsg("");
+    const normalizedEmail = email.trim().toLowerCase();
+
     try {
       await api("/auth/reset-password", {
         method: "POST",
-        body: JSON.stringify({ email, code: otpCode, newPassword })
+        body: JSON.stringify({ email: normalizedEmail, code: otpCode.trim(), newPassword })
       });
       setSuccessMsg("Password reset successfully! You can now log in.");
-      setPassword(newPassword); // Prefill the password field for immediate login convenience
+      setPassword(newPassword);
       setMode("login");
       setOtpCode("");
       setNewPassword("");
@@ -88,14 +125,8 @@ export default function Login() {
       <a href={config.websiteUrl} className={styles.backLink}>
         <Icon name="arrow_back" style={{ fontSize: "1.2rem" }} /> Back to home
       </a>
-      <div className={`${styles.container} ${shake ? styles.shake : ""} ${isRedirecting ? styles.containerRedirecting : ""}`}>
-        {isRedirecting && (
-          <div className={styles.overlay}>
-            <div className={styles.spinner}></div>
-            <p className={styles.overlayText}>Preparing your dashboard...</p>
-          </div>
-        )}
-        <div className={isRedirecting ? styles.blurBackground : ""}>
+      <div className={`${styles.container} ${shake ? styles.shake : ""}`}>
+        <div>
           <div className={styles.logoRow}>
             <span className={styles.brand}>Trade<span className={styles.brandAccent}>X</span></span>
           </div>
@@ -139,6 +170,7 @@ export default function Login() {
                       value={password}
                       onChange={(e) => { setPassword(e.target.value); setError(""); setSuccessMsg(""); }}
                       required
+                      maxLength={128}
                       className={`${styles.input} ${styles.inputPassword}`}
                     />
                     <button
@@ -159,10 +191,21 @@ export default function Login() {
           ) : (
             <>
               <h2 className={styles.title}>Reset Password</h2>
-              <p className={styles.subtitle}>Enter the verification code sent to your email.</p>
+              <p className={styles.subtitle}>Request a code and set a new password.</p>
               <form onSubmit={handleResetPassword} className={styles.form}>
                 <div className={styles.fieldGroup}>
-                  <label htmlFor="resetEmail" className={styles.label}>Email Address</label>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <label htmlFor="resetEmail" className={styles.label}>Email Address</label>
+                    <button
+                      type="button"
+                      onClick={handleSendResetCode}
+                      disabled={isSendingOtp || cooldown > 0}
+                      className={styles.link}
+                      style={{ background: "none", border: "none", fontSize: "12px", cursor: cooldown > 0 ? "default" : "pointer", padding: 0 }}
+                    >
+                      {isSendingOtp ? "Sending code…" : cooldown > 0 ? `Resend in ${cooldown}s` : "Send Code"}
+                    </button>
+                  </div>
                   <input
                     id="resetEmail"
                     name="email"
@@ -198,6 +241,8 @@ export default function Login() {
                       value={newPassword}
                       onChange={(e) => { setNewPassword(e.target.value); setError(""); }}
                       required
+                      minLength={8}
+                      maxLength={128}
                       className={`${styles.input} ${styles.inputPassword}`}
                     />
                     <button

@@ -16,14 +16,30 @@ public class TicketAnalyticsService {
 
     private final SupportTicketRepository supportTicketRepository;
 
-    public record TicketAnalytics(long openTickets, long resolvedTickets) {}
+    public record TicketAnalytics(long openTickets, long resolvedTickets, Double avgResolutionHours) {}
 
     @Transactional(readOnly = true)
     @Cacheable(value = "ticketStats", key = "{#start, #end}")
     public TicketAnalytics getTicketAnalytics(LocalDateTime start, LocalDateTime end) {
+        List<SupportTicketRepository.EmployeeResolutionTimeProjection> times =
+                supportTicketRepository.getEmployeeResolutionTimes(List.of(TicketStatus.RESOLVED, TicketStatus.CLOSED), start, end);
+        double totalHours = 0.0;
+        int count = 0;
+        for (var t : times) {
+            if (t.getClaimedAt() != null && t.getResolvedAt() != null) {
+                long secs = java.time.Duration.between(t.getClaimedAt(), t.getResolvedAt()).getSeconds();
+                if (secs > 0) {
+                    totalHours += (double) secs / 3600.0;
+                    count++;
+                }
+            }
+        }
+        double avg = count > 0 ? totalHours / count : 0.0;
+
         return new TicketAnalytics(
             countActiveTickets(),
-            countResolvedTickets(start, end)
+            countResolvedTickets(start, end),
+            Math.round(avg * 10.0) / 10.0
         );
     }
 

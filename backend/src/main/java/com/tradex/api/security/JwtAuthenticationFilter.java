@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -23,6 +24,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Date;
+import java.time.LocalDateTime;
+import com.tradex.api.util.AuthUtils;
 
 import jakarta.servlet.http.Cookie;
 
@@ -35,6 +39,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
     private final SystemSettingService systemSettingService;
     private final TokenBlacklistCache tokenBlacklistCache;
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return HttpMethod.OPTIONS.matches(request.getMethod());
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -88,6 +97,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SystemSetting settings = (systemSettingService != null) ? systemSettingService.getSettings() : null;
             User user = null;
 
+            if (userRepository != null) {
+                User dbUser = userRepository.findByEmail(userEmail).orElse(null);
+                if (dbUser != null) {
+                    user = dbUser;
+                    if (dbUser.getPasswordChangedAt() != null) {
+                        Date issuedAt = jwtUtil.extractIssuedAt(jwt);
+                        if (issuedAt != null) {
+                            LocalDateTime issuedAtLdt = issuedAt.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime();
+                            if (issuedAtLdt.isBefore(dbUser.getPasswordChangedAt())) {
+                                log.warn("[AUTH_SESSION_REVOKED] Token issued at {} revoked due to password change at {} for {}",
+                                        issuedAtLdt, dbUser.getPasswordChangedAt(), AuthUtils.maskEmail(userEmail));
+                                writeErrorResponse(request, response, HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized",
+                                        "Session expired due to password reset. Please log in again.");
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+
             if (settings != null && (settings.isEmailVerificationEnabled() || settings.isPhoneVerificationEnabled())) {
                 String path = request.getRequestURI();
                 boolean isBypass = path.endsWith("/verify-email") ||
@@ -96,7 +125,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         path.endsWith("/me");
 
                 if (!isBypass) {
-                    user = userRepository.findByEmail(userEmail).orElse(null);
+                    if (user == null) {
+                        user = userRepository.findByEmail(userEmail).orElse(null);
+                    }
                     if (user == null) {
                         filterChain.doFilter(request, response);
                         return;

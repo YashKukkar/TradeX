@@ -1,7 +1,9 @@
 package com.tradex.api.mapper;
 
+import com.tradex.api.config.AppProperties;
 import com.tradex.api.dto.*;
 import com.tradex.api.entity.SupportTicket;
+import com.tradex.api.entity.TicketAttachment;
 import com.tradex.api.entity.TicketComment;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,12 @@ import java.util.stream.Collectors;
 
 @Component
 public class TicketMapper {
+
+    private final AppProperties appProperties;
+
+    public TicketMapper(AppProperties appProperties) {
+        this.appProperties = appProperties;
+    }
 
     public TicketDTO mapToDTO(SupportTicket ticket) {
         return TicketDTO.builder()
@@ -28,6 +36,7 @@ public class TicketMapper {
                 .claimedAt(ticket.getClaimedAt())
                 .createdAt(ticket.getCreatedAt())
                 .updatedAt(ticket.getUpdatedAt())
+                .resolvedAt(ticket.getResolvedAt())
                 .build();
     }
 
@@ -80,6 +89,17 @@ public class TicketMapper {
                 .build();
     }
 
+    public TicketAttachmentDTO mapToAttachmentDTO(TicketAttachment att) {
+        return TicketAttachmentDTO.builder()
+                .id(att.getId())
+                .fileName(att.getFileName())
+                .contentType(att.getContentType())
+                .fileSize(att.getFileSize())
+                .url(buildAccessUrl(att.getId()))
+                .createdAt(att.getCreatedAt())
+                .build();
+    }
+
     public TicketCommentDTO mapToCommentDTO(TicketComment comment) {
         return TicketCommentDTO.builder()
                 .id(comment.getId())
@@ -88,5 +108,9 @@ public class TicketMapper {
                 .adminReply(comment.isAdminReply())
                 .createdAt(comment.getCreatedAt())
                 .build();
+    }
+
+    private String buildAccessUrl(Long attachmentId) {
+        return appProperties.getStorage().buildAccessUrl(attachmentId);
     }
 }

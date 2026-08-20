@@ -39,8 +39,10 @@ public class DashboardCacheAspect {
             clearCache("transactionStats");
             clearCache("ticketStats");
             clearCache("employeePerformance");
+            clearCache("dashboardMetrics");
         } else {
             log.info("Evicting specific admin dashboard metrics cache domains: {}", Arrays.toString(domains));
+            clearCache("dashboardMetrics");
             for (String domain : domains) {
                 switch (domain.toLowerCase()) {
                     case "users" -> clearCache("userStats");

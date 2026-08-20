@@ -1,5 +1,6 @@
 import axios from "axios";
 import { config } from "../config";
+import { generateCsvFilename } from "./formatters";
 
 export const safeStorage = {
   getItem(key: string): string | null {
@@ -100,15 +101,35 @@ export const api = async (endpoint: string, options: any = {}): Promise<any> => 
 export const apiDownload = async (endpoint: string, defaultFilename: string): Promise<void> => {
   const url = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
   const responseData: any = await axiosInstance.get(url, { responseType: "blob" });
-  
-  const blob = responseData instanceof Blob ? responseData : new Blob([responseData], { type: "text/csv" });
+
+  const blob = responseData instanceof Blob ? responseData : new Blob([responseData], { type: "text/csv;charset=utf-8;" });
   const downloadUrl = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = downloadUrl;
-  link.setAttribute("download", defaultFilename);
+  link.setAttribute("download", defaultFilename.endsWith(".csv") ? defaultFilename : `${defaultFilename}.csv`);
   document.body.appendChild(link);
   link.click();
   link.remove();
   window.URL.revokeObjectURL(downloadUrl);
+};
+
+export const exportCsvReport = async (
+  endpoint: string,
+  reportName: string,
+  params?: Record<string, string | undefined>
+): Promise<void> => {
+  let query = "";
+  if (params) {
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => {
+      if (v) searchParams.append(k, v);
+    });
+    const queryString = searchParams.toString();
+    if (queryString) {
+      query = (endpoint.includes("?") ? "&" : "?") + queryString;
+    }
+  }
+  const filename = generateCsvFilename(reportName);
+  await apiDownload(`${endpoint}${query}`, filename);
 };
 

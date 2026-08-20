@@ -59,7 +59,7 @@ export function useAdminTelemetry(isAdmin: boolean, currentUser?: UserProfile | 
     },
     enabled: isAdmin && !!currentUser,
     staleTime: 60000,
-    refetchInterval: () => getPollingInterval(isOverlayActive, 5000),
+    refetchInterval: () => getPollingInterval(isOverlayActive, 30000),
   });
 }
 
@@ -119,7 +119,7 @@ export function useSeedTestData(
   });
 }
 
-export function useLogout(onLogoutComplete: () => void) {
+export function useLogout(onLogoutComplete?: () => void) {
   const queryClient = useQueryClient();
   return useMutation<void, Error, void>({
     mutationFn: async () => {
@@ -135,7 +135,7 @@ export function useLogout(onLogoutComplete: () => void) {
       sessionStorage.clear();
       document.cookie = "token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
       document.documentElement.removeAttribute("data-theme");
-      onLogoutComplete();
+      if (onLogoutComplete) onLogoutComplete();
     }
   });
 }

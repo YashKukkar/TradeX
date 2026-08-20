@@ -176,7 +176,7 @@ public class TicketStatusService {
                         try {
                             attachmentStorageService.delete(attachment.getStorageKey());
                         } catch (Exception e) {
-                            log.error("Failed to delete dormant S3 attachment: " + attachment.getStorageKey(), e);
+                            log.error("Failed to delete dormant local attachment: " + attachment.getStorageKey(), e);
                         }
                     }
                     ticket.getAttachments().clear();

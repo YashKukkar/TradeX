@@ -74,8 +74,8 @@ export default function AdminUserControlModal({
   const defaultTab = hasPermission(currentUser, "MANAGE_USERS")
     ? "cash"
     : hasPermission(currentUser, "MANAGE_POINTS")
-    ? "points"
-    : "audit";
+      ? "points"
+      : "audit";
 
   const [activeTab, setActiveTab] = useState<"cash" | "points" | "audit">(defaultTab);
 
@@ -83,8 +83,8 @@ export default function AdminUserControlModal({
 
   const joinedDate = user.createdAt
     ? new Date(user.createdAt * 1000).toLocaleDateString("en-IN", {
-        day: "2-digit", month: "short", year: "numeric",
-      })
+      day: "2-digit", month: "short", year: "numeric",
+    })
     : "—";
 
   const leftPaneContent = (
@@ -158,7 +158,7 @@ export default function AdminUserControlModal({
             <ul style={{ margin: "6px 0 0 0", paddingLeft: "20px", color: "var(--text)" }}>
               {activeTickets.map(t => (
                 <li key={t.id}>
-                  <strong>{t.ticketNumber}</strong> ({t.category.replace("_", " ")}) 
+                  <strong>{t.ticketNumber}</strong> ({t.category.replace("_", " ")})
                   {t.assignedToUserEmail ? ` assigned to ${t.assignedToUserEmail}` : t.assignedToPermission ? ` assigned to group ${t.assignedToPermission.replace("MANAGE_", "")}` : " (Unassigned)"}
                 </li>
               ))}

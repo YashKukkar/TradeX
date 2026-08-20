@@ -58,9 +58,9 @@ export default function AdminControlsSection({
             iconName="lock_open"
             title={!hasManageUsers ? "Requires User Management authority" : ""}
             style={{
-              background: "rgba(0, 224, 164, 0.1)",
-              border: "1px solid #00e0a4",
-              color: "#00e0a4",
+              background: "var(--success-bg)",
+              border: "1px solid var(--success-border)",
+              color: "var(--success)",
               padding: "10px 14px",
               borderRadius: "8px",
               fontSize: "13px",
@@ -78,9 +78,9 @@ export default function AdminControlsSection({
             iconName="lock"
             title={!hasManageUsers ? "Requires User Management authority" : ""}
             style={{
-              background: "rgba(255, 90, 106, 0.1)",
-              border: "1px solid #ff5a6a",
-              color: "#ff5a6a",
+              background: "var(--danger-bg)",
+              border: "1px solid var(--danger-border)",
+              color: "var(--danger)",
               padding: "10px 14px",
               borderRadius: "8px",
               fontSize: "13px",
@@ -100,9 +100,9 @@ export default function AdminControlsSection({
             iconName="person"
             title={!hasManageUsers ? "Requires User Management authority" : ""}
             style={{
-              background: "rgba(0, 224, 164, 0.1)",
-              border: "1px solid #00e0a4",
-              color: "#00e0a4",
+              background: "var(--success-bg)",
+              border: "1px solid var(--success-border)",
+              color: "var(--success)",
               padding: "10px 14px",
               borderRadius: "8px",
               fontSize: "13px",
@@ -120,9 +120,9 @@ export default function AdminControlsSection({
             iconName="person_off"
             title={!hasManageUsers ? "Requires User Management authority" : ""}
             style={{
-              background: "rgba(255, 90, 106, 0.1)",
-              border: "1px solid #ff5a6a",
-              color: "#ff5a6a",
+              background: "var(--danger-bg)",
+              border: "1px solid var(--danger-border)",
+              color: "var(--danger)",
               padding: "10px 14px",
               borderRadius: "8px",
               fontSize: "13px",

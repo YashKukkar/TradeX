@@ -7,7 +7,7 @@ import DashboardSkeleton from "./components/DashboardSkeleton";
 import VerificationModal from "./components/VerificationModal";
 import AdminDashboard from "./components/AdminDashboard";
 import UserDashboard from "./components/UserDashboard";
-import { getDisplayName, formatDate } from "./utils/dashboardHelpers";
+import { getDisplayName, formatFullDate } from "./utils/dashboardHelpers";
 import { isAdminRole } from "./utils/permissions";
 import { safeStorage } from "./utils/api";
 import {
@@ -135,7 +135,7 @@ export default function Dashboard() {
   const phoneNumber = user?.phoneNumber || "";
   const emailVerified = !!user?.emailVerified;
   const phoneVerified = !!user?.phoneVerified;
-  const memberSince = user?.createdAt ? formatDate(user.createdAt) : "";
+  const memberSince = user?.createdAt ? formatFullDate(user.createdAt) : "";
 
   if (pageLoading) {
     return <DashboardSkeleton />;

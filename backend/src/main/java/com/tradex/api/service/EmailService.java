@@ -17,7 +17,6 @@ import java.util.Properties;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("null")
 public class EmailService {
 
     private final SystemSettingService systemSettingService;

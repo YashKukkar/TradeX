@@ -130,37 +130,39 @@ export function getDisplayName(email: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export function formatDate(val: number | string | Date): string {
-  if (!val) return "";
-  const date = typeof val === "number"
-    ? new Date(val * 1000)
-    : typeof val === "string"
-      ? new Date(val)
-      : val;
+import { formatDate as fmtDate, formatTime as fmtTime, parseToDate } from "./formatters";
 
-  const currentYear = new Date().getFullYear();
-  const dateYear = date.getFullYear();
+export { formatCurrency, formatNumber } from "./formatters";
 
-  return date.toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    ...(dateYear !== currentYear ? { year: "numeric" } : {}),
-  });
+export function getOrdinalSuffix(day: number): string {
+  if (day > 3 && day < 21) return `${day}th`;
+  switch (day % 10) {
+    case 1: return `${day}st`;
+    case 2: return `${day}nd`;
+    case 3: return `${day}rd`;
+    default: return `${day}th`;
+  }
+}
+
+export function formatDate(val: number | string | Date, includeYear: boolean = true): string {
+  const formatted = fmtDate(val, includeYear);
+  return formatted === "—" ? "" : formatted;
+}
+
+export function formatFullDate(val: number | string | Date): string {
+  const date = parseToDate(val);
+  if (!date) return "";
+
+  const dayOrdinal = getOrdinalSuffix(date.getDate());
+  const monthFull = date.toLocaleDateString("en-IN", { month: "long" });
+  const year = date.getFullYear();
+
+  return `${dayOrdinal} ${monthFull} ${year}`;
 }
 
 export function formatTime(val: number | string | Date): string {
-  if (!val) return "";
-  const date = typeof val === "number"
-    ? new Date(val * 1000)
-    : typeof val === "string"
-      ? new Date(val)
-      : val;
-
-  return date.toLocaleTimeString("en-IN", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
+  const formatted = fmtTime(val);
+  return formatted === "—" ? "" : formatted;
 }
 
 export function formatDateTime(val: number | string | Date): string {
@@ -175,13 +177,11 @@ export function formatEpochTime(
   options?: Intl.DateTimeFormatOptions
 ): string {
   const date = new Date(epochSeconds * 1000);
-  const currentYear = new Date().getFullYear();
-  const dateYear = date.getFullYear();
 
   return date.toLocaleString("en-IN", options || {
     day: "2-digit",
     month: "short",
-    ...(dateYear !== currentYear ? { year: "numeric" } : {}),
+    year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",

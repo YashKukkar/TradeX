@@ -28,6 +28,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.email = :email")
     Optional<User> findByEmailForUpdate(@Param("email") String email);
 
+    @Modifying
+    @Query("UPDATE User u SET u.failedLoginAttempts = u.failedLoginAttempts + 1 WHERE u.id = :userId")
+    void incrementFailedLoginAttempts(@Param("userId") Long userId);
+
+    @Modifying
+    @Query("UPDATE User u SET u.failedLoginAttempts = 0, u.locked = false, u.lockedUntil = null WHERE u.id = :userId")
+    void resetFailedLoginAttemptsAndUnlock(@Param("userId") Long userId);
+
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.referredBy WHERE u.email = :email")
     Optional<User> findByEmail(@Param("email") String email);
 

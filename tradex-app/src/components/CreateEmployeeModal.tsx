@@ -93,7 +93,7 @@ export default function CreateEmployeeModal({
                     onChange={() => onToggleTeam(team.name)}
                     className={styles.checkbox}
                   />
-                  <strong>{team.name}</strong> <span style={{ fontSize: "0.85em", color: "#888" }}>({team.description})</span>
+                  <strong>{team.name}</strong> <span className={styles.checkboxDesc}>({team.description})</span>
                 </label>
               ))
             )}
@@ -112,17 +112,17 @@ export default function CreateEmployeeModal({
                   onChange={() => onTogglePermission(perm.key)}
                   className={styles.checkbox}
                 />
-                <strong>{perm.displayName}</strong> <span style={{ fontSize: "0.85em", color: "#888" }}>- {perm.description}</span>
+                <strong>{perm.displayName}</strong> <span className={styles.checkboxDesc}>- {perm.description}</span>
               </label>
             ))}
           </div>
         </div>
 
         {/* Live calculated effective permissions */}
-        <div className={styles.formGroup} style={{ backgroundColor: "#f9f9fb", padding: "12px", borderRadius: "6px", border: "1px solid #eef" }}>
+        <div className={`${styles.formGroup} ${styles.previewContainer}`}>
           <label className={styles.label} style={{ marginBottom: "6px" }}>Calculated Effective Permissions Preview</label>
           {effectivePermissions.length === 0 ? (
-            <span style={{ fontSize: "0.9em", color: "#999", fontStyle: "italic" }}>No permissions will be granted yet.</span>
+            <span className={styles.previewEmpty}>No permissions will be granted yet.</span>
           ) : (
             <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "4px" }}>
               {effectivePermissions.map((permKey) => {
@@ -134,17 +134,7 @@ export default function CreateEmployeeModal({
                 return (
                   <span
                     key={permKey}
-                    style={{
-                      fontSize: "0.8em",
-                      backgroundColor: "#e3f2fd",
-                      color: "#0d47a1",
-                      padding: "3px 8px",
-                      borderRadius: "12px",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "4px",
-                      border: "1px solid #bbdefb",
-                    }}
+                    className={styles.effectiveBadge}
                   >
                     {label}
                     {isInherited && <span title="Inherited from Team" style={{ cursor: "help" }}>🛡️</span>}

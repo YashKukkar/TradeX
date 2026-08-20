@@ -3,6 +3,7 @@ package com.tradex.api.repository;
 import com.tradex.api.entity.SupportTicket;
 import com.tradex.api.entity.User;
 import com.tradex.api.enums.TicketStatus;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -14,9 +15,16 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SupportTicketRepository extends JpaRepository<SupportTicket, Long> {
+
+    @EntityGraph(attributePaths = {"user", "assignedToUser", "resolvedBy"})
     List<SupportTicket> findByUserOrderByCreatedAtDesc(User user);
+
+    @EntityGraph(attributePaths = {"user", "assignedToUser", "resolvedBy"})
     List<SupportTicket> findAllByOrderByCreatedAtDesc();
+
+    @EntityGraph(attributePaths = {"user", "assignedToUser", "resolvedBy", "comments", "attachments"})
     Optional<SupportTicket> findByTicketNumber(String ticketNumber);
+
     List<SupportTicket> findByStatusAndResolvedAtBefore(TicketStatus status, LocalDateTime dateTime);
     List<SupportTicket> findByUserAndStatusIn(User user, List<TicketStatus> statuses);
     long countByUserAndStatusIn(User user, List<TicketStatus> statuses);

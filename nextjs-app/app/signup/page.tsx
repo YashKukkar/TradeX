@@ -4,8 +4,11 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./Auth.module.css";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5173";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 
+  (process.env.NODE_ENV === "production" ? "https://api.tradenows.com/api" : "http://localhost:8080/api");
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 
+  (process.env.NODE_ENV === "production" ? "https://control.tradenows.com" : "http://localhost:5173");
 
 function SignupForm() {
   const [fullName, setFullName] = useState("");
@@ -203,6 +206,7 @@ function SignupForm() {
                     onChange={(e) => { setPassword(e.target.value); setMessage(""); }}
                     required
                     minLength={8}
+                    maxLength={128}
                     className={`${styles.input} ${styles.inputPassword} ${errors.password ? styles.inputInvalid : ""}`}
                   />
                   <button

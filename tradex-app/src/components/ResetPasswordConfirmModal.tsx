@@ -1,4 +1,4 @@
-import Icon from "./Icon";
+import Modal from "./Modal";
 import type { UserInfo } from "../utils/dashboardHelpers";
 import styles from "../AdminUsers.module.css";
 
@@ -16,24 +16,18 @@ export default function ResetPasswordConfirmModal({
   onConfirm,
 }: ResetPasswordConfirmModalProps) {
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.modalHeader}>
-          <div>
-            <h2 className={styles.modalTitle}>Send Reset Email</h2>
-            <p className={styles.modalSub}>{user.email}</p>
-          </div>
-          <button className={styles.closeBtn} onClick={onClose}>
-            <Icon name="close" style={{ fontSize: "20px" }} />
-          </button>
-        </div>
-        <div className={styles.modalBody} style={{ padding: "24px 28px" }}>
-          <p style={{ color: "var(--muted)", fontSize: "14px", margin: 0 }}>
-            Are you sure you want to send a password reset email to <strong style={{ color: "var(--text)" }}>{user.email}</strong>? This will require the user to set a new password on their next login attempt.
-          </p>
-        </div>
-        <div className={styles.modalFooter}>
-          <button className={styles.cancelBtn} onClick={onClose}>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title="Send Reset Email"
+      subtitle={user.email}
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        <p style={{ color: "var(--muted)", fontSize: "14px", margin: 0, lineHeight: 1.5 }}>
+          Are you sure you want to send a password reset email to <strong style={{ color: "var(--text)" }}>{user.email}</strong>? This will require the user to set a new password on their next login attempt.
+        </p>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+          <button className={styles.cancelBtn} onClick={onClose} disabled={isPending}>
             Cancel
           </button>
           <button
@@ -45,6 +39,6 @@ export default function ResetPasswordConfirmModal({
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

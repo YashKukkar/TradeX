@@ -2,11 +2,9 @@ package com.tradex.api.repository;
 
 import com.tradex.api.entity.User;
 import com.tradex.api.entity.WalletTransaction;
-import com.tradex.api.enums.WalletTransactionType;
-
-import jakarta.persistence.LockModeType;
-
 import com.tradex.api.enums.WalletTransactionStatus;
+import com.tradex.api.enums.WalletTransactionType;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
@@ -25,6 +23,13 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
     boolean existsByUserIdAndTypeAndStatus(Long userId, WalletTransactionType type, WalletTransactionStatus status);
 
     List<WalletTransaction> findByStatusOrderByCreatedAtDesc(WalletTransactionStatus status);
+
+    List<WalletTransaction> findByTypeOrderByCreatedAtDesc(WalletTransactionType type);
+
+    List<WalletTransaction> findByTypeAndCreatedAtBetweenOrderByCreatedAtDesc(
+            WalletTransactionType type,
+            LocalDateTime start,
+            LocalDateTime end);
 
     List<WalletTransaction> findAllByOrderByApprovedAtDesc();
 
@@ -55,9 +60,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     interface EmployeeWalletPerformanceProjection {
         Long getEmployeeId();
-
         WalletTransactionType getType();
-
         Long getTxCount();
     }
 
@@ -83,3 +86,4 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end);
 }
+

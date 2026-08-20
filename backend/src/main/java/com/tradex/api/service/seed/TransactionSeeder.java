@@ -8,6 +8,7 @@ import com.tradex.api.enums.PointsTransactionType;
 import com.tradex.api.enums.WalletTransactionType;
 import com.tradex.api.enums.WalletTransactionStatus;
 import com.tradex.api.repository.PointsTransactionRepository;
+import com.tradex.api.repository.UserRepository;
 import com.tradex.api.repository.WalletTransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class TransactionSeeder {
 
         private final PointsTransactionRepository pointsTransactionRepository;
         private final WalletTransactionRepository walletTransactionRepository;
+        private final UserRepository userRepository;
         private final AppProperties appProperties;
 
         @Transactional
@@ -143,8 +145,11 @@ public class TransactionSeeder {
                 List<WalletTransaction> walletTxs = new ArrayList<>();
                 LocalDateTime now = LocalDateTime.now();
 
-                // u1 — approved deposit (submitted ~4h after registration, approved same day at
-                // 1:22 PM)
+                // Look up operational staff member (Meera Joshi - Deposit/Withdrawal reviewer)
+                User staffMeera = userRepository.findByEmail("e2@tradex.com").orElse(null);
+
+                // u1 — approved deposit (submitted ~4h after registration, approved 12 mins later)
+                LocalDateTime u1DepCreated = u1.getCreatedAt().plusHours(4);
                 walletTxs.add(WalletTransaction.builder()
                                 .user(u1)
                                 .amount(new BigDecimal("12500.00"))
@@ -153,10 +158,13 @@ public class TransactionSeeder {
                                 .status(WalletTransactionStatus.SUCCESS)
                                 .notes("Deposit approved by admin")
                                 .idempotencyKey(UUID.randomUUID().toString())
-                                .createdAt(u1.getCreatedAt().plusHours(4))
+                                .createdAt(u1DepCreated)
+                                .approvedAt(u1DepCreated.plusMinutes(12))
+                                .processedBy(staffMeera)
                                 .build());
 
-                // u1 — first deposit bonus (credited immediately after deposit approval)
+                // u1 — first deposit bonus (credited automatically right after deposit approval)
+                LocalDateTime u1BonusCreated = u1DepCreated.plusMinutes(13);
                 walletTxs.add(WalletTransaction.builder()
                                 .user(u1)
                                 .amount(new BigDecimal("800.00"))
@@ -165,11 +173,13 @@ public class TransactionSeeder {
                                 .status(WalletTransactionStatus.SUCCESS)
                                 .notes("First-time wallet load bonus reward")
                                 .idempotencyKey(UUID.randomUUID().toString())
-                                .createdAt(u1.getCreatedAt().withHour(13).withMinute(23))
+                                .createdAt(u1BonusCreated)
+                                .approvedAt(u1BonusCreated)
+                                .processedBy(staffMeera)
                                 .build());
 
-                // u2 — approved deposit (submitted 2h after joining, approved at 5:10 PM same
-                // day)
+                // u2 — approved deposit (submitted 2h after joining, approved 9 mins later)
+                LocalDateTime u2DepCreated = u2.getCreatedAt().plusHours(2);
                 walletTxs.add(WalletTransaction.builder()
                                 .user(u2)
                                 .amount(new BigDecimal("5000.00"))
@@ -178,10 +188,13 @@ public class TransactionSeeder {
                                 .status(WalletTransactionStatus.SUCCESS)
                                 .notes("Deposit approved by admin")
                                 .idempotencyKey(UUID.randomUUID().toString())
-                                .createdAt(u2.getCreatedAt().plusHours(2))
+                                .createdAt(u2DepCreated)
+                                .approvedAt(u2DepCreated.plusMinutes(9))
+                                .processedBy(staffMeera)
                                 .build());
 
-                // u2 — withdrawal the next morning at 10:45 AM
+                // u2 — withdrawal the next morning at 10:45 AM (approved 15 mins later)
+                LocalDateTime u2WithCreated = u2.getCreatedAt().plusDays(1).withHour(10).withMinute(45);
                 walletTxs.add(WalletTransaction.builder()
                                 .user(u2)
                                 .amount(new BigDecimal("250.00"))
@@ -190,7 +203,9 @@ public class TransactionSeeder {
                                 .status(WalletTransactionStatus.SUCCESS)
                                 .notes("Withdrawal approved by admin")
                                 .idempotencyKey(UUID.randomUUID().toString())
-                                .createdAt(u2.getCreatedAt().plusDays(1).withHour(10).withMinute(45))
+                                .createdAt(u2WithCreated)
+                                .approvedAt(u2WithCreated.plusMinutes(15))
+                                .processedBy(staffMeera)
                                 .build());
 
                 // u3 — pending deposit (submitted ~3 hours ago — fresh in the admin queue)
@@ -203,9 +218,11 @@ public class TransactionSeeder {
                                 .notes("Deposit request pending approval")
                                 .idempotencyKey(UUID.randomUUID().toString())
                                 .createdAt(now.minusHours(3).withSecond(0).withNano(0))
+                                .approvedAt(null)
+                                .processedBy(null)
                                 .build());
 
-                // u4 — pending withdrawal (submitted ~45 minutes ago — very fresh)
+                // u4 — pending withdrawal (submitted ~45 minutes ago — fresh in the admin queue)
                 walletTxs.add(WalletTransaction.builder()
                                 .user(u4)
                                 .amount(new BigDecimal("500.00"))
@@ -215,6 +232,8 @@ public class TransactionSeeder {
                                 .notes("Withdrawal of funds from wallet to bank account ACCU104")
                                 .idempotencyKey(UUID.randomUUID().toString())
                                 .createdAt(now.minusMinutes(45).withSecond(0).withNano(0))
+                                .approvedAt(null)
+                                .processedBy(null)
                                 .build());
 
                 walletTransactionRepository.saveAll(walletTxs);

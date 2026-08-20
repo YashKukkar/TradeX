@@ -39,8 +39,8 @@ export default function SegmentedControl<T extends string>({
     >
       {options.map((opt) => {
         const isActive = opt.value === value;
-        const activeBg = opt.activeBg || "var(--surface-3)";
-        const activeColor = opt.activeColor || "var(--text)";
+        const activeBg = opt.activeBg || "var(--primary)";
+        const activeColor = opt.activeColor || "var(--on-primary)";
 
         return (
           <button

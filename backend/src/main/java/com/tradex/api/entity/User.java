@@ -100,6 +100,16 @@ public class User {
     @Builder.Default
     private boolean locked = false;
 
+    @Column(name = "failed_login_attempts", nullable = false)
+    @Builder.Default
+    private int failedLoginAttempts = 0;
+
+    @Column(name = "locked_until")
+    private LocalDateTime lockedUntil;
+
+    @Column(name = "password_changed_at")
+    private LocalDateTime passwordChangedAt;
+
     @Column(name = "expired", nullable = false)
     @Builder.Default
     private boolean expired = false;

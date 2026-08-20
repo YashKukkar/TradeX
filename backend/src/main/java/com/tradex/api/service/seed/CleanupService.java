@@ -74,7 +74,7 @@ public class CleanupService {
         }
 
         verificationTokenRepository.deleteByUserIn(existingUsers);
-        adminAuditLogRepository.deleteByActorInOrTargetIn(existingUsers);
+        adminAuditLogRepository.deleteAll();
         pointsTransactionRepository.deleteByUserIn(existingUsers);
         walletTransactionRepository.deleteByUserIn(existingUsers);
         referralRewardRepository.deleteByReferrerOrReferredUserIn(existingUsers);
