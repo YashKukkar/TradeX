@@ -15,7 +15,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: "TradeX — Trade Smarter. Invest Better.",
-  description: "TradeX",
+  description: "Trade NSE stocks, F&O, and MCX commodities on TradeX — India's modern trading platform.",
   icons: {
     icon: "/icon.svg?v=2",
   },

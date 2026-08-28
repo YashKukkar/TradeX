@@ -38,10 +38,10 @@ export default function Home() {
   <div class="container hero-grid">
     <div>
       <span class="pill">● Live markets • SEBI-registered partners</span>
-      <h1>Trade global markets on a <span class="gradient">single smart platform</span></h1>
+      <h1>Trade Indian markets on a <span class="gradient">single smart platform</span></h1>
       <p class="lead">
-        Stocks, commodities, indices and CFDs — analyse, execute and manage your portfolio with
-        institutional-grade tools, transparent pricing and 24/7 customer support.
+        Stocks, F&amp;O, and commodities — analyze, execute, and manage your portfolio with
+        institutional-grade tools, transparent pricing, and 24/7 customer support.
       </p>
       <div class="hero-cta">
         <a href="/signup" class="btn btn-primary btn-lg">Get Started Free</a>
@@ -81,14 +81,14 @@ export default function Home() {
 
 <div class="markets">
   <div class="ticker-track">
-    <div class="ticker-item"><b>SENSEX</b> 73,892.31 <span class="up">+0.88%</span></div>
-    <div class="ticker-item"><b>NIFTY</b> 22,418.75 <span class="up">+1.24%</span></div>
+    <div class="ticker-item"><b>NIFTY 50</b> 22,418.75 <span class="up">+1.24%</span></div>
     <div class="ticker-item"><b>BANK NIFTY</b> 47,120.10 <span class="down">-0.32%</span></div>
-    <div class="ticker-item"><b>USD/INR</b> 83.47 <span class="up">+0.04%</span></div>
-    <div class="ticker-item"><b>BRENT</b> $87.42 <span class="down">-0.21%</span></div>
-    <div class="ticker-item"><b>GOLD</b> ₹71,320 <span class="up">+0.31%</span></div>
-    <div class="ticker-item"><b>BTC</b> $64,880 <span class="up">+2.01%</span></div>
-    <div class="ticker-item"><b>S&amp;P 500</b> 5,204.10 <span class="up">+0.55%</span></div>
+    <div class="ticker-item"><b>FINNIFTY</b> 21,180.45 <span class="up">+0.65%</span></div>
+    <div class="ticker-item"><b>GOLD (MCX)</b> ₹71,320 <span class="up">+0.31%</span></div>
+    <div class="ticker-item"><b>SILVER (MCX)</b> ₹83,450 <span class="up">+0.85%</span></div>
+    <div class="ticker-item"><b>CRUDE OIL (MCX)</b> ₹6,840 <span class="up">+0.75%</span></div>
+    <div class="ticker-item"><b>NATURAL GAS (MCX)</b> ₹198.50 <span class="down">-1.10%</span></div>
+    <div class="ticker-item"><b>RELIANCE (NSE)</b> ₹2,910.40 <span class="up">+0.82%</span></div>
   </div>
 </div>
 
@@ -97,7 +97,7 @@ export default function Home() {
     <div class="section-head">
       <span class="pill">Why TradeX</span>
       <h2>Everything you need to trade — in one place</h2>
-      <p>Powerful charts, transparent pricing, lightning execution, and human support when it matters.</p>
+      <p>Powerful charts, transparent pricing, lightning-fast execution, and dedicated human support when it matters.</p>
     </div>
 
     <div class="grid-3">
@@ -114,7 +114,7 @@ export default function Home() {
       <div class="card">
         <div class="icon"><span class="material-symbols-outlined">bar_chart</span></div>
         <h3>Pro Charts</h3>
-        <p>TradingView-powered charts with 100+ indicators, drawing tools and saved templates.</p>
+        <p>TradingView-powered charts with 100+ indicators, drawing tools, and saved templates.</p>
       </div>
       <div class="card">
         <div class="icon"><span class="material-symbols-outlined">lock</span></div>
@@ -124,7 +124,7 @@ export default function Home() {
       <div class="card">
         <div class="icon"><span class="material-symbols-outlined">schedule</span></div>
         <h3>24/7 Support</h3>
-        <p>Get real humans on chat, email and phone — any time the markets — or your doubts — are open.</p>
+        <p>Connect with real humans on chat, email, and phone whenever markets are open or questions arise.</p>
       </div>
       <div class="card">
         <div class="icon"><span class="material-symbols-outlined">smartphone</span></div>
@@ -143,15 +143,15 @@ export default function Home() {
           <img src="/assets/logo.svg" alt="" class="logo" />
           <span class="brand-name">Trade<span>X</span></span>
         </a>
-        <p>India's modern trading platform for stocks, derivatives, commodities and global markets.</p>
+        <p>India's modern trading platform for NSE stocks, F&amp;O, and MCX commodities.</p>
       </div>
       <div class="footer-col">
         <h4>Products</h4>
         <ul>
-          <li><a href="/pages/products.html">Stocks &amp; ETFs</a></li>
-          <li><a href="/pages/products.html">Options &amp; Futures</a></li>
-          <li><a href="/pages/products.html">Mutual Funds</a></li>
+          <li><a href="/pages/products.html">Stocks & ETFs</a></li>
+          <li><a href="/pages/products.html">Futures & Options</a></li>
           <li><a href="/pages/products.html">Commodities</a></li>
+          <li><a href="/pages/products.html">Index Derivatives</a></li>
         </ul>
       </div>
       <div class="footer-col">

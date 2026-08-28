@@ -117,8 +117,8 @@ export interface ReferralReward {
 
 export const TICKERS_DATA = [
   { symbol: "NIFTY 50", value: "22,418.75", change: "+1.24%", up: true },
-  { symbol: "SENSEX", value: "73,892.31", change: "+0.88%", up: true },
   { symbol: "BANK NIFTY", value: "47,120.10", change: "-0.32%", up: false },
+  { symbol: "FINNIFTY", value: "21,180.45", change: "+0.65%", up: true },
   { symbol: "GOLD MCX", value: "₹71,320", change: "+0.31%", up: true },
 ];
 
