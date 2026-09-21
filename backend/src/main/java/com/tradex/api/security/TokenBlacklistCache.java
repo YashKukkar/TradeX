@@ -2,16 +2,35 @@ package com.tradex.api.security;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Expiry;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 @Component
 public class TokenBlacklistCache {
 
     private final Cache<String, Long> blacklist = Caffeine.newBuilder()
-            .expireAfterWrite(24, TimeUnit.HOURS)
+            .expireAfter(new Expiry<String, Long>() {
+                @Override
+                public long expireAfterCreate(String key, Long expiryEpochMilli, long currentTime) {
+                    if (expiryEpochMilli == null) {
+                        return TimeUnit.HOURS.toNanos(24);
+                    }
+                    long remainingMs = expiryEpochMilli - System.currentTimeMillis();
+                    return remainingMs > 0 ? TimeUnit.MILLISECONDS.toNanos(remainingMs) : 0L;
+                }
+
+                @Override
+                public long expireAfterUpdate(String key, Long value, long currentTime, long currentDuration) {
+                    return currentDuration;
+                }
+
+                @Override
+                public long expireAfterRead(String key, Long value, long currentTime, long currentDuration) {
+                    return currentDuration;
+                }
+            })
             .build();
 
     public void blacklistToken(String token, long expiryTimeSeconds) {
@@ -21,18 +40,7 @@ public class TokenBlacklistCache {
     }
 
     public boolean isBlacklisted(String token) {
-        if (token == null) {
-            return false;
-        }
-        Long expiry = blacklist.getIfPresent(token);
-        if (expiry == null) {
-            return false;
-        }
-        if (Instant.now().toEpochMilli() > expiry) {
-            blacklist.invalidate(token);
-            return false;
-        }
-        return true;
+        return token != null && blacklist.getIfPresent(token) != null;
     }
 
     public void cleanExpiredTokens() {

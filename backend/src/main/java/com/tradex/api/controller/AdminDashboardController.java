@@ -79,11 +79,7 @@ public class AdminDashboardController {
         String endStr = dataCutoff.toLocalDate().toString();
         String timeStr = asOfNow.format(DateTimeFormatter.ofPattern("HH-mm-ss"));
 
-        String brandPrefix = (appProperties != null && appProperties.getBranding() != null
-                && appProperties.getBranding().getAppName() != null
-                && !appProperties.getBranding().getAppName().isBlank())
-                        ? appProperties.getBranding().getAppName().toLowerCase().replaceAll("[^a-z0-9_-]", "")
-                        : "tradex";
+        String brandPrefix = appProperties.getBranding().getSanitizedAppName().toLowerCase();
 
         String filename;
         if (startStr.equals(endStr)) {
@@ -92,9 +88,6 @@ public class AdminDashboardController {
             filename = String.format("%s-analytics-%s_to_%s_asof_%s.csv", brandPrefix, startStr, endStr, timeStr);
         }
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
-                .body(csvData);
+        return com.tradex.api.util.CsvExportUtils.toResponseEntity(csvData, filename);
     }
 }

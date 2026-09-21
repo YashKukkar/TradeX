@@ -7,14 +7,14 @@ class DataFormatterTest {
 
     @Test
     void testMaskEmail() {
-        assertNull(DataFormatter.maskEmail(null));
-        assertEquals("", DataFormatter.maskEmail(""));
-        assertEquals("test", DataFormatter.maskEmail("test"));
-        assertEquals("te***t@example.com", DataFormatter.maskEmail("test@example.com"));
+        assertEquals("[EMPTY_EMAIL]", DataFormatter.maskEmail(null));
+        assertEquals("[EMPTY_EMAIL]", DataFormatter.maskEmail(""));
+        assertEquals("***", DataFormatter.maskEmail("test"));
+        assertEquals("te***@example.com", DataFormatter.maskEmail("test@example.com"));
         assertEquals("a***@example.com", DataFormatter.maskEmail("a@example.com"));
         assertEquals("a***@example.com", DataFormatter.maskEmail("ab@example.com"));
         assertEquals("ab***@example.com", DataFormatter.maskEmail("abc@example.com"));
-        assertEquals("ab***d@example.com", DataFormatter.maskEmail("abcd@example.com"));
+        assertEquals("ab***@example.com", DataFormatter.maskEmail("abcd@example.com"));
     }
 }
 

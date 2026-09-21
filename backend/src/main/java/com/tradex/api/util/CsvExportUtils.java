@@ -1,5 +1,13 @@
 package com.tradex.api.util;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.QuoteMode;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -9,8 +17,9 @@ public class CsvExportUtils {
 
     public static final DateTimeFormatter DISPLAY_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    private static final java.util.regex.Pattern PURE_NUMBER_PATTERN = java.util.regex.Pattern.compile("^[+-]?(\\d+(\\.\\d+)?|\\.\\d+)$");
-    private static final java.util.regex.Pattern FORMULA_TRIGGER_PATTERN = java.util.regex.Pattern.compile("^[=+\\-@\\t\\r|%]");
+    private static final CSVFormat FORMAT = CSVFormat.DEFAULT.builder()
+            .setQuoteMode(QuoteMode.MINIMAL)
+            .build();
 
     public static String escapeCsv(String value) {
         if (value == null) {
@@ -20,18 +29,13 @@ public class CsvExportUtils {
         if (str.isEmpty()) {
             return "";
         }
-
-        // Neutralize formula injection for non-numeric fields starting with formula trigger characters
-        if (!PURE_NUMBER_PATTERN.matcher(str).matches() && FORMULA_TRIGGER_PATTERN.matcher(str).find()) {
-            str = "'" + str;
+        StringBuilder out = new StringBuilder();
+        try {
+            FORMAT.print(str, out, true);
+        } catch (IOException e) {
+            return str;
         }
-
-        // Standard RFC 4180 CSV escaping
-        if (str.contains(",") || str.contains("\"") || str.contains("\n") || str.contains("\r") || str.contains("'")) {
-            str = str.replace("\"", "\"\"");
-            return "\"" + str + "\"";
-        }
-        return str;
+        return out.toString();
     }
 
     public static String formatDecimal(BigDecimal val) {
@@ -46,5 +50,13 @@ public class CsvExportUtils {
             return "";
         }
         return dateTime.format(DISPLAY_DATE_FORMATTER);
+    }
+
+    public static ResponseEntity<byte[]> toResponseEntity(byte[] data, String filename) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("text/csv;charset=utf-8"));
+        headers.setContentDisposition(ContentDisposition.attachment().filename(filename).build());
+        headers.setContentLength(data.length);
+        return ResponseEntity.ok().headers(headers).body(data);
     }
 }

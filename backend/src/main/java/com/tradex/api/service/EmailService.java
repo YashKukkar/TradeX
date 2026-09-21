@@ -49,16 +49,11 @@ public class EmailService {
 
             String fromEmail = settings.getSmtpFromEmail();
             if (fromEmail == null || fromEmail.isBlank() || "noreply@tradex.com".equalsIgnoreCase(fromEmail.trim())) {
-                fromEmail = (appProperties.getBranding() != null && appProperties.getBranding().getSupportEmail() != null && !appProperties.getBranding().getSupportEmail().isBlank())
-                        ? appProperties.getBranding().getSupportEmail()
-                        : "noreply@example.com";
+                fromEmail = appProperties.getBranding().getSupportEmail();
             }
             String fromName = settings.getSmtpFromName();
             if (fromName == null || fromName.isBlank() || "TradeX".equalsIgnoreCase(fromName.trim()) || "TradeX Support".equalsIgnoreCase(fromName.trim())) {
-                String brandName = (appProperties.getBranding() != null && appProperties.getBranding().getAppName() != null && !appProperties.getBranding().getAppName().isBlank())
-                        ? appProperties.getBranding().getAppName()
-                        : "TradeX";
-                fromName = brandName + " Support";
+                fromName = appProperties.getBranding().getAppName() + " Support";
             }
 
             String targetEmail = to;

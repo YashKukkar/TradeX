@@ -2,12 +2,10 @@ package com.tradex.api.controller;
 
 import com.tradex.api.config.AppProperties;
 import com.tradex.api.service.TransactionExportService;
+import com.tradex.api.util.CsvExportUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,13 +31,6 @@ public class AdminTransactionExportController {
         this.appProperties = appProperties;
     }
 
-    private String getBrandPrefix() {
-        if (appProperties != null && appProperties.getBranding() != null && appProperties.getBranding().getAppName() != null && !appProperties.getBranding().getAppName().isBlank()) {
-            return appProperties.getBranding().getAppName().replaceAll("[^a-zA-Z0-9_-]", "");
-        }
-        return "TradeX";
-    }
-
     @PreAuthorize("hasAnyAuthority('MANAGE_DEPOSITS', 'ROLE_SUPER_ADMIN')")
     @GetMapping("/deposits")
     public ResponseEntity<byte[]> exportDeposits(
@@ -49,8 +40,8 @@ public class AdminTransactionExportController {
         log.info("Exporting deposits CSV. startDate: {}, endDate: {}", startDate, endDate);
         byte[] csvData = transactionExportService.generateDepositsCsv(startDate, endDate);
 
-        String filename = getBrandPrefix() + "_Deposits_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")) + ".csv";
-        return buildCsvResponse(csvData, filename);
+        String filename = appProperties.getBranding().getSanitizedAppName() + "_Deposits_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")) + ".csv";
+        return CsvExportUtils.toResponseEntity(csvData, filename);
     }
 
     @PreAuthorize("hasAnyAuthority('MANAGE_WITHDRAWALS', 'ROLE_SUPER_ADMIN')")
@@ -62,8 +53,8 @@ public class AdminTransactionExportController {
         log.info("Exporting withdrawals CSV. startDate: {}, endDate: {}", startDate, endDate);
         byte[] csvData = transactionExportService.generateWithdrawalsCsv(startDate, endDate);
 
-        String filename = getBrandPrefix() + "_Withdrawals_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")) + ".csv";
-        return buildCsvResponse(csvData, filename);
+        String filename = appProperties.getBranding().getSanitizedAppName() + "_Withdrawals_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")) + ".csv";
+        return CsvExportUtils.toResponseEntity(csvData, filename);
     }
 
     @PreAuthorize("hasAnyAuthority('MANAGE_POINTS', 'ROLE_SUPER_ADMIN')")
@@ -75,18 +66,7 @@ public class AdminTransactionExportController {
         log.info("Exporting points conversions CSV. startDate: {}, endDate: {}", startDate, endDate);
         byte[] csvData = transactionExportService.generatePointsConversionsCsv(startDate, endDate);
 
-        String filename = getBrandPrefix() + "_PointsConversions_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")) + ".csv";
-        return buildCsvResponse(csvData, filename);
-    }
-
-    private ResponseEntity<byte[]> buildCsvResponse(byte[] data, String filename) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("text/csv"));
-        headers.setContentDisposition(ContentDisposition.attachment().filename(filename).build());
-        headers.setContentLength(data.length);
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(data);
+        String filename = appProperties.getBranding().getSanitizedAppName() + "_PointsConversions_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")) + ".csv";
+        return CsvExportUtils.toResponseEntity(csvData, filename);
     }
 }

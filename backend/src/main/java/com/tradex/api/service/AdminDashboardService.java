@@ -2,6 +2,7 @@ package com.tradex.api.service;
 
 import com.tradex.api.dto.AdminDashboardMetricsDTO;
 import com.tradex.api.dto.AdminDashboardMetricsDTO.EmployeeMetricsDTO;
+import com.tradex.api.enums.Role;
 import com.tradex.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,7 +19,6 @@ import com.tradex.api.dto.AdminSystemHealthDTO;
 public class AdminDashboardService {
 
     private final UserRepository userRepository;
-    private final UserAnalyticsService userAnalyticsService;
     private final TransactionAnalyticsService transactionAnalyticsService;
     private final TicketAnalyticsService ticketAnalyticsService;
     private final EmployeeAnalyticsService employeeAnalyticsService;
@@ -40,14 +40,15 @@ public class AdminDashboardService {
     @Transactional(readOnly = true)
     @Cacheable(value = "dashboardMetrics", key = "{#start, #end}")
     public AdminDashboardMetricsDTO getDashboardMetrics(LocalDateTime start, LocalDateTime end) {
-        UserAnalyticsService.UserAnalytics userResult = userAnalyticsService.getUserAnalytics(start, end);
+        long totalUsers = userRepository.countByRole(Role.USER);
+        long newRegistrations = userRepository.countByRoleAndCreatedAtBetween(Role.USER, start, end);
         TransactionAnalyticsService.TransactionAnalytics transactionResult = transactionAnalyticsService.getTransactionAnalytics(start, end);
         TicketAnalyticsService.TicketAnalytics ticketResult = ticketAnalyticsService.getTicketAnalytics(start, end);
         List<EmployeeMetricsDTO> employeeResult = employeeAnalyticsService.getEmployeePerformance(start, end);
 
         return new AdminDashboardMetricsDTO(
-            userResult.totalUsers(),
-            userResult.newRegistrations(),
+            totalUsers,
+            newRegistrations,
             transactionResult.totalDeposits(),
             transactionResult.totalDepositsCount(),
             transactionResult.totalWithdrawals(),

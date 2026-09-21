@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/papaparse": "^5.5.2",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "typescript": "~6.0.2",
@@ -19,7 +20,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.100.14",
-    "axios": "^1.16.1",
+    "papaparse": "^5.7.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

@@ -12,6 +12,17 @@ export interface SlaInfo {
   elapsedHours: number;
 }
 
+function formatDuration(diffMs: number): string {
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  const days = Math.floor(diffMinutes / 1440);
+  const hours = Math.floor((diffMinutes % 1440) / 60);
+  const minutes = diffMinutes % 60;
+
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${Math.max(1, minutes)}m`;
+}
+
 export function getTicketSlaInfo(
   createdAtInput: string | number,
   ticketStatus: string,
@@ -26,25 +37,14 @@ export function getTicketSlaInfo(
 
   const diffMs = Math.max(0, endTime - createdTime);
   const diffHours = diffMs / (1000 * 60 * 60);
-  const diffMinutes = Math.floor((diffMs / (1000 * 60)) % 60);
   const roundedHours = Math.floor(diffHours);
+  const durationStr = formatDuration(diffMs);
 
   if (isResolvedOrClosed) {
-    let resolutionTimeStr = "";
-    if (roundedHours >= 24) {
-      const days = Math.floor(roundedHours / 24);
-      const remainingHours = roundedHours % 24;
-      resolutionTimeStr = `${days}d ${remainingHours}h`;
-    } else if (roundedHours > 0) {
-      resolutionTimeStr = `${roundedHours}h ${diffMinutes}m`;
-    } else {
-      resolutionTimeStr = `${Math.max(1, diffMinutes)}m`;
-    }
-
     return {
       status: "COMPLETED",
-      label: `Resolved in ${resolutionTimeStr}`,
-      shortLabel: resolutionTimeStr,
+      label: `Resolved in ${durationStr}`,
+      shortLabel: durationStr,
       color: "var(--success)",
       bg: "var(--success-bg)",
       border: "var(--success-border)",
@@ -56,14 +56,10 @@ export function getTicketSlaInfo(
 
   // Active tickets (OPEN / IN_PROGRESS)
   if (diffHours >= 24) {
-    const days = Math.floor(diffHours / 24);
-    const remainingHours = roundedHours % 24;
-    const timeStr = days >= 1 ? `${days}d ${remainingHours}h` : `${roundedHours}h`;
-
     return {
       status: "OVERDUE",
-      label: `Overdue • ${timeStr}`,
-      shortLabel: `${timeStr} (Overdue)`,
+      label: `Overdue • ${durationStr}`,
+      shortLabel: `${durationStr} (Overdue)`,
       color: "var(--danger)",
       bg: "var(--danger-bg)",
       border: "var(--danger-border)",
@@ -87,11 +83,10 @@ export function getTicketSlaInfo(
     };
   }
 
-  const timeStr = roundedHours > 0 ? `${roundedHours}h ${diffMinutes}m` : `${Math.max(1, diffMinutes)}m`;
   return {
     status: "ON_TRACK",
-    label: `On Track • ${timeStr}`,
-    shortLabel: `${timeStr} (Active)`,
+    label: `On Track • ${durationStr}`,
+    shortLabel: `${durationStr} (Active)`,
     color: "var(--primary)",
     bg: "var(--primary-bg)",
     border: "var(--primary-border)",

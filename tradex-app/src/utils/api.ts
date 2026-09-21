@@ -1,4 +1,3 @@
-import axios from "axios";
 import { config } from "../config";
 import { generateCsvFilename } from "./formatters";
 
@@ -27,22 +26,6 @@ export const safeStorage = {
   }
 };
 
-const axiosInstance = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    "Content-Type": "application/json"
-  }
-});
-
-axiosInstance.interceptors.request.use((req) => {
-  const token = safeStorage.getItem("token");
-  if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
-  }
-  return req;
-});
-
 export class ApiError extends Error {
   status: number;
   validationErrors?: Record<string, string>;
@@ -57,52 +40,72 @@ export class ApiError extends Error {
   }
 }
 
-axiosInstance.interceptors.response.use(
-  (res) => res.data,
-  (err) => {
-    const errorData = err.response?.data;
-    const message = errorData?.message || err.message || "Request failed";
-    const status = err.response?.status || 500;
-    const validationErrors = errorData?.validationErrors;
-    const path = errorData?.path;
-    return Promise.reject(new ApiError(message, status, validationErrors, path));
-  }
-);
-
-const parseBody = (body: any) => {
-  if (typeof body === "string") {
-    try {
-      return JSON.parse(body);
-    } catch (e) {
-      return body;
-    }
-  }
-  return body;
-};
-
 export const api = async (endpoint: string, options: any = {}): Promise<any> => {
-  const url = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-  const data = parseBody(options.body);
-  if (options.method === "POST") {
-    return axiosInstance.post(url, data || {}, { headers: options.headers });
+  const url = endpoint.startsWith("http")
+    ? endpoint
+    : `${config.apiUrl}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+
+  const token = safeStorage.getItem("token");
+  const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
+
+  const headers: Record<string, string> = {
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
+    ...(options.headers || {}),
+  };
+
+  const body = isFormData
+    ? options.body
+    : options.body
+      ? (typeof options.body === "string" ? options.body : JSON.stringify(options.body))
+      : undefined;
+
+  const res = await fetch(url, {
+    method: options.method || "GET",
+    headers,
+    body,
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    let errorData: any = null;
+    try {
+      errorData = await res.json();
+    } catch {
+      // Non-JSON error body
+    }
+    const message = errorData?.message || res.statusText || "Request failed";
+    throw new ApiError(message, res.status, errorData?.validationErrors, errorData?.path);
   }
-  if (options.method === "PUT") {
-    return axiosInstance.put(url, data || {}, { headers: options.headers });
+
+  if (res.status === 204) return null;
+  const contentType = res.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return res.json();
   }
-  if (options.method === "DELETE") {
-    return axiosInstance.delete(url, { headers: options.headers });
-  }
-  if (options.method === "PATCH") {
-    return axiosInstance.patch(url, data || {}, { headers: options.headers });
-  }
-  return axiosInstance.get(url, { headers: options.headers });
+  return res.text();
 };
 
 export const apiDownload = async (endpoint: string, defaultFilename: string): Promise<void> => {
-  const url = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-  const responseData: any = await axiosInstance.get(url, { responseType: "blob" });
+  const url = endpoint.startsWith("http")
+    ? endpoint
+    : `${config.apiUrl}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
 
-  const blob = responseData instanceof Blob ? responseData : new Blob([responseData], { type: "text/csv;charset=utf-8;" });
+  const token = safeStorage.getItem("token");
+  const headers: Record<string, string> = {
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+
+  const res = await fetch(url, {
+    headers,
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new ApiError(`Download failed: ${res.statusText}`, res.status);
+  }
+
+  const blob = await res.blob();
   const downloadUrl = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = downloadUrl;

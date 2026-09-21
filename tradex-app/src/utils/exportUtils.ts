@@ -1,3 +1,4 @@
+import Papa from "papaparse";
 import { apiDownload } from "./api";
 import { branding } from "../config";
 
@@ -41,35 +42,9 @@ export function generateExportFilename(domain: string, options?: ExportFilenameO
   return `${brandSlug || "TradeX"}_${cleanDomain}${scopePart}${timestampPart}${partSuffix}.${ext}`;
 }
 
-/**
- * Precise RFC4180 CSV field escaper.
- * Preserves legitimate numeric and signed values (e.g. -500, +250.50, 42),
- * while neutralizing non-numeric formula injection patterns (=cmd, @SUM).
- */
 export function escapeCsvField(val: string | number | boolean | null | undefined): string {
   if (val === null || val === undefined) return "";
-
-  // 1. Primitive numbers: pass through directly
-  if (typeof val === "number") {
-    return isFinite(val) ? String(val) : "";
-  }
-
-  let str = String(val).trim();
-  if (str === "") return "";
-
-  // 2. Legitimate numeric strings (e.g. "-500.00", "+250", "42"): preserve without single quote
-  const isPureNumber = /^[+-]?(\d+(\.\d+)?|\.\d+)$/.test(str);
-
-  // 3. Formula injection mitigation: Only escape non-numeric strings starting with formula trigger chars
-  if (!isPureNumber && /^[=+\-@\t\r|%]/.test(str)) {
-    str = `'` + str;
-  }
-
-  // 4. RFC4180 quote wrapping
-  if (str.includes(",") || str.includes("\"") || str.includes("\n") || str.includes("\r") || str.includes("'")) {
-    return `"${str.replace(/"/g, '""')}"`;
-  }
-  return str;
+  return Papa.unparse([[val]]).trim();
 }
 
 /**
@@ -80,9 +55,10 @@ export function exportClientCsv(
   headers: string[],
   rows: (string | number | boolean | null | undefined)[][]
 ): void {
-  const headerLine = headers.map(escapeCsvField).join(",");
-  const dataLines = rows.map((r) => r.map(escapeCsvField).join(","));
-  const csvContent = "\uFEFF" + [headerLine, ...dataLines].join("\r\n");
+  const csvContent = "\uFEFF" + Papa.unparse({
+    fields: headers,
+    data: rows as any[][],
+  });
 
   const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);

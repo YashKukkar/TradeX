@@ -23,9 +23,26 @@ public class AppProperties {
     @Getter
     @Setter
     public static class Branding {
-        private String appName;
-        private String supportEmail;
-        private String legalName;
+        private String appName = "TradeX";
+        private String supportEmail = "support@tradenows.com";
+        private String legalName = "TradeX Technologies Ltd";
+
+        public String getAppName() {
+            return (appName != null && !appName.isBlank()) ? appName : "TradeX";
+        }
+
+        public String getSupportEmail() {
+            return (supportEmail != null && !supportEmail.isBlank()) ? supportEmail : "support@tradenows.com";
+        }
+
+        public String getLegalName() {
+            return (legalName != null && !legalName.isBlank()) ? legalName : "TradeX Technologies Ltd";
+        }
+
+        public String getSanitizedAppName() {
+            String sanitized = getAppName().replaceAll("[^a-zA-Z0-9_-]", "");
+            return sanitized.isBlank() ? "TradeX" : sanitized;
+        }
     }
 
     @Getter

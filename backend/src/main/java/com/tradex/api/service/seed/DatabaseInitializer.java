@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,8 +17,9 @@ public class DatabaseInitializer implements CommandLineRunner {
     private final JdbcTemplate jdbcTemplate;
     private final AdminSeeder adminSeeder;
     private final SystemSettingsSeeder systemSettingsSeeder;
-    private final DemoDataSeeder demoDataSeeder;
+    private final SeedDataService seedDataService;
     private final AppProperties appProperties;
+    private final Environment environment;
 
     @Override
     public void run(String... args) throws Exception {
@@ -76,7 +79,12 @@ public class DatabaseInitializer implements CommandLineRunner {
         // Delegate seeding steps to dedicated seeder components
         adminSeeder.seedAdmin();
         systemSettingsSeeder.seedSettings();
-        demoDataSeeder.seedDemoData();
+        if (appProperties.getSeed().isDemoEnabled() && !environment.acceptsProfiles(Profiles.of("test"))) {
+            log.info("Seeding demo transactions and demo system users");
+            seedDataService.seedTestData();
+        } else {
+            log.info("Demo data seeding is disabled by config or profile check");
+        }
 
         log.info("Database initialization completed successfully.");
     }

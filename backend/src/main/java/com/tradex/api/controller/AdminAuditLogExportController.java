@@ -48,9 +48,7 @@ public class AdminAuditLogExportController {
     public ResponseEntity<StreamingResponseBody> exportAuditLogs(
             @RequestParam(required = false) String targetEmail) {
 
-        String brand = (appProperties != null && appProperties.getBranding() != null && appProperties.getBranding().getAppName() != null && !appProperties.getBranding().getAppName().isBlank())
-                ? appProperties.getBranding().getAppName().replaceAll("[^a-zA-Z0-9_-]", "")
-                : "TradeX";
+        String brand = appProperties.getBranding().getSanitizedAppName();
 
         String dateStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"));
         String filename = brand + "_System_Audit_Logs_" + dateStr + ".csv";

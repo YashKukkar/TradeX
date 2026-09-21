@@ -1,19 +1,12 @@
 package com.tradex.api.util;
 
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.ImageOutputStream;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 
 @Slf4j
 public class ImageCompressionUtil {
@@ -44,75 +37,19 @@ public class ImageCompressionUtil {
                 return new CompressionResult(concat(header, rest), originalContentType);
             }
 
-            // ImageIO.read needs the stream from position 0, so open a fresh one
-            BufferedImage originalImage;
-            try (InputStream fullStream = file.getInputStream()) {
-                originalImage = ImageIO.read(fullStream);
-            }
-
-            if (originalImage == null) {
-                log.warn("Failed to parse image from file: {}", file.getOriginalFilename());
-                return new CompressionResult(file.getBytes(), originalContentType);
-            }
-
             long rawSize = file.getSize();
-            int width  = originalImage.getWidth();
-            int height = originalImage.getHeight();
-            log.info("Original image dimensions: {}x{}, size: {} bytes", width, height, rawSize);
-
-            BufferedImage targetImage = originalImage;
-            boolean needsResize = width > MAX_DIMENSION || height > MAX_DIMENSION;
-
-            if (needsResize) {
-                double ratio = Math.min((double) MAX_DIMENSION / width, (double) MAX_DIMENSION / height);
-                int targetWidth  = (int) Math.round(width  * ratio);
-                int targetHeight = (int) Math.round(height * ratio);
-
-                targetImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-                Graphics2D g2d = targetImage.createGraphics();
-                g2d.setColor(Color.WHITE);
-                g2d.fillRect(0, 0, targetWidth, targetHeight);
-                g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-                g2d.setRenderingHint(RenderingHints.KEY_RENDERING,     RenderingHints.VALUE_RENDER_QUALITY);
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,  RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
-                g2d.dispose();
-                log.info("Resized image to {}x{}", targetWidth, targetHeight);
-            } else if (originalImage.getType() != BufferedImage.TYPE_INT_RGB) {
-                // JPEG writer requires standard RGB — convert in-place without resizing
-                targetImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-                Graphics2D g2d = targetImage.createGraphics();
-                g2d.setColor(Color.WHITE);
-                g2d.fillRect(0, 0, width, height);
-                g2d.drawImage(originalImage, 0, 0, null);
-                g2d.dispose();
-            }
-
             float quality = rawSize < SMALL_THRESHOLD  ? QUALITY_HIGH
                           : rawSize < MEDIUM_THRESHOLD ? QUALITY_MEDIUM
                           : QUALITY_LOW;
 
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                 ImageOutputStream ios = ImageIO.createImageOutputStream(baos)) {
+                 InputStream fullStream = file.getInputStream()) {
 
-                Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpeg");
-                if (!writers.hasNext()) {
-                    throw new IllegalStateException("No JPEG writers found in this JVM");
-                }
-                ImageWriter writer = writers.next();
-                writer.setOutput(ios);
-
-                ImageWriteParam param = writer.getDefaultWriteParam();
-                if (param.canWriteCompressed()) {
-                    param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                    param.setCompressionType("JPEG");
-                    param.setCompressionQuality(quality);
-                }
-
-                writer.write(null, new IIOImage(targetImage, null, null), param);
-                writer.dispose();
-
-                ios.flush();
+                Thumbnails.of(fullStream)
+                        .size(MAX_DIMENSION, MAX_DIMENSION)
+                        .outputFormat("jpeg")
+                        .outputQuality(quality)
+                        .toOutputStream(baos);
 
                 byte[] compressedBytes = baos.toByteArray();
 
@@ -126,7 +63,6 @@ public class ImageCompressionUtil {
                         rawSize, compressedBytes.length,
                         String.format("%.1f%%", (1.0 - (double) compressedBytes.length / rawSize) * 100));
 
-                // Output bytes are JPEG even if the original was PNG
                 return new CompressionResult(compressedBytes, "image/jpeg");
             }
         } catch (Exception e) {

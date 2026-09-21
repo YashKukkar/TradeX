@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Icon from "./Icon";
 import { config } from "../config";
-import axios from "axios";
 import { useToast } from "../context/ToastContext";
 import { safeStorage } from "../utils/api";
 
@@ -47,17 +46,16 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
 
     const fetchImage = async (attId: number) => {
       try {
-        const response = await axios.get(resolveAttachmentUrl(attId, attachments.find((a) => a.id === attId)?.url), {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          responseType: "blob",
-          withCredentials: true,
+        const url = resolveAttachmentUrl(attId, attachments.find((a) => a.id === attId)?.url);
+        const res = await fetch(url, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          credentials: "include",
         });
-        const blob = response.data;
-        const url = window.URL.createObjectURL(blob);
-        setImageUrls((prev) => ({ ...prev, [attId]: url }));
-        loadedUrls[attId] = url;
+        if (!res.ok) throw new Error("Failed to load image");
+        const blob = await res.blob();
+        const objectUrl = window.URL.createObjectURL(blob);
+        setImageUrls((prev) => ({ ...prev, [attId]: objectUrl }));
+        loadedUrls[attId] = objectUrl;
       } catch (err) {
         console.error("Failed to load attachment image", err);
       }
@@ -77,21 +75,20 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
   const handleDownload = async (attId: number, fileName: string) => {
     const token = safeStorage.getItem("token");
     try {
-      const response = await axios.get(resolveAttachmentUrl(attId, attachments.find((a) => a.id === attId)?.url), {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        responseType: "blob",
-        withCredentials: true,
+      const url = resolveAttachmentUrl(attId, attachments.find((a) => a.id === attId)?.url);
+      const res = await fetch(url, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        credentials: "include",
       });
-      const blob = response.data;
-      const url = window.URL.createObjectURL(blob);
+      if (!res.ok) throw new Error("Download failed");
+      const blob = await res.blob();
+      const objectUrl = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url;
+      a.href = objectUrl;
       a.download = fileName;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
+      window.URL.revokeObjectURL(objectUrl);
       a.remove();
     } catch (err) {
       showToast("Failed to download file. The attachment might not exist.", "error");
