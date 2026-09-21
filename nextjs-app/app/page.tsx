@@ -1,23 +1,20 @@
-"use client";
-
-import React, { useEffect } from "react";
+import { serverBranding as branding } from "./branding.server";
 
 export default function Home() {
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      window.location.href = "https://control.tradenows.com/dashboard";
-    }
-  }, []);
-
   return (
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `if (typeof window !== 'undefined' && localStorage.getItem('token')) { window.location.href = '${branding.urls.portalUrl}/dashboard'; }`,
+        }}
+      />
     <main dangerouslySetInnerHTML={{
       __html: `
 <header class="site-header">
   <div class="container nav">
     <a href="/" class="brand">
-      <img src="/assets/logo.svg" alt="" class="logo" />
-      <span class="brand-name">Trade<span>X</span></span>
+      <img src="${branding.logoUrl}" alt="${branding.appName}" class="logo" />
+      <span class="brand-name">${branding.brandPrefix}<span>${branding.accentText}</span></span>
     </a>
     <ul class="nav-links">
       <li><a href="/">Home</a></li>
@@ -27,7 +24,7 @@ export default function Home() {
       <li><a href="/pages/contact.html">Contact</a></li>
     </ul>
     <div class="nav-cta">
-      <a href="https://control.tradenows.com/login" class="btn btn-ghost">Login</a>
+      <a href="${branding.urls.portalUrl}/login" class="btn btn-ghost">Login</a>
       <a href="/signup" class="btn btn-primary">Open Account</a>
       <button class="mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button>
     </div>
@@ -95,7 +92,7 @@ export default function Home() {
 <section id="features">
   <div class="container">
     <div class="section-head">
-      <span class="pill">Why TradeX</span>
+      <span class="pill">Why ${branding.appName}</span>
       <h2>Everything you need to trade — in one place</h2>
       <p>Powerful charts, transparent pricing, lightning-fast execution, and dedicated human support when it matters.</p>
     </div>
@@ -140,8 +137,8 @@ export default function Home() {
     <div class="footer-grid">
       <div class="footer-brand">
         <a href="/" class="brand">
-          <img src="/assets/logo.svg" alt="" class="logo" />
-          <span class="brand-name">Trade<span>X</span></span>
+          <img src="${branding.logoUrl}" alt="${branding.appName}" class="logo" />
+          <span class="brand-name">${branding.brandPrefix}<span>${branding.accentText}</span></span>
         </a>
         <p>India's modern trading platform for NSE stocks, F&amp;O, and MCX commodities.</p>
       </div>
@@ -166,7 +163,7 @@ export default function Home() {
       <div class="footer-col">
         <h4>Company</h4>
         <ul>
-          <li><a href="/pages/about.html">About TradeX</a></li>
+          <li><a href="/pages/about.html">About ${branding.appName}</a></li>
           <li><a href="/pages/about.html">Press &amp; Media</a></li>
           <li><a href="/pages/about.html">Careers &amp; Hiring</a></li>
           <li><a href="/pages/about.html">Safety &amp; Security</a></li>
@@ -183,10 +180,11 @@ export default function Home() {
       </div>
     </div>
     <div class="footer-bottom">
-      <div>© 2026 TradeX. All rights reserved.</div>
+      <div>© ${branding.year} ${branding.appName}. All rights reserved.</div>
     </div>
   </div>
 </footer>
     ` }} />
+    </>
   );
 }

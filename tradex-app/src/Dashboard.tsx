@@ -17,6 +17,7 @@ import {
   useLogout,
 } from "./hooks/useDashboard";
 import { config } from "./config";
+import BrandLogo from "./components/BrandLogo";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -153,7 +154,7 @@ export default function Dashboard() {
             }}
             className={styles.brand}
           >
-            Trade<span className={styles.brandAccent}>X</span>
+            <BrandLogo accentClassName={styles.brandAccent} />
             {isAdmin && <span className={styles.brandAdminBadge}>SYSTEM</span>}
           </a>
         </div>

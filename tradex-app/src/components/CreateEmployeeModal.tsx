@@ -2,6 +2,7 @@ import React from "react";
 import Modal from "./Modal";
 import styles from "./EmployeeManagement.module.css";
 import type { TeamData, PermissionRegistryData } from "../hooks/useAdmin";
+import { branding } from "../config";
 
 interface CreateEmployeeModalProps {
   isOpen: boolean;
@@ -60,7 +61,7 @@ export default function CreateEmployeeModal({
             required
             value={newEmail}
             onChange={(e) => setNewEmail(e.target.value)}
-            placeholder="employee@tradex.com"
+            placeholder={`employee@${branding.emailDomain}`}
             className={styles.input}
           />
         </div>

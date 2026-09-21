@@ -285,7 +285,7 @@ export default function SuperAdminOverviewTab({
             <div className={overviewStyles.healthItem}>
               <span className={overviewStyles.healthLabel}>
                 <span className={`${overviewStyles.healthStatusDot} ${healthLoading ? overviewStyles.healthDotWarning : systemHealth?.storageOperational ? overviewStyles.healthDotOperational : overviewStyles.healthDotDanger}`} />
-                Image Storage ({(systemHealth?.storageProvider?.split(" ")[0]) || "Supabase"})
+                Image Storage ({(systemHealth?.storageProvider?.split(" ")[0]) || "Local"})
               </span>
               <span style={{ fontSize: "11.5px", color: healthLoading ? "var(--warning)" : systemHealth?.storageOperational ? "var(--success)" : "var(--danger)", fontWeight: 600 }}>
                 {healthLoading ? "Checking..." : systemHealth?.storageOperational ? "Operational" : "Offline / Unconfigured"}

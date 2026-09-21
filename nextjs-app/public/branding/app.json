@@ -1,0 +1,21 @@
+{
+  "$schema": "./schema.json",
+  "assetVersion": "1.0.0",
+  "brand": {
+    "appName": "TradeX",
+    "brandPrefix": "Trade",
+    "accentText": "X",
+    "pointsName": "TradeX Points",
+    "supportEmail": "support@tradenows.com",
+    "legalName": "TradeX Technologies Ltd"
+  },
+  "urls": {
+    "portalUrl": "http://localhost:5173",
+    "landingUrl": "http://localhost:3000",
+    "apiUrl": "http://localhost:8080/api"
+  },
+  "theme": {
+    "primaryColor": "#00e0a4",
+    "accentColor": "#7ee3ff"
+  }
+}

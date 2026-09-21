@@ -216,11 +216,11 @@ export default function SupportTickets() {
           {!isLoading && filteredTickets.length === 0 && (
             <div className={styles.noTickets}>
               <Icon name="chat_bubble_outline" style={{ fontSize: "40px", color: "var(--muted)" }} />
-              <p style={{ margin: 0, fontWeight: "500" }}>No support tickets found</p>
-              <p style={{ margin: 0, fontSize: "13px" }}>
+              <p style={{ margin: 0, fontWeight: "600", fontSize: "15px" }}>All clear here!</p>
+              <p style={{ margin: 0, fontSize: "13px", color: "var(--muted)" }}>
                 {tickets.length === 0 
-                  ? "You haven't raised any tickets yet. Click 'Raise Ticket' to start." 
-                  : "No tickets match your filter criteria."}
+                  ? "Have a question or need assistance? Click 'Raise Ticket' and our support team will help you right away." 
+                  : "No tickets match your search or filter."}
               </p>
             </div>
           )}

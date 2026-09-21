@@ -15,24 +15,25 @@ import org.springframework.http.MediaType;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import com.tradex.api.config.AppProperties;
 import com.tradex.api.dto.AdminSystemHealthDTO;
 
 @RestController
 @RequestMapping("/api/admin/dashboard")
+@PreAuthorize("hasRole('SUPER_ADMIN')")
 @RequiredArgsConstructor
 @Slf4j
 public class AdminDashboardController {
 
     private final AdminDashboardService adminDashboardService;
     private final AnalyticsExportService analyticsExportService;
+    private final AppProperties appProperties;
 
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @GetMapping("/health")
     public ResponseEntity<AdminSystemHealthDTO> getSystemHealth() {
         return ResponseEntity.ok(adminDashboardService.getSystemHealth());
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @GetMapping("/metrics")
     public ResponseEntity<AdminDashboardMetricsDTO> getDashboardMetrics(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
@@ -40,32 +41,34 @@ public class AdminDashboardController {
 
         log.info("Super Admin requested dashboard metrics. startDate: {}, endDate: {}", startDate, endDate);
 
-        // Default to Today if no parameters are specified (normalized to second boundaries for cache hits)
+        // Default to Today if no parameters are specified (normalized to second
+        // boundaries for cache hits)
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime start = startDate != null ? startDate.withNano(0) : now.withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime start = startDate != null ? startDate.withNano(0)
+                : now.withHour(0).withMinute(0).withSecond(0).withNano(0);
         LocalDateTime end = endDate != null ? endDate.withNano(0) : now.withSecond(0).withNano(0);
 
         AdminDashboardMetricsDTO metrics = adminDashboardService.getDashboardMetrics(start, end);
         return ResponseEntity.ok(metrics);
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @GetMapping("/export")
     public ResponseEntity<byte[]> exportAnalytics(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
 
         LocalDateTime asOfNow = LocalDateTime.now();
-        log.info("Super Admin requested analytics export. startDate: {}, endDate: {}, asOfNow: {}", startDate, endDate, asOfNow);
+        log.info("Super Admin requested analytics export. startDate: {}, endDate: {}, asOfNow: {}", startDate, endDate,
+                asOfNow);
 
-        LocalDateTime start = startDate != null ? startDate : asOfNow.withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime start = startDate != null ? startDate
+                : asOfNow.withHour(0).withMinute(0).withSecond(0).withNano(0);
         LocalDateTime end = endDate != null ? endDate : asOfNow;
 
         // Reject invalid date ranges where "From" date is after "To" date
         if (start.isAfter(end)) {
             throw new IllegalArgumentException("Invalid date range: 'From' date cannot be after 'To' date.");
         }
-
 
         LocalDateTime dataCutoff = end.isAfter(asOfNow) ? asOfNow : end;
 
@@ -76,11 +79,17 @@ public class AdminDashboardController {
         String endStr = dataCutoff.toLocalDate().toString();
         String timeStr = asOfNow.format(DateTimeFormatter.ofPattern("HH-mm-ss"));
 
+        String brandPrefix = (appProperties != null && appProperties.getBranding() != null
+                && appProperties.getBranding().getAppName() != null
+                && !appProperties.getBranding().getAppName().isBlank())
+                        ? appProperties.getBranding().getAppName().toLowerCase().replaceAll("[^a-z0-9_-]", "")
+                        : "tradex";
+
         String filename;
         if (startStr.equals(endStr)) {
-            filename = String.format("tradex-analytics-%s_asof_%s.csv", startStr, timeStr);
+            filename = String.format("%s-analytics-%s_asof_%s.csv", brandPrefix, startStr, timeStr);
         } else {
-            filename = String.format("tradex-analytics-%s_to_%s_asof_%s.csv", startStr, endStr, timeStr);
+            filename = String.format("%s-analytics-%s_to_%s_asof_%s.csv", brandPrefix, startStr, endStr, timeStr);
         }
 
         return ResponseEntity.ok()
@@ -89,6 +98,3 @@ public class AdminDashboardController {
                 .body(csvData);
     }
 }
-
-
-

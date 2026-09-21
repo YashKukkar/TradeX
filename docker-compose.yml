@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  config-doctor:
+    image: node:22-alpine
+    volumes:
+      - .:/app:ro
+    working_dir: /app
+    command: node scripts/doctor.js
+    restart: "no"
+
+  tradex-portal:
+    build: ./tradex-app
+    ports:
+      - "5173:80"
+    volumes:
+      # Mount brand assets into the static Nginx/web server directory
+      - ./config/app.json:/usr/share/nginx/html/branding/app.json:ro
+      - ./config/assets:/usr/share/nginx/html/branding:ro
+    depends_on:
+      config-doctor:
+        condition: service_completed_successfully
+
+  nextjs-landing:
+    build: ./nextjs-app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./config/app.json:/app/config/app.json:ro
+      - ./config/assets:/app/public/branding:ro
+    depends_on:
+      config-doctor:
+        condition: service_completed_successfully
+
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      config-doctor:
+        condition: service_completed_successfully

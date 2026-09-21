@@ -1,4 +1,5 @@
 import styles from "../Dashboard.module.css";
+import BrandLogo from "./BrandLogo";
 
 export default function DashboardSkeleton() {
   return (
@@ -6,7 +7,7 @@ export default function DashboardSkeleton() {
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <a href="#" onClick={(e) => e.preventDefault()} className={styles.brand}>
-            Trade<span className={styles.brandAccent}>X</span>
+            <BrandLogo accentClassName={styles.brandAccent} />
           </a>
         </div>
         <div className={styles.headerRight}>

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { config } from "./config";
+import { config, branding } from "./config";
 import styles from "./Auth.module.css";
 import { api, safeStorage } from "./utils/api";
 import Icon from "./components/Icon";
+import BrandLogo from "./components/BrandLogo";
 
 export default function Login() {
   const queryClient = useQueryClient();
@@ -62,7 +63,7 @@ export default function Login() {
       queryClient.clear();
       navigate("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Invalid email or password.");
+      setError(err.message || "Incorrect email or password. Please try again.");
       triggerShake();
     } finally {
       setIsLoading(false);
@@ -72,7 +73,7 @@ export default function Login() {
   const handleSendResetCode = async () => {
     const normalizedEmail = email.trim().toLowerCase();
     if (!normalizedEmail || !normalizedEmail.includes("@")) {
-      setError("Please enter a valid email address first.");
+      setError("Please enter your email address to continue.");
       triggerShake();
       return;
     }
@@ -85,10 +86,10 @@ export default function Login() {
         method: "POST",
         body: JSON.stringify({ email: normalizedEmail })
       });
-      setSuccessMsg("If an account exists, a 6-digit verification code has been dispatched to your email.");
+      setSuccessMsg("We've sent a 6-digit code to your email. Check your inbox!");
       setCooldown(60);
     } catch (err: any) {
-      setError(err.message || "Failed to dispatch reset code. Please try again.");
+      setError(err.message || "Couldn't send the code right now. Please try again in a moment.");
       triggerShake();
     } finally {
       setIsSendingOtp(false);
@@ -128,7 +129,7 @@ export default function Login() {
       <div className={`${styles.container} ${shake ? styles.shake : ""}`}>
         <div>
           <div className={styles.logoRow}>
-            <span className={styles.brand}>Trade<span className={styles.brandAccent}>X</span></span>
+            <BrandLogo className={styles.brand} accentClassName={styles.brandAccent} />
           </div>
 
           {mode === "login" ? (
@@ -184,14 +185,14 @@ export default function Login() {
                   </div>
                 </div>
                 <button type="submit" className={styles.button} disabled={isLoading}>
-                  {isLoading ? "Logging in…" : "Login to Dashboard"}
+                  {isLoading ? "Signing in…" : "Sign In"}
                 </button>
               </form>
             </>
           ) : (
             <>
               <h2 className={styles.title}>Reset Password</h2>
-              <p className={styles.subtitle}>Request a code and set a new password.</p>
+              <p className={styles.subtitle}>Enter your email and we'll send you a 6-digit recovery code.</p>
               <form onSubmit={handleResetPassword} className={styles.form}>
                 <div className={styles.fieldGroup}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -256,7 +257,7 @@ export default function Login() {
                   </div>
                 </div>
                 <button type="submit" className={styles.button} disabled={isLoading}>
-                  {isLoading ? "Resetting…" : "Reset & Back to Login"}
+                  {isLoading ? "Saving password…" : "Save New Password & Sign In"}
                 </button>
                 <button
                   type="button"
@@ -274,7 +275,7 @@ export default function Login() {
           {successMsg && <p style={{ color: "var(--primary)", fontSize: "13px", marginTop: "12px", textAlign: "center" }}>{successMsg}</p>}
 
           <p className={styles.footerText}>
-            New to TradeX?{" "}
+            New to {branding.appName}?{" "}
             <a href={`${config.websiteUrl}/signup`} className={styles.link}>Create a free account</a>
           </p>
         </div>

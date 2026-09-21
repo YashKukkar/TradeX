@@ -18,6 +18,15 @@ public class AppProperties {
     private final Seed seed = new Seed();
     private final Storage storage = new Storage();
     private final Cors cors = new Cors();
+    private final Branding branding = new Branding();
+
+    @Getter
+    @Setter
+    public static class Branding {
+        private String appName;
+        private String supportEmail;
+        private String legalName;
+    }
 
     @Getter
     @Setter
@@ -124,9 +133,6 @@ public class AppProperties {
                 "http://10.0.2.2",
                 "http://10.0.2.2:*",
                 "http://192.168.*:*",
-                "http://10.*:*",
-                "https://tradenows.com",
-                "https://www.tradenows.com",
-                "https://*.tradenows.com"));
+                "http://10.*:*"));
     }
 }

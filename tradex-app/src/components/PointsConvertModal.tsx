@@ -6,6 +6,7 @@ import cwStyles from "./CashWallet.module.css";
 import { useConvertPoints } from "../hooks/useDashboard";
 import type { SystemSetting } from "../utils/dashboardHelpers";
 import { formatNumber, formatCurrency } from "../utils/formatters";
+import { branding } from "../config";
 
 interface PointsConvertModalProps {
   isOpen: boolean;
@@ -74,8 +75,8 @@ export default function PointsConvertModal({
   };
 
   const estimatedValue = (parseFloat(convSuccessPoints || "0") / (publicSettings?.pointsToCashConversionRate || 1));
-  const modalTitle = convSuccess ? "Transaction Successful" : convFailed ? "Transaction Failed" : "Convert TradeX Points";
-  const modalSubtitle = (convSuccess || convFailed) ? undefined : "Exchange your earned TradeX points directly into wallet bonus cash balance";
+  const modalTitle = convSuccess ? "Transaction Successful" : convFailed ? "Transaction Failed" : `Convert ${branding.pointsName}`;
+  const modalSubtitle = (convSuccess || convFailed) ? undefined : `Exchange your earned ${branding.pointsName} directly into wallet bonus cash balance`;
 
   return (
     <Modal
@@ -94,7 +95,7 @@ export default function PointsConvertModal({
             Points Converted Successfully
           </h4>
           <p className={styles.successDesc}>
-            Your conversion of <strong>{formatNumber(parseInt(convSuccessPoints || "0"))} TradeX Points</strong> has been successfully processed. You have received <strong>{formatCurrency(estimatedValue)}</strong> in bonus cash.
+            Your conversion of <strong>{formatNumber(parseInt(convSuccessPoints || "0"))} {branding.pointsName}</strong> has been successfully processed. You have received <strong>{formatCurrency(estimatedValue)}</strong> in bonus cash.
           </p>
           <button type="button" className={styles.doneBtn} onClick={onClose}>
             Return to Dashboard
@@ -119,7 +120,7 @@ export default function PointsConvertModal({
         <form onSubmit={handleConvertSubmit} className={cwStyles.modalForm}>
           <div className={cwStyles.modalBalanceRow}>
             <span className={cwStyles.modalBalanceText}>
-              TradeX Points Balance: <strong>{pointsBalance}</strong>
+              {branding.pointsName} Balance: <strong>{pointsBalance}</strong>
             </span>
             <span className={cwStyles.modalBalanceText}>
               Conversion Rate: <strong>{publicSettings?.pointsToCashConversionRate ? `${publicSettings.pointsToCashConversionRate} Points = ₹1.00` : "..."}</strong>

@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AppBrandingConfig",
+  "type": "object",
+  "required": ["brand", "urls"],
+  "properties": {
+    "assetVersion": {
+      "type": "string",
+      "description": "Cache-busting version token appended to asset requests (e.g. '1.0.0')"
+    },
+    "brand": {
+      "type": "object",
+      "required": ["appName", "supportEmail"],
+      "properties": {
+        "appName": { "type": "string" },
+        "brandPrefix": { "type": "string" },
+        "accentText": { "type": "string" },
+        "pointsName": { "type": "string" },
+        "supportEmail": { "type": "string", "format": "email" },
+        "legalName": { "type": "string" }
+      }
+    },
+    "urls": {
+      "type": "object",
+      "required": ["portalUrl", "landingUrl", "apiUrl"],
+      "properties": {
+        "portalUrl": { "type": "string", "format": "uri" },
+        "landingUrl": { "type": "string", "format": "uri" },
+        "apiUrl": { "type": "string" }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "properties": {
+        "primaryColor": { "type": "string" },
+        "accentColor": { "type": "string" }
+      }
+    }
+  }
+}

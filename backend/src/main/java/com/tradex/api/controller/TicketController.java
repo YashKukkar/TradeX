@@ -17,15 +17,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/tickets")
 @RequiredArgsConstructor
 @Slf4j
-
 public class TicketController {
 
     private final SupportTicketService supportTicketService;
 
-    @PostMapping(value = "/tickets", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<TicketDetailDTO> createTicket(
             @RequestPart("ticket") @Valid TicketCreateRequest request,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
@@ -36,17 +35,17 @@ public class TicketController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ticket);
     }
 
-    @GetMapping("/tickets")
+    @GetMapping
     public ResponseEntity<List<TicketDTO>> getUserTickets(Authentication auth) {
         return ResponseEntity.ok(supportTicketService.getUserTickets(SecurityUtils.getAuthenticatedEmail(auth)));
     }
 
-    @GetMapping("/tickets/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<TicketDetailDTO> getTicketDetail(@PathVariable Long id, Authentication auth) {
         return ResponseEntity.ok(supportTicketService.getTicketDetail(SecurityUtils.getAuthenticatedEmail(auth), id));
     }
 
-    @PostMapping("/tickets/{id}/comments")
+    @PostMapping("/{id}/comments")
     public ResponseEntity<TicketCommentDTO> addComment(
             @PathVariable Long id,
             @Valid @RequestBody TicketCommentRequest request,
@@ -54,7 +53,7 @@ public class TicketController {
         return ResponseEntity.ok(supportTicketService.addComment(SecurityUtils.getAuthenticatedEmail(auth), id, request, null));
     }
 
-    @PostMapping(value = "/tickets/{id}/comments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{id}/comments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<TicketCommentDTO> addCommentWithFiles(
             @PathVariable Long id,
             @RequestPart("comment") @Valid TicketCommentRequest request,
@@ -63,17 +62,17 @@ public class TicketController {
         return ResponseEntity.ok(supportTicketService.addComment(SecurityUtils.getAuthenticatedEmail(auth), id, request, files));
     }
 
-    @PostMapping("/tickets/{id}/reopen")
+    @PostMapping("/{id}/reopen")
     public ResponseEntity<TicketDetailDTO> reopenTicket(@PathVariable Long id, Authentication auth) {
         return ResponseEntity.ok(supportTicketService.reopenTicket(id, SecurityUtils.getAuthenticatedEmail(auth)));
     }
 
-    @PostMapping("/tickets/{id}/close")
+    @PostMapping("/{id}/close")
     public ResponseEntity<TicketDetailDTO> closeTicket(@PathVariable Long id, Authentication auth) {
         return ResponseEntity.ok(supportTicketService.closeTicket(id, SecurityUtils.getAuthenticatedEmail(auth)));
     }
 
-    @GetMapping("/tickets/attachments/{attachmentId}")
+    @GetMapping("/attachments/{attachmentId}")
     public ResponseEntity<byte[]> downloadAttachment(@PathVariable Long attachmentId, Authentication auth) {
         String email = SecurityUtils.getAuthenticatedEmail(auth);
         log.info("[Download] Request | attachmentId={} | user={}", attachmentId, email);

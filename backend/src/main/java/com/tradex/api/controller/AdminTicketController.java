@@ -16,19 +16,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/tickets")
+@PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EMPLOYEE')")
 @RequiredArgsConstructor
 @Slf4j
 public class AdminTicketController {
 
     private final SupportTicketService supportTicketService;
 
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EMPLOYEE')")
     @GetMapping
     public ResponseEntity<List<TicketDTO>> getAllTickets(Authentication auth) {
         return ResponseEntity.ok(supportTicketService.getAllTickets(SecurityUtils.getAuthenticatedEmail(auth)));
     }
 
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EMPLOYEE')")
     @PatchMapping("/{id}/status")
     public ResponseEntity<TicketDetailDTO> updateTicketStatus(
             @PathVariable Long id,
@@ -41,7 +40,6 @@ public class AdminTicketController {
     public record AssignTicketRequest(String assignedToPermission) {
     }
 
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EMPLOYEE')")
     @PatchMapping("/{id}/assign")
     public ResponseEntity<TicketDetailDTO> assignTicket(
             @PathVariable Long id,
@@ -51,7 +49,6 @@ public class AdminTicketController {
                 com.tradex.api.util.SecurityUtils.getAuthenticatedEmail(auth)));
     }
 
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EMPLOYEE')")
     @PatchMapping("/{id}/claim")
     public ResponseEntity<TicketDetailDTO> claimTicket(
             @PathVariable Long id,

@@ -1,5 +1,6 @@
 package com.tradex.api.controller;
 
+import com.tradex.api.config.AppProperties;
 import com.tradex.api.service.TransactionExportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +24,20 @@ public class AdminTransactionExportController {
 
     private static final Logger log = LoggerFactory.getLogger(AdminTransactionExportController.class);
     private final TransactionExportService transactionExportService;
+    private final AppProperties appProperties;
 
-    public AdminTransactionExportController(TransactionExportService transactionExportService) {
+    public AdminTransactionExportController(
+            TransactionExportService transactionExportService,
+            AppProperties appProperties) {
         this.transactionExportService = transactionExportService;
+        this.appProperties = appProperties;
+    }
+
+    private String getBrandPrefix() {
+        if (appProperties != null && appProperties.getBranding() != null && appProperties.getBranding().getAppName() != null && !appProperties.getBranding().getAppName().isBlank()) {
+            return appProperties.getBranding().getAppName().replaceAll("[^a-zA-Z0-9_-]", "");
+        }
+        return "TradeX";
     }
 
     @PreAuthorize("hasAnyAuthority('MANAGE_DEPOSITS', 'ROLE_SUPER_ADMIN')")
@@ -37,7 +49,7 @@ public class AdminTransactionExportController {
         log.info("Exporting deposits CSV. startDate: {}, endDate: {}", startDate, endDate);
         byte[] csvData = transactionExportService.generateDepositsCsv(startDate, endDate);
 
-        String filename = "TradeX_Deposits_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")) + ".csv";
+        String filename = getBrandPrefix() + "_Deposits_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")) + ".csv";
         return buildCsvResponse(csvData, filename);
     }
 
@@ -50,7 +62,7 @@ public class AdminTransactionExportController {
         log.info("Exporting withdrawals CSV. startDate: {}, endDate: {}", startDate, endDate);
         byte[] csvData = transactionExportService.generateWithdrawalsCsv(startDate, endDate);
 
-        String filename = "TradeX_Withdrawals_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")) + ".csv";
+        String filename = getBrandPrefix() + "_Withdrawals_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")) + ".csv";
         return buildCsvResponse(csvData, filename);
     }
 
@@ -63,7 +75,7 @@ public class AdminTransactionExportController {
         log.info("Exporting points conversions CSV. startDate: {}, endDate: {}", startDate, endDate);
         byte[] csvData = transactionExportService.generatePointsConversionsCsv(startDate, endDate);
 
-        String filename = "TradeX_PointsConversions_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")) + ".csv";
+        String filename = getBrandPrefix() + "_PointsConversions_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")) + ".csv";
         return buildCsvResponse(csvData, filename);
     }
 

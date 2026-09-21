@@ -5,6 +5,7 @@ import App from "./App";
 import "./index.css";
 import { ToastProvider } from "./context/ToastContext";
 import { OverlayProvider } from "./context/OverlayContext";
+import { initBranding } from "./config/branding";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -14,6 +15,8 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+await initBranding();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

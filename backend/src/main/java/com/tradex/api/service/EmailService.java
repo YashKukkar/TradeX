@@ -32,7 +32,8 @@ public class EmailService {
             return;
         }
 
-        String subject = "Your TradeX Verification Code";
+        String appName = appProperties.getBranding().getAppName();
+        String subject = "Your " + appName + " Verification Code";
         String htmlContent = buildOtpEmailHtml(otp);
 
         sendHtmlEmail(toEmail, subject, htmlContent);
@@ -47,12 +48,17 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             String fromEmail = settings.getSmtpFromEmail();
-            if (fromEmail == null) {
-                fromEmail = "noreply@tradex.com";
+            if (fromEmail == null || fromEmail.isBlank() || "noreply@tradex.com".equalsIgnoreCase(fromEmail.trim())) {
+                fromEmail = (appProperties.getBranding() != null && appProperties.getBranding().getSupportEmail() != null && !appProperties.getBranding().getSupportEmail().isBlank())
+                        ? appProperties.getBranding().getSupportEmail()
+                        : "noreply@example.com";
             }
             String fromName = settings.getSmtpFromName();
-            if (fromName == null) {
-                fromName = "TradeX";
+            if (fromName == null || fromName.isBlank() || "TradeX".equalsIgnoreCase(fromName.trim()) || "TradeX Support".equalsIgnoreCase(fromName.trim())) {
+                String brandName = (appProperties.getBranding() != null && appProperties.getBranding().getAppName() != null && !appProperties.getBranding().getAppName().isBlank())
+                        ? appProperties.getBranding().getAppName()
+                        : "TradeX";
+                fromName = brandName + " Support";
             }
 
             String targetEmail = to;
@@ -86,17 +92,14 @@ public class EmailService {
             return;
         }
 
-        String subject = "Reset Your TradeX Password";
+        String appName = appProperties.getBranding().getAppName();
+        String subject = "Reset Your " + appName + " Password";
         String htmlContent = buildPasswordResetEmailHtml(otp);
         sendHtmlEmail(toEmail, subject, htmlContent);
     }
 
     private @NonNull String buildPasswordResetEmailHtml(@NonNull String otp) {
-        int expiryMinutes = appProperties.getOtp().getExpiryMinutes();
-        // Reuse the OTP template — same structure, different subject line
-        return getOtpEmailTemplate()
-                .replace("{{expiryMinutes}}", String.valueOf(expiryMinutes))
-                .replace("{{otp}}", otp);
+        return populateTemplate(otp);
     }
 
     private JavaMailSender createMailSender(SystemSetting settings) {
@@ -134,8 +137,16 @@ public class EmailService {
     }
 
     private @NonNull String buildOtpEmailHtml(@NonNull String otp) {
+        return populateTemplate(otp);
+    }
+
+    private @NonNull String populateTemplate(@NonNull String otp) {
         int expiryMinutes = appProperties.getOtp().getExpiryMinutes();
+        String appName = appProperties.getBranding().getAppName();
+        String currentYear = String.valueOf(java.time.Year.now().getValue());
         return getOtpEmailTemplate()
+                .replace("{{appName}}", appName)
+                .replace("{{currentYear}}", currentYear)
                 .replace("{{expiryMinutes}}", String.valueOf(expiryMinutes))
                 .replace("{{otp}}", otp);
     }

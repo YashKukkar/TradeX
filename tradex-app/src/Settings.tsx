@@ -11,6 +11,7 @@ import { useCurrentUser, useLogout } from "./hooks/useDashboard";
 import { useToast } from "./context/ToastContext";
 import BankAccountsSection from "./components/BankAccountsSection";
 import SecuritySettingsSection from "./components/SecuritySettingsSection";
+import BrandLogo from "./components/BrandLogo";
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ export default function Settings() {
             }}
             className={dashboardStyles.brand}
           >
-            Trade<span className={dashboardStyles.brandAccent}>X</span>
+            <BrandLogo accentClassName={dashboardStyles.brandAccent} />
             {isAdmin && <span className={dashboardStyles.brandAdminBadge}>SYSTEM</span>}
           </a>
         </div>

@@ -7,13 +7,16 @@
  * is often the best choice for production.
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 
-  (import.meta.env.PROD ? "https://api.tradenows.com/api" : "http://localhost:8080/api");
-
-const WEBSITE_URL = import.meta.env.VITE_WEBSITE_URL || 
-  (import.meta.env.PROD ? "https://tradenows.com" : "http://localhost:3000");
+import { branding } from "./config/branding";
 
 export const config = {
-  apiUrl: API_BASE_URL,
-  websiteUrl: WEBSITE_URL,
+  get apiUrl(): string {
+    return branding.apiUrl;
+  },
+  get websiteUrl(): string {
+    return branding.landingUrl;
+  },
+  branding,
 };
+
+export { branding };

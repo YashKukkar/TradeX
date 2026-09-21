@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import styles from "../WalletModal.module.css";
+import { branding } from "../../config";
 
 interface UPIPaymentStepProps {
   amount: number;
@@ -23,7 +24,7 @@ export default function UPIPaymentStep({ amount, onSubmit, onBack, errorMsg }: U
     onSubmit(upiId);
   };
 
-  const note = "TradeX Deposit";
+  const note = `${branding.appName} Deposit`;
   const payeeVpa = "9545719126@ibl";
   const payeeName = "Yash Jtendra Kukkar";
   const upiUrl = `upi://pay?pa=${payeeVpa}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(note)}`;

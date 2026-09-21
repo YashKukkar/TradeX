@@ -78,10 +78,10 @@ public class SystemSetting {
     private String smtpPassword = "";
 
     @Column(name = "smtp_from_email", nullable = false)
-    private String smtpFromEmail = "noreply@tradex.com";
+    private String smtpFromEmail = "noreply@example.com";
 
     @Column(name = "smtp_from_name", nullable = false)
-    private String smtpFromName = "TradeX";
+    private String smtpFromName = "Support";
 
     @Column(name = "email_notifications_enabled", nullable = false)
     private boolean emailNotificationsEnabled = true;

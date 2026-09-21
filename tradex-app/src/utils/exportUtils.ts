@@ -1,4 +1,5 @@
 import { apiDownload } from "./api";
+import { branding } from "../config";
 
 export const MAX_CLIENT_EXPORT_ROWS = 50000;
 
@@ -36,7 +37,8 @@ export function generateExportFilename(domain: string, options?: ExportFilenameO
     partSuffix = `_Part${options.part}_of_${options.totalParts}`;
   }
 
-  return `TradeX_${cleanDomain}${scopePart}${timestampPart}${partSuffix}.${ext}`;
+  const brandSlug = (branding.appName || "TradeX").replace(/[^a-zA-Z0-9_-]/g, "");
+  return `${brandSlug || "TradeX"}_${cleanDomain}${scopePart}${timestampPart}${partSuffix}.${ext}`;
 }
 
 /**

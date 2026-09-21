@@ -78,10 +78,7 @@ public class SecurityConfig {
                     "http://10.0.2.2",
                     "http://10.0.2.2:*",
                     "http://192.168.*:*",
-                    "http://10.*:*",
-                    "https://tradenows.com",
-                    "https://www.tradenows.com",
-                    "https://*.tradenows.com"));
+                    "http://10.*:*"));
         }
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowedHeaders(List.of("*"));

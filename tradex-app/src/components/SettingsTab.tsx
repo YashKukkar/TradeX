@@ -3,6 +3,7 @@ import AdminSettingsForm from "./AdminSettingsForm";
 import { useSaveSystemSettings } from "../hooks/useAdmin";
 import { validateSystemSettings } from "../utils/validation";
 import type { SystemSetting } from "../utils/dashboardHelpers";
+import { branding } from "../config";
 
 export default function SettingsTab({ settingsConfig }: { settingsConfig?: SystemSetting }) {
   const [settings, setSettings] = useState<SystemSetting>({
@@ -26,8 +27,8 @@ export default function SettingsTab({ settingsConfig }: { settingsConfig?: Syste
     smtpPort: 587,
     smtpUsername: "",
     smtpPassword: "",
-    smtpFromEmail: "noreply@tradex.com",
-    smtpFromName: "TradeX",
+    smtpFromEmail: `noreply@${branding.emailDomain}`,
+    smtpFromName: branding.appName,
     emailNotificationsEnabled: false,
     appTimezone: "Asia/Kolkata",
     appCurrency: "INR",

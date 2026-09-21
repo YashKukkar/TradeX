@@ -1,5 +1,6 @@
 package com.tradex.api.controller;
 
+import com.tradex.api.config.AppProperties;
 import com.tradex.api.entity.AdminAuditLog;
 import com.tradex.api.repository.AdminAuditLogRepository;
 import com.tradex.api.util.CsvExportUtils;
@@ -31,12 +32,15 @@ public class AdminAuditLogExportController {
     private static final Logger log = LoggerFactory.getLogger(AdminAuditLogExportController.class);
     private final AdminAuditLogRepository adminAuditLogRepository;
     private final TransactionTemplate transactionTemplate;
+    private final AppProperties appProperties;
 
     public AdminAuditLogExportController(
             AdminAuditLogRepository adminAuditLogRepository,
-            TransactionTemplate transactionTemplate) {
+            TransactionTemplate transactionTemplate,
+            AppProperties appProperties) {
         this.adminAuditLogRepository = adminAuditLogRepository;
         this.transactionTemplate = transactionTemplate;
+        this.appProperties = appProperties;
     }
 
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EMPLOYEE')")
@@ -44,8 +48,12 @@ public class AdminAuditLogExportController {
     public ResponseEntity<StreamingResponseBody> exportAuditLogs(
             @RequestParam(required = false) String targetEmail) {
 
+        String brand = (appProperties != null && appProperties.getBranding() != null && appProperties.getBranding().getAppName() != null && !appProperties.getBranding().getAppName().isBlank())
+                ? appProperties.getBranding().getAppName().replaceAll("[^a-zA-Z0-9_-]", "")
+                : "TradeX";
+
         String dateStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"));
-        String filename = "TradeX_System_Audit_Logs_" + dateStr + ".csv";
+        String filename = brand + "_System_Audit_Logs_" + dateStr + ".csv";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("text/csv;charset=utf-8"));

@@ -9,10 +9,18 @@
     content="Trade NSE stocks, F&amp;O, and MCX commodities on TradeX with unified risk and reporting." />
   <script>
     (function () {
-      var token = localStorage.getItem("token");
-      if (token) {
-        window.location.href = "https://control.tradenows.com/dashboard";
-      }
+      var portalUrl = "http://localhost:5173";
+      fetch("/branding/app.json").then(function(r){return r.json();}).then(function(d){
+        if (d && d.urls && d.urls.portalUrl) portalUrl = d.urls.portalUrl;
+        document.querySelectorAll('a[data-portal-login]').forEach(function(a){ a.href = portalUrl + '/login'; });
+        if (localStorage.getItem("token")) {
+          window.location.href = portalUrl + "/dashboard";
+        }
+      }).catch(function(){
+        if (localStorage.getItem("token")) {
+          window.location.href = portalUrl + "/dashboard";
+        }
+      });
     })();
   </script>
   <link rel="icon" type="image/svg+xml" href="../assets/logo.svg" />
@@ -38,7 +46,7 @@
         <li><a href="contact.html">Contact</a></li>
       </ul>
       <div class="nav-cta">
-        <a href="https://control.tradenows.com/login" class="btn btn-ghost">Login</a>
+        <a href="http://localhost:5173/login" data-portal-login class="btn btn-ghost">Login</a>
         <a href="/signup" class="btn btn-primary">Open Account</a>
         <button class="mobile-toggle" aria-label="Toggle menu">☰</button>
       </div>

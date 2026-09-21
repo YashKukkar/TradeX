@@ -112,6 +112,14 @@ if (-not (Test-Path "$PROJECT_ROOT\tradex-app\node_modules\.bin\vite.ps1")) {
     Pop-Location
 }
 
+# pre-flight doctor check
+Write-Host "Running pre-flight configuration doctor check..." -ForegroundColor Cyan
+node "$PROJECT_ROOT\scripts\doctor.js"
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Pre-flight check failed! Please fix configuration mismatches above before starting." -ForegroundColor Red
+    exit 1
+}
+
 # launch services
 # CRITICAL FIX: The JVM hangs on Windows if the %TMP%\hsperfdata directory is corrupt.
 # Disabling PerfData globally for this session ensures Maven and Spring Boot will not hang.

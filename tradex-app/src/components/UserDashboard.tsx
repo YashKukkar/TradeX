@@ -2,6 +2,7 @@ import Icon from "./Icon";
 import Card from "./Card";
 import styles from "../Dashboard.module.css";
 import { TICKERS_DATA } from "../utils/dashboardHelpers";
+import { branding } from "../config";
 import type { NavigateFunction } from "react-router-dom";
 import { useWalletData, usePublicSettings, useCurrentUser } from "../hooks/useDashboard";
 import CashWalletSection from "./CashWalletSection";
@@ -78,7 +79,7 @@ export default function UserDashboard({
             <div className={styles.heroPointsCard}>
               <div className={styles.pointsBadge}>
                 <Icon name="stars" style={{ fontSize: "16px", color: "var(--accent)" }} />
-                <span>TradeX Points</span>
+                <span>{branding.pointsName}</span>
               </div>
               <div className={styles.pointsValue}>
                 {pointsBalance.toLocaleString()} <span className={styles.ptsLabel}>PTS</span>
@@ -121,13 +122,13 @@ export default function UserDashboard({
           <Card.Body>
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               <div>
-                You have <strong style={{ color: "var(--accent)", fontSize: "16px" }}>{pointsBalance}</strong> TradeX Points.
+                You have <strong style={{ color: "var(--accent)", fontSize: "16px" }}>{pointsBalance}</strong> {branding.pointsName}.
               </div>
               <div style={{ fontSize: "13.5px", color: "var(--muted)" }}>
                 Invite Code: <strong style={{ color: "var(--text)" }}>{referralCode || "..."}</strong>
               </div>
               <span className={styles.metaLabel} style={{ marginTop: "4px" }}>
-                Earn bonus cash and points by inviting friends to join and trade on TradeX.
+                Earn bonus cash and points by inviting friends to join and trade on {branding.appName}.
               </span>
             </div>
           </Card.Body>

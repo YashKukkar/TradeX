@@ -3,12 +3,10 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./Auth.module.css";
+import { branding } from "../branding";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 
-  (process.env.NODE_ENV === "production" ? "https://api.tradenows.com/api" : "http://localhost:8080/api");
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 
-  (process.env.NODE_ENV === "production" ? "https://control.tradenows.com" : "http://localhost:5173");
+const API_URL = branding.urls.apiUrl;
+const APP_URL = branding.urls.portalUrl;
 
 function SignupForm() {
   const [fullName, setFullName] = useState("");
@@ -154,15 +152,15 @@ function SignupForm() {
         {isRedirecting && (
           <div className={styles.overlay}>
             <div className={styles.spinner}></div>
-            <p className={styles.overlayText}>Preparing your dashboard...</p>
+            <p className={styles.overlayText}>Setting up your trading account...</p>
           </div>
         )}
         <div className={isRedirecting ? styles.blurBackground : ""}>
           <div className={styles.logoRow}>
-            <span className={styles.brand}>Trade<span className={styles.brandAccent}>X</span></span>
+            <span className={styles.brand}>{branding.brandPrefix}{branding.accentText ? <span className={styles.brandAccent}>{branding.accentText}</span> : null}</span>
           </div>
           <h2 className={styles.title}>Create your account</h2>
-          <p className={styles.subtitle}>Start trading in minutes. No hidden fees.</p>
+          <p className={styles.subtitle}>Open your trading account in minutes. Zero hidden fees.</p>
           <form onSubmit={handleSignup} className={styles.form}>
             <div className={styles.formFields}>
               <div className={styles.fieldGroup}>
@@ -172,7 +170,7 @@ function SignupForm() {
                 </div>
                 <input
                   type="text"
-                  placeholder="e.g. Alex Morgan (First / Given name first)"
+                  placeholder="Alex Morgan"
                   value={fullName}
                   onChange={(e) => { setFullName(e.target.value); setMessage(""); }}
                   required
@@ -201,7 +199,7 @@ function SignupForm() {
                 <div className={styles.passwordWrapper}>
                   <input
                     type={showPassword ? "text" : "password"}
-                    placeholder="Min. 8 characters"
+                    placeholder="At least 8 characters"
                     value={password}
                     onChange={(e) => { setPassword(e.target.value); setMessage(""); }}
                     required
@@ -229,7 +227,7 @@ function SignupForm() {
                 <div className={styles.passwordWrapper}>
                   <input
                     type={showConfirm ? "text" : "password"}
-                    placeholder="Re-enter your password"
+                    placeholder="Confirm your password"
                     value={confirmPassword}
                     onChange={(e) => { setConfirmPassword(e.target.value); setMessage(""); }}
                     required

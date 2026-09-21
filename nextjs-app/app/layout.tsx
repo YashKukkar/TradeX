@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { serverBranding as branding } from "./branding.server";
 
 const ibmPlexSans = IBM_Plex_Sans({
   variable: "--font-ibm-plex-sans",
@@ -14,10 +15,13 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "TradeX — Trade Smarter. Invest Better.",
-  description: "Trade NSE stocks, F&O, and MCX commodities on TradeX — India's modern trading platform.",
+  title: `${branding.appName} — Trade Smarter. Invest Better.`,
+  description: `Trade NSE stocks, F&O, and MCX commodities on ${branding.appName} — India's modern trading platform.`,
   icons: {
-    icon: "/icon.svg?v=2",
+    icon: [
+      { url: branding.faviconIcoUrl, sizes: "any" },
+      { url: branding.faviconUrl, type: "image/svg+xml" },
+    ],
   },
 };
 
@@ -29,7 +33,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${ibmPlexSans.variable} ${plusJakartaSans.variable}`} suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml" />
+        <link rel="icon" href={branding.faviconIcoUrl} sizes="any" />
+        <link rel="icon" href={branding.faviconUrl} type="image/svg+xml" />
         <link rel="stylesheet" href="/css/styles.css" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
       </head>

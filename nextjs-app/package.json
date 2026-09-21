@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "doctor": "node ../scripts/doctor.js",
+    "predev": "node ../scripts/sync-config.js",
     "dev": "next dev",
+    "prebuild": "node ../scripts/doctor.js && node ../scripts/sync-config.js",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
