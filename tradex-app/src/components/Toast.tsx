@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import clsx from "clsx";
 import styles from "./Toast.module.css";
 
 interface ToastProps {
@@ -29,7 +30,7 @@ export default function Toast({ message, type = "success", onClose, duration = 3
   };
 
   return (
-    <div className={`${styles.toast} ${styles[type]}`} role="alert" aria-live="assertive">
+    <div className={clsx(styles.toast, styles[type])} role="alert" aria-live="assertive">
       <span className={`material-symbols-outlined ${styles.icon}`}>
         {getIcon()}
       </span>

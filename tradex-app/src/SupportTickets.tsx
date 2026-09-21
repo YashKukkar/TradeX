@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import clsx from "clsx";
 import styles from "./SupportTickets.module.css";
 import { useMyTickets } from "./hooks/useTickets";
 import Icon from "./components/Icon";
@@ -25,9 +26,9 @@ export default function SupportTickets() {
 
   useEffect(() => {
     if (error) {
-      navigate("/login");
+      showToast("Failed to load tickets: " + (error as Error).message, "error");
     }
-  }, [error, navigate]);
+  }, [error, showToast]);
 
   // Compute stat metrics
   const totalCount = tickets.length;
@@ -137,14 +138,14 @@ export default function SupportTickets() {
           <div className={styles.filterGroup}>
             <h4>Filter Status</h4>
             <button 
-              className={`${styles.filterBtn} ${statusFilter === "ALL" ? styles.filterBtnActive : ""}`}
+              className={clsx(styles.filterBtn, statusFilter === "ALL" && styles.filterBtnActive)}
               onClick={() => setStatusFilter("ALL")}
             >
               <span>All Tickets</span>
               <span className={styles.filterCount}>{totalCount}</span>
             </button>
             <button 
-              className={`${styles.filterBtn} ${statusFilter === "OPEN" ? styles.filterBtnActive : ""}`}
+              className={clsx(styles.filterBtn, statusFilter === "OPEN" && styles.filterBtnActive)}
               onClick={() => setStatusFilter("OPEN")}
             >
               <span>Open</span>
@@ -153,7 +154,7 @@ export default function SupportTickets() {
               </span>
             </button>
             <button 
-              className={`${styles.filterBtn} ${statusFilter === "IN_PROGRESS" ? styles.filterBtnActive : ""}`}
+              className={clsx(styles.filterBtn, statusFilter === "IN_PROGRESS" && styles.filterBtnActive)}
               onClick={() => setStatusFilter("IN_PROGRESS")}
             >
               <span>In Progress</span>
@@ -162,14 +163,14 @@ export default function SupportTickets() {
               </span>
             </button>
             <button 
-              className={`${styles.filterBtn} ${statusFilter === "RESOLVED" ? styles.filterBtnActive : ""}`}
+              className={clsx(styles.filterBtn, statusFilter === "RESOLVED" && styles.filterBtnActive)}
               onClick={() => setStatusFilter("RESOLVED")}
             >
               <span>Resolved</span>
               <span className={styles.filterCount}>{resolvedCount}</span>
             </button>
             <button 
-              className={`${styles.filterBtn} ${statusFilter === "CLOSED" ? styles.filterBtnActive : ""}`}
+              className={clsx(styles.filterBtn, statusFilter === "CLOSED" && styles.filterBtnActive)}
               onClick={() => setStatusFilter("CLOSED")}
             >
               <span>Closed</span>
