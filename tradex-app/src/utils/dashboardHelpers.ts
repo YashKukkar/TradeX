@@ -130,9 +130,9 @@ export function getDisplayName(email: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-import { formatDate as fmtDate, formatTime as fmtTime, parseToDate } from "./formatters";
+import { parseToDate } from "./formatters";
 
-export { formatCurrency, formatNumber } from "./formatters";
+export { formatDate, formatDateTime, formatTime, formatCurrency, formatNumber } from "./formatters";
 
 export function getOrdinalSuffix(day: number): string {
   if (day > 3 && day < 21) return `${day}th`;
@@ -144,11 +144,6 @@ export function getOrdinalSuffix(day: number): string {
   }
 }
 
-export function formatDate(val: number | string | Date, includeYear: boolean = true): string {
-  const formatted = fmtDate(val, includeYear);
-  return formatted === "—" ? "" : formatted;
-}
-
 export function formatFullDate(val: number | string | Date): string {
   const date = parseToDate(val);
   if (!date) return "";
@@ -158,18 +153,6 @@ export function formatFullDate(val: number | string | Date): string {
   const year = date.getFullYear();
 
   return `${dayOrdinal} ${monthFull} ${year}`;
-}
-
-export function formatTime(val: number | string | Date): string {
-  const formatted = fmtTime(val);
-  return formatted === "—" ? "" : formatted;
-}
-
-export function formatDateTime(val: number | string | Date): string {
-  if (!val) return "";
-  const dStr = formatDate(val);
-  const tStr = formatTime(val);
-  return `${dStr}, ${tStr}`;
 }
 
 export function formatEpochTime(
