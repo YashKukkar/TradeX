@@ -1,5 +1,5 @@
 .card {
-  background: var(--surface-2-grad);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 24px;
@@ -10,7 +10,6 @@
 }
 
 .card:hover {
-  transform: translateY(-3px);
   border-color: var(--card-hover-border);
   box-shadow: var(--shadow-elevated-hover);
 }
@@ -19,13 +18,13 @@
   position: absolute;
   right: 20px;
   top: 24px;
-  font-size: 32px;
-  color: var(--primary);
+  font-size: var(--fs-5xl);
+  color: var(--primary-text);
   opacity: 0.15;
 }
 
 .value {
-  font-size: 28px;
+  font-size: var(--fs-4xl);
   font-weight: 850;
   color: var(--text);
   margin-top: 10px;
@@ -33,7 +32,7 @@
 }
 
 .label {
-  font-size: 13px;
+  font-size: var(--fs-md);
   font-weight: 600;
   color: var(--muted);
   text-transform: uppercase;
@@ -41,7 +40,7 @@
 }
 
 .skeleton {
-  background: linear-gradient(90deg, var(--clr-white-a03) 25%, var(--clr-white-a08) 50%, var(--clr-white-a03) 75%);
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--border) 50%, var(--surface-2) 75%);
   background-size: 200% 100%;
   animation: loadingShimmer 1.5s infinite;
   border-radius: 4px;
@@ -61,7 +60,7 @@
 }
 
 .footer {
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--muted);
   opacity: 0.8;
   margin-top: 6px;

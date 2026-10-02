@@ -168,7 +168,7 @@ export default function SearchablePopover({
             />
           )}
           {!loading && selectedOption?.icon && (
-            <Icon name={selectedOption.icon} style={{ fontSize: "14px" }} />
+            <Icon name={selectedOption.icon} style={{ fontSize: "var(--fs-base)" }} />
           )}
           <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {selectedOption ? selectedOption.label : placeholder}
@@ -177,7 +177,7 @@ export default function SearchablePopover({
         <Icon
           name="arrow_drop_down"
           style={{
-            fontSize: "16px",
+            fontSize: "var(--fs-lg)",
             color: "var(--muted)",
             transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
             transition: "transform 0.2s ease",
@@ -191,7 +191,7 @@ export default function SearchablePopover({
           {/* Search Box */}
           {showSearch && (
             <div className={styles.searchBox}>
-              <Icon name="search" style={{ fontSize: "14px", color: "var(--muted)" }} />
+              <Icon name="search" style={{ fontSize: "var(--fs-base)", color: "var(--muted)" }} />
               <input
                 ref={inputRef}
                 type="text"
@@ -232,7 +232,7 @@ export default function SearchablePopover({
                           style={{ backgroundColor: opt.color }}
                         />
                       )}
-                      {opt.icon && <Icon name={opt.icon} style={{ fontSize: "14px" }} />}
+                      {opt.icon && <Icon name={opt.icon} style={{ fontSize: "var(--fs-base)" }} />}
                       <span className={styles.optionText}>
                         <span
                           className={`${styles.optionLabel} ${
@@ -252,8 +252,8 @@ export default function SearchablePopover({
                       <Icon
                         name="check"
                         style={{
-                          fontSize: "14px",
-                          color: "var(--primary)",
+                          fontSize: "var(--fs-base)",
+                          color: "var(--primary-text)",
                           fontWeight: "bold",
                         }}
                       />

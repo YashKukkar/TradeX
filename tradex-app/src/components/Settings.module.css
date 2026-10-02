@@ -31,7 +31,7 @@
 }
 
 .pageTitle {
-  font-size: 22px;
+  font-size: var(--fs-3xl);
   font-weight: 800;
   color: var(--text);
   margin: 0;
@@ -39,7 +39,7 @@
 }
 
 .pageSubtitle {
-  font-size: 13px;
+  font-size: var(--fs-md);
   color: var(--muted);
   margin: 4px 0 0 0;
 }
@@ -82,7 +82,6 @@
 }
 
 /* ── Button Primitives Scoped to Settings Module ── */
-.primaryBtn,
 .saveBtn {
   display: inline-flex;
   align-items: center;
@@ -92,8 +91,8 @@
   background: var(--primary) !important;
   color: var(--on-primary) !important;
   border: none !important;
-  border-radius: 10px;
-  font-size: 13.5px;
+  border-radius: var(--btn-radius);
+  font-size: var(--fs-base);
   font-weight: 750;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -101,20 +100,16 @@
   white-space: nowrap;
 }
 
-.primaryBtn:hover:not(:disabled),
 .saveBtn:hover:not(:disabled) {
   background: var(--primary-2) !important;
   color: var(--on-primary) !important;
-  transform: translateY(-1px);
 }
 
-.primaryBtn:disabled,
 .saveBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.secondaryBtn,
 .cancelBtn {
   display: inline-flex;
   align-items: center;
@@ -125,21 +120,19 @@
   color: var(--text) !important;
   border: 1px solid var(--border) !important;
   border-radius: 10px;
-  font-size: 13.5px;
+  font-size: var(--fs-base);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
   height: 40px;
 }
 
-.secondaryBtn:hover:not(:disabled),
 .cancelBtn:hover:not(:disabled) {
   background: var(--surface-hover) !important;
   border-color: var(--primary-border) !important;
   color: var(--text) !important;
 }
 
-.secondaryBtn:disabled,
 .cancelBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -151,23 +144,23 @@
   gap: 6px;
   background: var(--primary-bg) !important;
   border: 1px solid var(--primary-border) !important;
-  color: var(--primary) !important;
+  color: var(--primary-text) !important;
   padding: 6px 14px;
   border-radius: 8px;
-  font-size: 12.5px;
+  font-size: var(--fs-md);
   font-weight: 750;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .linkBtn:hover {
-  background: lch(74% 54 165 / 0.2) !important;
+  background: var(--brand-a20) !important;
   border-color: var(--primary) !important;
 }
 
 .fieldLabel {
   display: block;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   font-weight: 700;
   color: var(--muted);
   margin-bottom: 6px;
@@ -175,12 +168,12 @@
 
 .inputField {
   flex: 1;
-  background: var(--surface-recessed);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 10px 14px;
   color: var(--text);
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-family: inherit;
   font-weight: 600;
   outline: none;
@@ -206,7 +199,7 @@
 }
 
 .fieldHintHidden {
-  font-size: 11.5px;
+  font-size: var(--fs-sm);
   color: var(--warning);
   font-weight: 600;
   margin-top: 4px;
@@ -233,7 +226,7 @@
 }
 
 .sectionTitle {
-  font-size: 16px;
+  font-size: var(--fs-lg);
   font-weight: 800;
   color: var(--text);
   margin: 0;
@@ -248,7 +241,7 @@
 }
 
 .emptyState {
-  font-size: 13.5px;
+  font-size: var(--fs-base);
   color: var(--muted);
   font-style: italic;
   text-align: center;
@@ -299,12 +292,12 @@
 
 .bankName {
   font-weight: 750;
-  font-size: 14px;
+  font-size: var(--fs-base);
   color: var(--text);
 }
 
 .primaryBadge {
-  font-size: 9.5px;
+  font-size: var(--fs-xs);
   color: var(--success);
   background: var(--success-bg);
   border: 1px solid var(--success-border);
@@ -316,7 +309,7 @@
 }
 
 .bankDetailsText {
-  font-size: 12.5px;
+  font-size: var(--fs-md);
   color: var(--muted);
   margin-top: 6px;
   letter-spacing: 0.01em;
@@ -332,7 +325,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 6px 14px;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   font-weight: 750;
   color: var(--text);
   cursor: pointer;
@@ -342,7 +335,7 @@
 .makePrimaryBtn:hover {
   background: var(--surface-hover);
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .deleteBtn {
@@ -360,12 +353,11 @@
 }
 
 .deleteBtn:hover {
-  background: lch(58% 72 25 / 0.16);
+  background: var(--clr-red-a16);
   border-color: var(--danger);
 }
 
-.addBankForm,
-.changePasswordForm {
+.addBankForm {
   padding: 18px;
   border-radius: 14px;
   background: var(--surface-elevated);
@@ -382,7 +374,7 @@
 }
 
 .addBankTitle {
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-weight: 800;
   color: var(--text);
   margin: 0 0 4px 0;
@@ -395,12 +387,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: var(--fs-md);
   font-weight: 850;
   font-family: 'Plus Jakarta Sans', sans-serif;
   flex-shrink: 0;
   background: var(--primary-bg);
-  color: var(--primary);
+  color: var(--primary-text);
   border: 1px solid var(--primary-border);
   text-transform: uppercase;
 }
@@ -418,8 +410,35 @@
 }
 
 .checkboxLabel {
-  font-size: 13px;
+  font-size: var(--fs-md);
   color: var(--muted);
   cursor: pointer;
   user-select: none;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: var(--fs-base);
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.backBtn:hover {
+  color: var(--text);
+  border-color: var(--border-hover);
+}
+
+.inputField:disabled,
+.inputField[readonly] {
+  background: var(--surface-recessed);
+  color: var(--muted);
 }

@@ -129,14 +129,14 @@ if (appConfig) {
     } else {
       pass(`App Name synchronized: "${appName}"`);
     }
-  } else if (appName && appName !== 'TradeX') {
+  } else if (appName && appName !== 'TradeNows') {
     fail(
       'APP_NAME missing in .env',
-      `Frontend appName is "${appName}", but backend .env has no APP_NAME set (defaults to "TradeX")`,
+      `Frontend appName is "${appName}", but backend .env has no APP_NAME set (defaults to "TradeNows")`,
       `Add APP_NAME="${appName}" to .env`
     );
   } else {
-    pass(`App Name default: "${appName || 'TradeX'}"`);
+    pass(`App Name default: "${appName || 'TradeNows'}"`);
   }
 
   // SUPPORT_EMAIL check

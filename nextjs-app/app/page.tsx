@@ -8,7 +8,30 @@ export default function Home() {
           __html: `if (typeof window !== 'undefined' && localStorage.getItem('token')) { window.location.href = '${branding.urls.portalUrl}/dashboard'; }`,
         }}
       />
-    <main dangerouslySetInnerHTML={{
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `window.addEventListener('DOMContentLoaded', function(){
+(function(){
+  function tick(){
+    var p={};
+    new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date()).forEach(function(x){p[x.type]=x.value;});
+    var dow={Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6}[p.weekday];
+    var h=parseInt(p.hour,10)%24, mi=parseInt(p.minute,10), m=h*60+mi, wk=dow<5;
+    var open={
+      nse: wk && m>=555 && m<930,
+      mcx: wk && m>=540 && m<1410,
+      comex: !((dow===5&&m>=150)||dow===6||(dow===0&&m<210)) && !(m>=150&&m<210)
+    };
+    var pct=(m/1440*100)+'%';
+    document.querySelectorAll('.hours .now').forEach(function(e){e.style.left=pct;e.style.display='block';});
+    document.querySelectorAll('.hours .st').forEach(function(e){var o=open[e.getAttribute('data-m')];e.textContent=o?'Open':'Closed';e.className='st '+(o?'on':'off');});
+    var l=document.getElementById('nowLabel'); if(l) l.textContent='Now '+('0'+h).slice(-2)+':'+('0'+mi).slice(-2)+' IST';
+  }
+  tick(); setInterval(tick,30000);
+})();});`,
+        }}
+      />
+    <main suppressHydrationWarning dangerouslySetInnerHTML={{
       __html: `
 <header class="site-header">
   <div class="container nav">
@@ -24,158 +47,155 @@ export default function Home() {
       <li><a href="/pages/contact.html">Contact</a></li>
     </ul>
     <div class="nav-cta">
-      <a href="${branding.urls.portalUrl}/login" class="btn btn-ghost">Login</a>
-      <a href="/signup" class="btn btn-primary">Open Account</a>
+      <a href="${branding.urls.portalUrl}/login" class="btn btn-ghost">Log in</a>
+      <a href="/signup" class="btn btn-primary">Open account</a>
       <button class="mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button>
     </div>
   </div>
 </header>
 
-<section class="hero">
-  <div class="container hero-grid">
+<div class="container">
+  <section class="hero">
+    <div class="eyebrow mono">NSE FUTURES · MCX · COMEX</div>
+    <h1>Trade with clarity. <span>Move with confidence.</span></h1>
+    <p class="lead">Purpose-built for NSE futures, MCX and COMEX commodities traders. Your wallet, bank accounts, referrals and rewards, managed from one secure account.</p>
+    <div class="hero-cta">
+      <a href="/signup" class="btn btn-primary btn-lg">Open account</a>
+      <a href="${branding.urls.portalUrl}/login" class="btn btn-ghost btn-lg">Log in</a>
+    </div>
+    <p class="hint">Have a referral code? Add it during sign-up.</p>
+  </section>
+
+  <section class="hours">
+    <div class="hhead"><b>Three markets, across the day</b><span id="nowLabel">Exchange session hours · IST</span></div>
+    <div class="hrow"><div class="lbl"><b>NSE <em class="st" data-m="nse"></em></b><span class="mono">09:15–15:30</span></div>
+      <div class="track"><div class="seg seg-nse mono" style="left:38.54%;width:26.04%">Futures</div><i class="now"></i></div></div>
+    <div class="hrow"><div class="lbl"><b>MCX <em class="st" data-m="mcx"></em></b><span class="mono">09:00–23:30</span></div>
+      <div class="track"><div class="seg seg-mcx mono" style="left:37.5%;width:60.42%">Commodities</div><i class="now"></i></div></div>
+    <div class="hrow"><div class="lbl"><b>COMEX <em class="st" data-m="comex"></em></b><span class="mono">24 hours</span></div>
+      <div class="track"><div class="seg seg-comex mono" style="left:0;width:10.42%" title="Trades 00:00–02:30"></div><div class="seg seg-comex mono" style="left:14.58%;width:85.42%" title="Trades 03:30–24:00">Commodities</div><i class="now"></i></div></div>
+    <div class="axis mono"><span>00:00</span><span>03:00</span><span>06:00</span><span>09:00</span><span>12:00</span><span>15:00</span><span>18:00</span><span>21:00</span><span>24:00</span></div>
+    <p class="hfoot">All times IST. NSE and MCX trade Mon–Fri. COMEX runs 24 hours, Sun–Fri, except a one-hour break each day. Exact hours follow the exchanges and shift slightly with US clock changes.</p>
+  </section>
+
+  <section class="features">
+    <div class="feat"><h4>Market focus</h4><p>Purpose-built for NSE futures, MCX and COMEX commodities traders.</p></div>
+    <div class="feat"><h4>Transparent wallet</h4><p>Separate cash, bonus and reward balances, with full transaction history.</p></div>
+    <div class="feat"><h4>Multi-account banking</h4><p>Link multiple bank accounts and choose your primary one.</p></div>
+    <div class="feat"><h4>Referrals &amp; rewards</h4><p>Multi-tier referrals, bonus cash and reward points.</p></div>
+    <div class="feat"><h4>Integrated support</h4><p>Raise in-app tickets, attach files and follow every reply.</p></div>
+    <div class="feat"><h4>Account security</h4><p>Verified email onboarding with secure sessions.</p></div>
+  </section>
+
+  <section class="invite">
     <div>
-      <span class="pill">● Live markets • SEBI-registered partners</span>
-      <h1>Trade Indian markets on a <span class="gradient">single smart platform</span></h1>
-      <p class="lead">
-        Stocks, F&amp;O, and commodities — analyze, execute, and manage your portfolio with
-        institutional-grade tools, transparent pricing, and 24/7 customer support.
-      </p>
-      <div class="hero-cta">
-        <a href="/signup" class="btn btn-primary btn-lg">Get Started Free</a>
-        <a href="/pages/features.html" class="btn btn-ghost btn-lg">See Platform <span class="material-symbols-outlined" style="vertical-align: middle; font-size: 1.25rem;">arrow_forward</span></a>
-      </div>
-
-      <div class="hero-stats">
-        <div class="stat"><div class="num">₹2,400 Cr+</div><div class="label">Volume Traded</div></div>
-        <div class="stat"><div class="num">180k+</div><div class="label">Active Traders</div></div>
-        <div class="stat"><div class="num">99.98%</div><div class="label">Uptime</div></div>
+      <h2>Invite friends.<br>Grow together.</h2>
+      <p class="lead">Share your personal link. Referrals are tracked across multiple levels, and rewards arrive as bonus cash and reward points.</p>
+      <div class="ol">
+        <div><span class="n mono">01</span><span><b>Share your link</b> Find your personal invite link in your account.</span></div>
+        <div><span class="n mono">02</span><span><b>Friends join</b> They sign up with your link or code.</span></div>
+        <div><span class="n mono">03</span><span><b>Earn across tiers</b> Referrals are tracked beyond your direct invites.</span></div>
       </div>
     </div>
+    <div class="linkcard">
+      <div class="t mono">YOUR INVITE LINK</div>
+      <div class="lbox"><code>…/signup?ref=YOURCODE</code></div>
+      <div class="rw">
+        <div class="t mono">REWARDS</div>
+        <dl>
+          <dt>Welcome points</dt><dd>Reward points when a new account is created.</dd>
+          <dt>First-deposit reward</dt><dd>A cash reward on the first approved deposit.</dd>
+          <dt>Points to bonus cash</dt><dd>Convert reward points into bonus cash at the current rate.</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
 
-    <div class="hero-visual">
-      <div class="hv-head">
-        <div class="ticker">
-          <span class="dot"></span>
-          <b>NIFTY 50</b>
-          <span>· NSE</span>
+  <section class="wallet">
+    <div>
+      <h2>One wallet,<br>three balances</h2>
+      <p class="lead">Cash, bonus and reward points are kept separate, so you always know what is withdrawable and what is a reward.</p>
+      <div class="list">
+        <div><h5>Deposits</h5><p>Submit a request. Once approved, it is credited to your withdrawable balance.</p></div>
+        <div><h5>Withdrawals</h5><p>The amount is held from your balance when you request it, paid out on approval, and returned if the request is declined.</p></div>
+        <div><h5>Bank accounts</h5><p>Link several accounts and mark one as primary.</p></div>
+      </div>
+    </div>
+    <div>
+      <div class="win">
+        <div class="bar"><i></i><i></i><i></i><span>Wallet</span></div>
+        <div class="wbody">
+          <div class="bals">
+            <div class="bal hi"><small>Withdrawable balance</small><b>₹24,500.00</b><small>Approved deposits</small></div>
+            <div class="bal"><small>Bonus balance</small><b>₹750.00</b><small>Rewards and conversions</small></div>
+            <div class="bal"><small>Reward points</small><b>1,200 <em>pts</em></b><small>Convert to bonus cash</small></div>
+          </div>
+          <div class="act">
+            <div>Recent activity</div>
+            <div>Deposit request<span class="status">Approved</span></div>
+            <div>Welcome points<span class="status">Credited</span></div>
+            <div>Points converted to bonus cash<span class="status">Completed</span></div>
+            <div>Withdrawal request<span class="status pending">Pending approval</span></div>
+          </div>
         </div>
-        <span class="change-up">+1.24%</span>
       </div>
-      <div class="price-row">
-        <div class="price">22,418.75</div>
-        <div class="change-up"><span class="material-symbols-outlined" style="vertical-align: middle; font-size: 1rem;">trending_up</span> 274.35</div>
-      </div>
-      <svg id="heroChart" class="chart" viewBox="0 0 520 180" preserveAspectRatio="none" role="img" aria-label="NIFTY 50 market trend chart"></svg>
-      <div class="watchlist">
-        <div class="wl-row"><b>RELIANCE</b><span>₹2,910.40</span><span class="change-up">+0.82%</span></div>
-        <div class="wl-row"><b>TCS</b><span>₹4,076.10</span><span class="change-up">+1.15%</span></div>
-        <div class="wl-row"><b>HDFCBANK</b><span>₹1,498.55</span><span class="change-down">-0.43%</span></div>
-        <div class="wl-row"><b>GOLD (MCX)</b><span>₹71,320</span><span class="change-up">+0.31%</span></div>
-      </div>
+      <p class="note">Illustration with example values.</p>
     </div>
-  </div>
-</section>
+  </section>
 
-<div class="markets">
-  <div class="ticker-track">
-    <div class="ticker-item"><b>NIFTY 50</b> 22,418.75 <span class="up">+1.24%</span></div>
-    <div class="ticker-item"><b>BANK NIFTY</b> 47,120.10 <span class="down">-0.32%</span></div>
-    <div class="ticker-item"><b>FINNIFTY</b> 21,180.45 <span class="up">+0.65%</span></div>
-    <div class="ticker-item"><b>GOLD (MCX)</b> ₹71,320 <span class="up">+0.31%</span></div>
-    <div class="ticker-item"><b>SILVER (MCX)</b> ₹83,450 <span class="up">+0.85%</span></div>
-    <div class="ticker-item"><b>CRUDE OIL (MCX)</b> ₹6,840 <span class="up">+0.75%</span></div>
-    <div class="ticker-item"><b>NATURAL GAS (MCX)</b> ₹198.50 <span class="down">-1.10%</span></div>
-    <div class="ticker-item"><b>RELIANCE (NSE)</b> ₹2,910.40 <span class="up">+0.82%</span></div>
-  </div>
+  <section class="cta">
+    <div class="cta-top">
+      <div><h2>Open your ${branding.appName} account</h2><p>Verify your email to get started.</p></div>
+      <a href="/signup" class="btn btn-primary">Open account</a>
+    </div>
+    <div class="steps">
+      <div><div class="n mono">01</div><h5>Sign up and verify</h5><p>Create your account and verify your email.</p></div>
+      <div><div class="n mono">02</div><h5>Link your bank</h5><p>Add one or more bank accounts and set a primary.</p></div>
+      <div><div class="n mono">03</div><h5>Add funds</h5><p>Submit a deposit request. Approved deposits land in your withdrawable balance.</p></div>
+      <div><div class="n mono">04</div><h5>Invite and earn</h5><p>Share your link and collect rewards as your network grows.</p></div>
+    </div>
+  </section>
 </div>
-
-<section id="features">
-  <div class="container">
-    <div class="section-head">
-      <span class="pill">Why ${branding.appName}</span>
-      <h2>Everything you need to trade — in one place</h2>
-      <p>Powerful charts, transparent pricing, lightning-fast execution, and dedicated human support when it matters.</p>
-    </div>
-
-    <div class="grid-3">
-      <div class="card">
-        <div class="icon">₹</div>
-        <h3>Transparent Pricing</h3>
-        <p>Flat, clearly disclosed brokerage. No hidden fees, no surprises on your contract note.</p>
-      </div>
-      <div class="card">
-        <div class="icon"><span class="material-symbols-outlined">bolt</span></div>
-        <h3>Lightning Execution</h3>
-        <p>Direct market access with co-located order routing — orders filled in milliseconds.</p>
-      </div>
-      <div class="card">
-        <div class="icon"><span class="material-symbols-outlined">bar_chart</span></div>
-        <h3>Pro Charts</h3>
-        <p>TradingView-powered charts with 100+ indicators, drawing tools, and saved templates.</p>
-      </div>
-      <div class="card">
-        <div class="icon"><span class="material-symbols-outlined">lock</span></div>
-        <h3>Bank-grade Security</h3>
-        <p>2-factor auth, encrypted sessions, and funds held in a SEBI-regulated clearing account.</p>
-      </div>
-      <div class="card">
-        <div class="icon"><span class="material-symbols-outlined">schedule</span></div>
-        <h3>24/7 Support</h3>
-        <p>Connect with real humans on chat, email, and phone whenever markets are open or questions arise.</p>
-      </div>
-      <div class="card">
-        <div class="icon"><span class="material-symbols-outlined">smartphone</span></div>
-        <h3>Works Everywhere</h3>
-        <p>Native iOS &amp; Android apps, a web trader, and a desktop terminal — all fully synced.</p>
-      </div>
-    </div>
-  </div>
-</section>
 
 <footer class="site-footer">
   <div class="container">
+    <p class="disclaimer">Trading in futures and commodity derivatives involves substantial risk and may not be suitable for every investor. Please read all related documents carefully before trading.</p>
     <div class="footer-grid">
       <div class="footer-brand">
         <a href="/" class="brand">
           <img src="${branding.logoUrl}" alt="${branding.appName}" class="logo" />
           <span class="brand-name">${branding.brandPrefix}<span>${branding.accentText}</span></span>
         </a>
-        <p>India's modern trading platform for NSE stocks, F&amp;O, and MCX commodities.</p>
+        <p>Trade with clarity. Move with confidence.</p>
       </div>
       <div class="footer-col">
-        <h4>Products</h4>
+        <h4>Product</h4>
         <ul>
-          <li><a href="/pages/products.html">Stocks & ETFs</a></li>
-          <li><a href="/pages/products.html">Futures & Options</a></li>
-          <li><a href="/pages/products.html">Commodities</a></li>
-          <li><a href="/pages/products.html">Index Derivatives</a></li>
+          <li><a href="/pages/products.html">Markets</a></li>
+          <li><a href="/pages/features.html">Features</a></li>
+          <li><a href="/pages/about.html">About</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <h4>Features</h4>
+        <h4>Account</h4>
         <ul>
-          <li><a href="/pages/features.html">Trading Terminal</a></li>
-          <li><a href="/pages/features.html">Analytics Deck</a></li>
-          <li><a href="/pages/features.html">Instant Payouts</a></li>
-          <li><a href="/pages/features.html">APIs &amp; Webhooks</a></li>
+          <li><a href="/signup">Open account</a></li>
+          <li><a href="${branding.urls.portalUrl}/login">Log in</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <h4>Company</h4>
+        <h4>Help</h4>
         <ul>
-          <li><a href="/pages/about.html">About ${branding.appName}</a></li>
-          <li><a href="/pages/about.html">Press &amp; Media</a></li>
-          <li><a href="/pages/about.html">Careers &amp; Hiring</a></li>
-          <li><a href="/pages/about.html">Safety &amp; Security</a></li>
+          <li><a href="/pages/contact.html">Support</a></li>
+          <li><a href="/pages/contact.html">Contact</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <h4>Support &amp; Legal</h4>
+        <h4>Legal</h4>
         <ul>
-          <li><a href="/pages/contact.html">Contact Desk</a></li>
-          <li><a href="/pages/contact.html">Help Portal</a></li>
-          <li><a href="/pages/contact.html">Terms of Use</a></li>
-          <li><a href="/pages/contact.html">Privacy Policy</a></li>
+          <li><a href="/pages/contact.html">Terms</a></li>
+          <li><a href="/pages/contact.html">Privacy</a></li>
+          <li><a href="/pages/contact.html">Disclosures</a></li>
         </ul>
       </div>
     </div>

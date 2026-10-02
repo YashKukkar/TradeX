@@ -11,19 +11,18 @@
 }
 
 .card:hover {
-  transform: translateY(-3px);
   border-color: var(--card-hover-border);
   box-shadow: var(--shadow-elevated-hover);
 }
 
 .icon {
-  font-size: 28px;
+  font-size: var(--fs-4xl);
   margin-bottom: 4px;
 }
 
 .title {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 18px;
+  font-size: var(--fs-xl);
   font-weight: 700;
   color: var(--text);
   margin: 0;
@@ -31,7 +30,7 @@
 
 .text {
   color: var(--muted);
-  font-size: 14.5px;
+  font-size: var(--fs-base);
   line-height: 1.6;
   margin: 0;
   flex: 1;
@@ -48,10 +47,10 @@
   align-self: flex-start;
   padding: 9px 18px;
   background: var(--cta-bg);
-  color: var(--primary);
+  color: var(--primary-text);
   border: 1px solid var(--cta-border);
   border-radius: 8px;
-  font-size: 13.5px;
+  font-size: var(--fs-base);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -59,7 +58,6 @@
 
 .cta:hover {
   background: var(--cta-hover-bg);
-  transform: translateY(-1px);
   box-shadow: var(--cta-hover-shadow);
 }
 

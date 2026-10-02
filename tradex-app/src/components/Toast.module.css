@@ -6,18 +6,19 @@
   padding: 12px 20px;
   border-radius: 12px;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-weight: 600;
-  box-shadow: 0 16px 36px var(--clr-black-a40);
-  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-elevated);
   z-index: 9999;
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   max-width: 450px;
   width: auto;
   min-width: 280px;
   box-sizing: border-box;
-  color: var(--clr-white);
-  border: 1px solid var(--clr-white-a10);
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left-width: 4px;
   transition: all 0.2s ease;
 }
 
@@ -33,7 +34,7 @@
 }
 
 .icon {
-  font-size: 20px;
+  font-size: var(--fs-2xl);
   flex-shrink: 0;
 }
 
@@ -45,7 +46,7 @@
 .closeBtn {
   background: transparent;
   border: none;
-  color: var(--clr-white-a50);
+  color: var(--muted);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -57,49 +58,26 @@
 }
 
 .closeBtn:hover {
-  color: var(--clr-white);
-  background: var(--clr-white-a08);
+  color: var(--text);
+  background: var(--surface-2);
 }
 
 /* Variants */
-.success {
-  background: var(--clr-scene-teal);
-  border: 1px solid var(--clr-teal-a25);
-}
-.success .icon {
-  color: var(--clr-teal);
-}
+.success { border-left-color: var(--success); }
+.success .icon { color: var(--success); }
 
-.error {
-  background: var(--clr-scene-red);
-  border: 1px solid var(--clr-red-a25);
-}
-.error .icon {
-  color: var(--clr-red-alt);
-}
+.error { border-left-color: var(--danger); }
+.error .icon { color: var(--danger); }
 
-.warning {
-  background: var(--clr-scene-amber);
-  border: 1px solid var(--clr-amber-a25);
-}
-.warning .icon {
-  color: var(--clr-amber);
-}
+.warning { border-left-color: var(--warning); }
+.warning .icon { color: var(--warning); }
 
-.info {
-  background: var(--clr-scene-blue);
-  border: 1px solid var(--clr-blue-a20);
-}
-.info .icon {
-  color: var(--clr-blue);
-}
+.info { border-left-color: var(--info); }
+.info .icon { color: var(--info); }
 
-.loading {
-  background: var(--clr-scene-dark);
-  border: 1px solid var(--clr-white-a15);
-}
+.loading { border-left-color: var(--primary); }
 .loading .icon {
-  color: var(--muted);
+  color: var(--primary);
   animation: spin 1.2s linear infinite;
 }
 

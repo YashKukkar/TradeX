@@ -36,7 +36,6 @@ import java.util.function.Function;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("null")
 public class ReferralService {
 
     private final UserRepository userRepository;
@@ -144,7 +143,8 @@ public class ReferralService {
             referrer.setPointsBalance(balanceAfter);
             referrersToSave.add(referrer);
 
-            PointsTransaction refTx = buildReferralPointsTransaction(referrer, points, balanceAfter, level, DataFormatter.maskEmail(newUser.getEmail()));
+            PointsTransaction refTx = buildReferralPointsTransaction(referrer, points, balanceAfter, level,
+                    DataFormatter.maskEmail(newUser.getEmail()));
             transactionsToSave.add(refTx);
 
             log.info("Awarded {} referral points to {} (Level {})", points, referrer.getEmail(), level);
@@ -293,7 +293,8 @@ public class ReferralService {
                 ReferralRewardStatus.CREDITED);
     }
 
-    private PointsTransaction buildReferralPointsTransaction(User referrer, long points, long balanceAfter, int level, String maskedEmail) {
+    private PointsTransaction buildReferralPointsTransaction(User referrer, long points, long balanceAfter, int level,
+            String maskedEmail) {
         PointsTransactionType txType = switch (level) {
             case 1 -> PointsTransactionType.REFERRAL_L1;
             case 2 -> PointsTransactionType.REFERRAL_L2;

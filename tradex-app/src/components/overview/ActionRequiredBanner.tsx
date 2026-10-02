@@ -34,7 +34,7 @@ export default function ActionRequiredBanner({
   if (totalPendingActions === 0) {
     return (
       <div className={overviewStyles.topActionClean}>
-        <Icon name="check_circle" style={{ fontSize: "18px" }} />
+        <Icon name="check_circle" style={{ fontSize: "var(--fs-xl)" }} />
         <span>All platform operational queues are clear! No pending actions require attention.</span>
       </div>
     );
@@ -44,10 +44,10 @@ export default function ActionRequiredBanner({
     <div className={overviewStyles.topActionBanner}>
       <div className={overviewStyles.actionBannerHeader}>
         <span>
-          <Icon name="error_outline" style={{ fontSize: "16px", verticalAlign: "middle", marginRight: "6px" }} />
+          <Icon name="error_outline" style={{ fontSize: "var(--fs-lg)", verticalAlign: "middle", marginRight: "6px" }} />
           Action Required ({totalPendingActions})
         </span>
-        <span style={{ fontSize: "11.5px", color: "var(--muted)", textTransform: "none" }}>
+        <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)", textTransform: "none" }}>
           Live Real-Time Operational Queue
         </span>
       </div>
@@ -56,21 +56,21 @@ export default function ActionRequiredBanner({
           <div className={overviewStyles.actionBannerPill} onClick={() => onTabChange("pending")}>
             <span style={{ color: "var(--warning)", fontWeight: 700 }}>● {pendingDepositsCount} Pending Deposits</span>
             <span style={{ color: "var(--muted)" }}>(₹{pendingDepositsAmount.toLocaleString()})</span>
-            <Icon name="arrow_forward" style={{ fontSize: "14px", color: "var(--muted)" }} />
+            <Icon name="arrow_forward" style={{ fontSize: "var(--fs-base)", color: "var(--muted)" }} />
           </div>
         )}
         {pendingWithdrawalsCount > 0 && (
           <div className={overviewStyles.actionBannerPill} onClick={() => onTabChange("pending")}>
             <span style={{ color: "var(--danger)", fontWeight: 700 }}>● {pendingWithdrawalsCount} Pending Withdrawals</span>
             <span style={{ color: "var(--muted)" }}>(₹{pendingWithdrawalsAmount.toLocaleString()})</span>
-            <Icon name="arrow_forward" style={{ fontSize: "14px", color: "var(--muted)" }} />
+            <Icon name="arrow_forward" style={{ fontSize: "var(--fs-base)", color: "var(--muted)" }} />
           </div>
         )}
         {openTicketsCount > 0 && (
           <div className={overviewStyles.actionBannerPill} onClick={() => onTabChange("tickets")}>
             <span style={{ color: "var(--accent)", fontWeight: 700 }}>● {openTicketsCount} Open Tickets</span>
             <span style={{ color: "var(--muted)" }}>(Awaiting support response)</span>
-            <Icon name="arrow_forward" style={{ fontSize: "14px", color: "var(--muted)" }} />
+            <Icon name="arrow_forward" style={{ fontSize: "var(--fs-base)", color: "var(--muted)" }} />
           </div>
         )}
       </div>

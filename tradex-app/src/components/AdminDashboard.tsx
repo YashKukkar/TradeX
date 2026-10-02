@@ -110,7 +110,7 @@ export default function AdminDashboard({
             Welcome back, <span className={styles.greetingName}>{displayName}</span>
           </h1>
           <span className={styles.adminStatusBadge}>
-            <Icon name="shield_person" style={{ fontSize: "14px", marginRight: "6px" }} />
+            <Icon name="shield_person" style={{ fontSize: "var(--fs-base)", marginRight: "6px" }} />
             Console Active
           </span>
         </div>

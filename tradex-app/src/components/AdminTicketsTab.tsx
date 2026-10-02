@@ -42,7 +42,7 @@ const TICKET_COLUMNS: ColumnDef<Ticket>[] = [
     render: (t) => (
       <span
         className={`category-tag-${t.category.toLowerCase().replace("_", "")}`}
-        style={{ fontSize: "11px", fontWeight: 700, padding: "4px 8px", borderRadius: "6px", textTransform: "uppercase", letterSpacing: "0.03em", display: "inline-block" }}
+        style={{ fontSize: "var(--fs-xs)", fontWeight: 700, padding: "4px 8px", borderRadius: "6px", textTransform: "uppercase", letterSpacing: "0.03em", display: "inline-block" }}
       >
         {getCategoryLabel(t.category)}
       </span>
@@ -60,11 +60,11 @@ const TICKET_COLUMNS: ColumnDef<Ticket>[] = [
         {t.status.replace("_", " ")}
       </span>
     ),
-    width: "95px",
+    width: "125px",
   },
   {
     label: "SLA / Age",
-    width: "140px",
+    width: "175px",
     render: (t) => {
       const sla = getTicketSlaInfo(t.createdAt, t.status, t.resolvedAt);
       return (
@@ -73,7 +73,7 @@ const TICKET_COLUMNS: ColumnDef<Ticket>[] = [
             display: "inline-flex",
             alignItems: "center",
             gap: "5px",
-            fontSize: "11px",
+            fontSize: "var(--fs-xs)",
             fontWeight: 700,
             padding: "3px 8px",
             borderRadius: "6px",
@@ -83,7 +83,7 @@ const TICKET_COLUMNS: ColumnDef<Ticket>[] = [
             whiteSpace: "nowrap",
           }}
         >
-          <Icon name={sla.icon} style={{ fontSize: "13px" }} />
+          <Icon name={sla.icon} style={{ fontSize: "var(--fs-md)" }} />
           {sla.label}
         </span>
       );
@@ -94,12 +94,12 @@ const TICKET_COLUMNS: ColumnDef<Ticket>[] = [
     render: (t) => (
       <div style={{ display: "flex", flexDirection: "column", gap: "4px", alignItems: "flex-start" }}>
         {t.assignedToPermission && (
-          <span style={{ fontSize: "11px", fontWeight: 600, background: "var(--primary-bg)", color: "var(--primary)", border: "1px solid var(--primary-border)", padding: "3px 8px", borderRadius: "6px" }}>
+          <span style={{ fontSize: "var(--fs-xs)", fontWeight: 600, background: "var(--primary-bg)", color: "var(--primary-text)", border: "1px solid var(--primary-border)", padding: "3px 8px", borderRadius: "6px" }}>
             {ROUTE_QUEUE_LABELS[t.assignedToPermission] || t.assignedToPermission}
           </span>
         )}
         {!t.assignedToPermission && !t.assignedToUserEmail && (
-          <span style={{ fontSize: "12px", color: "var(--muted)", fontStyle: "italic" }}>Unassigned</span>
+          <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)", fontStyle: "italic" }}>Unassigned</span>
         )}
         {t.assignedToUserEmail && (
           <PermissionsTooltip
@@ -115,7 +115,7 @@ const TICKET_COLUMNS: ColumnDef<Ticket>[] = [
   {
     label: "Created At",
     render: (t) => (
-      <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--text)", letterSpacing: "0.03em" }}>
+      <span style={{ fontSize: "var(--fs-sm)", fontWeight: 600, color: "var(--text)", letterSpacing: "0.03em" }}>
         {formatDateTime(t.createdAt)}
       </span>
     ),
@@ -127,7 +127,7 @@ const TICKET_COLUMNS: ColumnDef<Ticket>[] = [
     width: "50px",
     noHeader: true,
     render: () => (
-      <Icon name="open_in_new" style={{ fontSize: "16px", color: "var(--primary)" }} />
+      <Icon name="open_in_new" style={{ fontSize: "var(--fs-lg)", color: "var(--primary-text)" }} />
     ),
   },
 ];
@@ -198,7 +198,7 @@ export default function AdminTicketsTab({ user }: AdminTicketsTabProps) {
               gap: "6px",
               padding: "7px 12px",
               borderRadius: "8px",
-              fontSize: "12px",
+              fontSize: "var(--fs-sm)",
               fontWeight: 700,
               cursor: "pointer",
               transition: "all 0.2s ease",
@@ -209,7 +209,7 @@ export default function AdminTicketsTab({ user }: AdminTicketsTabProps) {
               height: "35px",
             }}
           >
-            <Icon name="warning" style={{ fontSize: "15px", color: overdueOnly ? "var(--clr-white-a95)" : overdueCount > 0 ? "var(--danger)" : "var(--muted)" }} />
+            <Icon name="warning" style={{ fontSize: "var(--fs-lg)", color: overdueOnly ? "var(--clr-white-a95)" : overdueCount > 0 ? "var(--danger)" : "var(--muted)" }} />
             <span>Overdue Only</span>
             <span
               style={{
@@ -217,7 +217,7 @@ export default function AdminTicketsTab({ user }: AdminTicketsTabProps) {
                 color: overdueOnly || overdueCount > 0 ? "var(--clr-white-a95)" : "var(--muted)",
                 padding: "1px 6px",
                 borderRadius: "10px",
-                fontSize: "10px",
+                fontSize: "var(--fs-xs)",
                 fontWeight: 800,
                 minWidth: "16px",
                 textAlign: "center",
@@ -229,23 +229,23 @@ export default function AdminTicketsTab({ user }: AdminTicketsTabProps) {
           </button>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-            <span style={{ fontSize: "11px", color: "var(--muted)", textTransform: "uppercase" }}>Search</span>
+            <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", textTransform: "uppercase" }}>Search</span>
             <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-              <Icon name="search" style={{ position: "absolute", left: "10px", color: "var(--muted)", fontSize: "16px", pointerEvents: "none" }} />
+              <Icon name="search" style={{ position: "absolute", left: "10px", color: "var(--muted)", fontSize: "var(--fs-lg)", pointerEvents: "none" }} />
               <input
                 type="text"
                 placeholder="Search ticket #, email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ padding: "8px 12px 8px 32px", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "8px", color: "var(--text)", fontSize: "13px", outline: "none", width: "200px" }}
+                style={{ padding: "8px 12px 8px 32px", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "8px", color: "var(--text)", fontSize: "var(--fs-md)", outline: "none", width: "200px" }}
               />
             </div>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-            <span style={{ fontSize: "11px", color: "var(--muted)", textTransform: "uppercase" }}>Status</span>
+            <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", textTransform: "uppercase" }}>Status</span>
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-              style={{ padding: "8px 12px", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "8px", color: "var(--text)", fontSize: "13px", outline: "none" }}
+              style={{ padding: "8px 12px", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "8px", color: "var(--text)", fontSize: "var(--fs-md)", outline: "none" }}
             >
               <option value="ALL">All Statuses</option>
               <option value="OPEN">Open</option>
@@ -256,9 +256,9 @@ export default function AdminTicketsTab({ user }: AdminTicketsTabProps) {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-            <span style={{ fontSize: "11px", color: "var(--muted)", textTransform: "uppercase" }}>Category</span>
+            <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", textTransform: "uppercase" }}>Category</span>
             <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}
-              style={{ padding: "8px 12px", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "8px", color: "var(--text)", fontSize: "13px", outline: "none" }}
+              style={{ padding: "8px 12px", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "8px", color: "var(--text)", fontSize: "var(--fs-md)", outline: "none" }}
             >
               <option value="ALL">All Categories</option>
               <option value="GENERAL">General</option>

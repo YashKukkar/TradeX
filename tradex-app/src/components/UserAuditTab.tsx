@@ -41,19 +41,19 @@ export default function UserAuditTab({ email }: UserAuditTabProps) {
                     border: "1px solid var(--border)",
                     borderRadius: "10px",
                     padding: "12px 14px",
-                    fontSize: "13px",
+                    fontSize: "var(--fs-md)",
                     marginBottom: "12px"
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                    <span style={{ fontSize: "11px", color: "var(--muted)" }}>{formatEpochTime(log.createdAt, { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
-                    <ActionBadge action={log.action} style={{ fontSize: "10px", padding: "2px 6px" }} />
+                    <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)" }}>{formatEpochTime(log.createdAt, { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                    <ActionBadge action={log.action} style={{ fontSize: "var(--fs-xs)", padding: "2px 6px" }} />
                   </div>
-                  <div style={{ fontSize: "13px", color: "var(--text)", fontWeight: "500" }}>
-                    Actor: <span style={{ color: "var(--primary)" }}>{log.actorEmail}</span>
+                  <div style={{ fontSize: "var(--fs-md)", color: "var(--text)", fontWeight: "500" }}>
+                    Actor: <span style={{ color: "var(--primary-text)" }}>{log.actorEmail}</span>
                   </div>
                   {log.details && (
-                    <div style={{ marginTop: "8px", fontSize: "12px", color: "var(--muted)", fontStyle: "italic", borderTop: "1px dashed rgba(255,255,255,0.04)", paddingTop: "6px" }}>
+                    <div style={{ marginTop: "8px", fontSize: "var(--fs-sm)", color: "var(--muted)", fontStyle: "italic", borderTop: "1px dashed var(--clr-white-a04)", paddingTop: "6px" }}>
                       {log.details}
                     </div>
                   )}

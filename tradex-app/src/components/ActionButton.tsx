@@ -44,12 +44,12 @@ export default function ActionButton({
               animation: action-btn-spin 1s linear infinite;
             }
           `}</style>
-          <Icon name="progress_activity" className="action-btn-spinner" style={{ fontSize: "16px" }} />
+          <Icon name="progress_activity" className="action-btn-spinner" style={{ fontSize: "var(--fs-lg)" }} />
           <span>{loadingText || "Processing..."}</span>
         </>
       ) : (
         <>
-          {iconName && <Icon name={iconName} style={{ fontSize: "16px" }} />}
+          {iconName && <Icon name={iconName} style={{ fontSize: "var(--fs-lg)" }} />}
           <span>{children}</span>
         </>
       )}

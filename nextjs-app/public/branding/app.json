@@ -2,12 +2,12 @@
   "$schema": "./schema.json",
   "assetVersion": "1.0.0",
   "brand": {
-    "appName": "TradeX",
+    "appName": "TradeNows",
     "brandPrefix": "Trade",
-    "accentText": "X",
-    "pointsName": "TradeX Points",
+    "accentText": "Nows",
+    "pointsName": "TradeNows Points",
     "supportEmail": "support@tradenows.com",
-    "legalName": "TradeX Technologies Ltd"
+    "legalName": "TradeNows"
   },
   "urls": {
     "portalUrl": "http://localhost:5173",
@@ -15,7 +15,7 @@
     "apiUrl": "http://localhost:8080/api"
   },
   "theme": {
-    "primaryColor": "#00e0a4",
-    "accentColor": "#7ee3ff"
+    "primaryColor": "#b5552b",
+    "accentColor": "#14213d"
   }
 }

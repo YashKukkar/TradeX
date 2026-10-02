@@ -67,14 +67,14 @@ export default function AdjustPointsModal({ user, onClose, onConfirm, isPending 
             className={`${styles.modeBtn} ${mode === "ADD" ? styles.modeBtnAddActive : ""}`}
             onClick={() => setMode("ADD")}
           >
-            <Icon name="add_circle" style={{ fontSize: "16px" }} /> Add Points (+)
+            <Icon name="add_circle" style={{ fontSize: "var(--fs-lg)" }} /> Add Points (+)
           </button>
           <button
             type="button"
             className={`${styles.modeBtn} ${mode === "DEDUCT" ? styles.modeBtnDeductActive : ""}`}
             onClick={() => setMode("DEDUCT")}
           >
-            <Icon name="remove_circle" style={{ fontSize: "16px" }} /> Deduct Points (-)
+            <Icon name="remove_circle" style={{ fontSize: "var(--fs-lg)" }} /> Deduct Points (-)
           </button>
         </div>
 
@@ -118,7 +118,7 @@ export default function AdjustPointsModal({ user, onClose, onConfirm, isPending 
           <div className={`${styles.previewCard} ${isNegativeResult ? styles.previewCardError : ""}`}>
             <span className={styles.previewTitle}>Resulting Balance Preview</span>
             <span className={`${styles.previewResult} ${isNegativeResult ? styles.previewResultError : ""}`}>
-              {isNegativeResult ? "⚠️ Cannot result in negative balance!" : `${formatNumber(newBalance)} pts`}
+              {isNegativeResult ? "Cannot result in negative balance!" : `${formatNumber(newBalance)} pts`}
             </span>
           </div>
         )}

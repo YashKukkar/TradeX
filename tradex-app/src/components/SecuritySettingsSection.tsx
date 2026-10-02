@@ -105,7 +105,7 @@ export default function SecuritySettingsSection({
             disabled
           />
           <span className={localStyles.fieldHintHidden}>
-            <Icon name="info" style={{ fontSize: "14px", marginRight: "4px" }} />
+            <Icon name="info" style={{ fontSize: "var(--fs-base)", marginRight: "4px" }} />
             Email address cannot be changed
           </span>
         </div>
@@ -151,7 +151,7 @@ export default function SecuritySettingsSection({
               onClick={() => setShowPasswordForm(true)}
               className={localStyles.linkBtn}
             >
-              <Icon name="lock_reset" style={{ fontSize: "16px" }} />
+              <Icon name="lock_reset" style={{ fontSize: "var(--fs-lg)" }} />
               Change Password
             </button>
           )}

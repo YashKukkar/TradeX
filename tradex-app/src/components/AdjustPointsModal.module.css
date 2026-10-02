@@ -7,7 +7,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: var(--fs-xl);
   flex-shrink: 0;
   border: 1px solid var(--warning-border);
 }
@@ -31,13 +31,13 @@
 }
 
 .balanceLabel {
-  font-size: 12.5px;
+  font-size: var(--fs-md);
   color: var(--muted);
   font-weight: 600;
 }
 
 .balanceValue {
-  font-size: 15px;
+  font-size: var(--fs-lg);
   font-weight: 800;
   color: var(--text);
 }
@@ -61,7 +61,7 @@
   padding: 10px;
   border-radius: 8px;
   border: none;
-  font-size: 13.5px;
+  font-size: var(--fs-base);
   font-weight: 700;
   cursor: pointer;
   background: transparent;
@@ -73,14 +73,14 @@
   background: var(--success-bg);
   color: var(--success);
   border: 1px solid var(--success-border);
-  box-shadow: 0 2px 8px lch(70% 48 145 / 0.12);
+  box-shadow: 0 2px 8px var(--clr-green-a12);
 }
 
 .modeBtnDeductActive {
   background: var(--danger-bg);
   color: var(--danger);
   border: 1px solid var(--danger-border);
-  box-shadow: 0 2px 8px lch(58% 72 25 / 0.12);
+  box-shadow: 0 2px 8px var(--clr-red-a12);
 }
 
 /* Amount Field & Quick Presets */
@@ -91,7 +91,7 @@
 }
 
 .fieldLabel {
-  font-size: 12px;
+  font-size: var(--fs-sm);
   font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
@@ -107,7 +107,7 @@
 .inputPrefix {
   position: absolute;
   left: 14px;
-  font-size: 16px;
+  font-size: var(--fs-lg);
   font-weight: 800;
 }
 
@@ -117,11 +117,11 @@
 .amountInput {
   width: 100%;
   padding: 12px 14px 12px 34px;
-  background: var(--surface-recessed);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
   color: var(--text);
-  font-size: 16px;
+  font-size: var(--fs-lg);
   font-weight: 700;
   outline: none;
   transition: all 0.2s ease;
@@ -130,7 +130,7 @@
 
 .amountInput:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px lch(74% 54 165 / 0.2);
+  box-shadow: 0 0 0 3px var(--brand-a20);
 }
 
 .presetContainer {
@@ -143,7 +143,7 @@
   background: var(--surface-recessed);
   border: 1px solid var(--border);
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--fs-sm);
   font-weight: 700;
   padding: 6px 12px;
   border-radius: 6px;
@@ -174,13 +174,13 @@
 }
 
 .previewTitle {
-  font-size: 12.5px;
+  font-size: var(--fs-md);
   color: var(--muted);
   font-weight: 600;
 }
 
 .previewResult {
-  font-size: 15px;
+  font-size: var(--fs-lg);
   font-weight: 800;
   color: var(--text);
 }
@@ -198,7 +198,7 @@
 }
 
 .reasonChip {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   font-weight: 600;
   background: var(--surface-recessed);
   border: 1px solid var(--border);
@@ -217,11 +217,11 @@
 .reasonInput {
   width: 100%;
   padding: 10px 14px;
-  background: var(--surface-recessed);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
   color: var(--text);
-  font-size: 13.5px;
+  font-size: var(--fs-base);
   outline: none;
   transition: all 0.2s ease;
   box-sizing: border-box;
@@ -244,7 +244,7 @@
   border: 1px solid var(--border);
   background: transparent;
   color: var(--muted);
-  font-size: 13.5px;
+  font-size: var(--fs-base);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -257,38 +257,36 @@
 
 .submitBtnAdd {
   padding: 10px 22px;
-  border-radius: 10px;
+  border-radius: var(--btn-radius);
   border: none;
   background: var(--success);
-  color: var(--bg);
-  font-size: 13.5px;
+  color: var(--on-primary);
+  font-size: var(--fs-base);
   font-weight: 800;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px lch(70% 48 145 / 0.25);
+  box-shadow: 0 4px 12px var(--clr-green-a25);
 }
 
 .submitBtnAdd:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px lch(70% 48 145 / 0.35);
+  box-shadow: 0 6px 16px var(--clr-green-a35);
 }
 
 .submitBtnDeduct {
   padding: 10px 22px;
-  border-radius: 10px;
+  border-radius: var(--btn-radius);
   border: none;
   background: var(--danger);
-  color: var(--text);
-  font-size: 13.5px;
+  color: var(--on-primary);
+  font-size: var(--fs-base);
   font-weight: 800;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px lch(58% 72 25 / 0.25);
+  box-shadow: 0 4px 12px var(--clr-red-a25);
 }
 
 .submitBtnDeduct:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px lch(58% 72 25 / 0.35);
+  box-shadow: 0 6px 16px var(--clr-red-a35);
 }
 
 .submitBtnDisabled {

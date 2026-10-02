@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useRef } from "react";
 import Icon from "./Icon";
 import styles from "./SplitDrawerLayout.module.css";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 
 interface SplitDrawerLayoutProps {
   isOpen: boolean;
@@ -21,6 +22,9 @@ export default function SplitDrawerLayout({
   rightPane,
   width = "1050px",
 }: SplitDrawerLayoutProps) {
+  const drawerRef = useRef<HTMLElement>(null);
+  useFocusTrap(drawerRef, isOpen);
+
   if (!isOpen) return null;
 
   return (
@@ -30,6 +34,7 @@ export default function SplitDrawerLayout({
 
       {/* Sliding Drawer Container */}
       <aside
+        ref={drawerRef}
         className={styles.drawer}
         role="dialog"
         aria-modal="true"
@@ -42,7 +47,7 @@ export default function SplitDrawerLayout({
             {subtitle && <div className={styles.sub}>{subtitle}</div>}
           </div>
           <button className={styles.closeBtn} onClick={onClose} aria-label="Close drawer">
-            <Icon name="close" style={{ fontSize: "18px" }} />
+            <Icon name="close" style={{ fontSize: "var(--fs-xl)" }} />
           </button>
         </div>
 

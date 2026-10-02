@@ -26,7 +26,7 @@ export default function SegmentedControl<T extends string>({
     <div
       style={{
         display: "flex",
-        background: "var(--clr-black-a20)",
+        background: "var(--surface-2)",
         borderRadius: "8px",
         padding: "3px",
         border: "1px solid var(--border)",
@@ -55,11 +55,11 @@ export default function SegmentedControl<T extends string>({
               border: "none",
               borderRadius: "6px",
               padding: "8px 6px",
-              fontSize: "12px",
+              fontSize: "var(--fs-sm)",
               fontWeight: 600,
               cursor: isControlDisabled ? "not-allowed" : "pointer",
               transition: "all 0.15s ease",
-              boxShadow: isActive ? "0 2px 6px rgba(0, 0, 0, 0.2)" : "none",
+              boxShadow: isActive ? "0 2px 6px var(--clr-black-a12)" : "none",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -76,7 +76,7 @@ export default function SegmentedControl<T extends string>({
                     display: inline-block;
                     width: 10px;
                     height: 10px;
-                    border: 2px solid rgba(255, 255, 255, 0.2);
+                    border: 2px solid var(--clr-white-a20);
                     border-radius: 50%;
                     border-top-color: currentColor;
                     animation: segmented-control-spin 0.8s linear infinite;

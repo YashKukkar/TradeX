@@ -26,12 +26,12 @@ const COLUMNS: ColumnDef<WalletTransaction>[] = [
             display: "inline-block",
             padding: "4px 10px",
             borderRadius: "6px",
-            fontSize: "11px",
+            fontSize: "var(--fs-xs)",
             fontWeight: "750",
             textTransform: "uppercase",
-            color: isCredit ? "var(--primary)" : "var(--danger)",
-            background: isCredit ? "var(--primary-bg)" : "var(--danger-bg)",
-            border: `1px solid ${isCredit ? "var(--primary-border)" : "var(--danger-border)"}`,
+            color: isCredit ? "var(--success)" : "var(--danger)",
+            background: isCredit ? "var(--success-bg)" : "var(--danger-bg)",
+            border: `1px solid ${isCredit ? "var(--success-border)" : "var(--danger-border)"}`,
           }}
         >
           {formatTxType(t.type)}
@@ -66,7 +66,7 @@ const COLUMNS: ColumnDef<WalletTransaction>[] = [
             display: "inline-block",
             padding: "4px 10px",
             borderRadius: "6px",
-            fontSize: "11px",
+            fontSize: "var(--fs-xs)",
             fontWeight: "750",
             textTransform: "uppercase",
             color,
@@ -86,7 +86,7 @@ const COLUMNS: ColumnDef<WalletTransaction>[] = [
       const isSuccess = t.status === "SUCCESS";
       const isDebit = t.type === "WITHDRAWAL";
 
-      let color = "var(--primary)";
+      let color = "var(--success)";
       if (!isSuccess) {
         color = "var(--muted)";
       } else if (isDebit) {
@@ -119,7 +119,7 @@ const COLUMNS: ColumnDef<WalletTransaction>[] = [
   {
     label: "Notes",
     render: (t) => (
-      <span style={{ color: "var(--muted)", fontSize: "13px" }}>
+      <span style={{ color: "var(--muted)", fontSize: "var(--fs-md)" }}>
         {t.notes}
       </span>
     ),
@@ -128,7 +128,7 @@ const COLUMNS: ColumnDef<WalletTransaction>[] = [
     label: "Date & Time",
     width: "180px",
     render: (t) => (
-      <span style={{ color: "var(--muted)", fontSize: "13px" }}>
+      <span style={{ color: "var(--muted)", fontSize: "var(--fs-md)" }}>
         {formatDateTime(t.createdAt)}
       </span>
     ),
@@ -217,24 +217,24 @@ export default function WalletActivityLog({ transactions }: WalletActivityLogPro
               display: "flex",
               gap: "24px",
               padding: "16px 28px",
-              background: "rgba(255, 255, 255, 0.02)",
+              background: "var(--clr-white-a02)",
               borderBottom: "1px solid var(--border)",
               flexWrap: "wrap",
             }}
           >
             <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "11px", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Current Balance</span>
-              <span style={{ fontSize: "16px", color: "var(--primary)", fontWeight: "800" }}>₹{withdrawableBalance.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Current Balance</span>
+              <span style={{ fontSize: "var(--fs-lg)", color: "var(--primary-text)", fontWeight: "800" }}>₹{withdrawableBalance.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
             <div style={{ width: "1px", background: "var(--border)", margin: "4px 0" }} />
             <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "11px", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Total Deposits</span>
-              <span style={{ fontSize: "16px", color: "var(--success)", fontWeight: "800" }}>+₹{totalDeposits.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Total Deposits</span>
+              <span style={{ fontSize: "var(--fs-lg)", color: "var(--success)", fontWeight: "800" }}>+₹{totalDeposits.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
             <div style={{ width: "1px", background: "var(--border)", margin: "4px 0" }} />
             <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "11px", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Total Withdrawals</span>
-              <span style={{ fontSize: "16px", color: "var(--danger)", fontWeight: "800" }}>-₹{totalWithdrawals.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Total Withdrawals</span>
+              <span style={{ fontSize: "var(--fs-lg)", color: "var(--danger)", fontWeight: "800" }}>-₹{totalWithdrawals.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
           </div>
         ) : (
@@ -243,29 +243,29 @@ export default function WalletActivityLog({ transactions }: WalletActivityLogPro
               display: "flex",
               gap: "24px",
               padding: "16px 28px",
-              background: "rgba(255, 255, 255, 0.02)",
+              background: "var(--clr-white-a02)",
               borderBottom: "1px solid var(--border)",
               flexWrap: "wrap",
             }}
           >
             <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "11px", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Current Balance</span>
-              <span style={{ fontSize: "16px", color: "var(--primary)", fontWeight: "800" }}>₹{bonusBalance.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Current Balance</span>
+              <span style={{ fontSize: "var(--fs-lg)", color: "var(--primary-text)", fontWeight: "800" }}>₹{bonusBalance.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
             <div style={{ width: "1px", background: "var(--border)", margin: "4px 0" }} />
             <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "11px", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Total Bonuses</span>
-              <span style={{ fontSize: "16px", color: "var(--success)", fontWeight: "800" }}>+₹{totalBonusesEarned.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Total Bonuses</span>
+              <span style={{ fontSize: "var(--fs-lg)", color: "var(--success)", fontWeight: "800" }}>+₹{totalBonusesEarned.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
             <div style={{ width: "1px", background: "var(--border)", margin: "4px 0" }} />
             <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "11px", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Total Points Converted</span>
-              <span style={{ fontSize: "16px", color: "var(--text)", fontWeight: "800" }}>₹{totalPointsConverted.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Total Points Converted</span>
+              <span style={{ fontSize: "var(--fs-lg)", color: "var(--text)", fontWeight: "800" }}>₹{totalPointsConverted.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
             <div style={{ width: "1px", background: "var(--border)", margin: "4px 0" }} />
             <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "11px", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>First Deposit Bonus</span>
-              <span style={{ fontSize: "16px", color: "var(--text)", fontWeight: "800" }}>₹{firstDepositBonusTotal.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>First Deposit Bonus</span>
+              <span style={{ fontSize: "var(--fs-lg)", color: "var(--text)", fontWeight: "800" }}>₹{firstDepositBonusTotal.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
           </div>
         )}

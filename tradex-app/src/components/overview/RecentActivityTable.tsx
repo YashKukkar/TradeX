@@ -96,16 +96,16 @@ export default function RecentActivityTable({
         <Card.Title>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", flexWrap: "wrap", gap: "10px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <Icon name="history" style={{ color: "var(--primary)" }} />
+              <Icon name="history" style={{ color: "var(--primary-text)" }} />
               <span>Recent System Activity</span>
               <span
                 style={{
-                  fontSize: "11px",
+                  fontSize: "var(--fs-xs)",
                   fontWeight: 750,
                   padding: "2px 8px",
                   borderRadius: "10px",
                   background: "var(--surface-2)",
-                  color: "var(--primary)",
+                  color: "var(--primary-text)",
                   border: "1px solid var(--border)",
                 }}
               >
@@ -116,7 +116,7 @@ export default function RecentActivityTable({
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <button
                 onClick={() => onTabChange("logs")}
-                style={{ background: "none", border: "none", color: "var(--primary)", fontSize: "12.5px", fontWeight: 600, cursor: "pointer" }}
+                style={{ background: "none", border: "none", color: "var(--primary-text)", fontSize: "var(--fs-md)", fontWeight: 600, cursor: "pointer" }}
               >
                 View full audit log →
               </button>
@@ -141,7 +141,7 @@ export default function RecentActivityTable({
                 maxWidth: "320px",
               }}
             >
-              <Icon name="search" style={{ fontSize: "16px", color: "var(--muted)" }} />
+              <Icon name="search" style={{ fontSize: "var(--fs-lg)", color: "var(--muted)" }} />
               <input
                 type="text"
                 placeholder="Search user, staff or keyword..."
@@ -155,17 +155,17 @@ export default function RecentActivityTable({
                   border: "none",
                   outline: "none",
                   color: "var(--text)",
-                  fontSize: "12.5px",
+                  fontSize: "var(--fs-md)",
                   width: "100%",
                 }}
               />
               {searchQuery && (
-                <button
+                <button aria-label="Clear search"
                   type="button"
                   onClick={() => setSearchQuery("")}
                   style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", padding: 0 }}
                 >
-                  <Icon name="close" style={{ fontSize: "14px" }} />
+                  <Icon name="close" style={{ fontSize: "var(--fs-base)" }} />
                 </button>
               )}
             </div>
@@ -182,7 +182,7 @@ export default function RecentActivityTable({
                 border: "1px solid var(--border)",
                 borderRadius: "6px",
                 padding: "6px 10px",
-                fontSize: "12px",
+                fontSize: "var(--fs-sm)",
                 fontWeight: 650,
                 cursor: "pointer",
                 height: "33px",
@@ -197,7 +197,7 @@ export default function RecentActivityTable({
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span style={{ fontSize: "12px", color: "var(--muted)" }}>Rows per page:</span>
+            <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)" }}>Rows per page:</span>
             <select
               value={pageSize}
               onChange={(e) => {
@@ -210,7 +210,7 @@ export default function RecentActivityTable({
                 border: "1px solid var(--border)",
                 borderRadius: "6px",
                 padding: "4px 8px",
-                fontSize: "12px",
+                fontSize: "var(--fs-sm)",
                 cursor: "pointer",
               }}
             >
@@ -225,7 +225,7 @@ export default function RecentActivityTable({
         {isLoading ? (
           <LoadingState message="Loading recent activity stream..." padding="24px 0" />
         ) : filteredLogs.length === 0 ? (
-          <div style={{ padding: "32px", textAlign: "center", color: "var(--muted)", fontSize: "13px" }}>
+          <div style={{ padding: "32px", textAlign: "center", color: "var(--muted)", fontSize: "var(--fs-md)" }}>
             {searchQuery ? "No activities match your search criteria." : "No recent system activity recorded."}
           </div>
         ) : (
@@ -234,10 +234,10 @@ export default function RecentActivityTable({
               <table className={overviewStyles.activityTable} style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                   <tr>
-                    <th style={{ width: "160px", background: "var(--surface-2)", color: "var(--muted)", fontWeight: 700, fontSize: "11px", letterSpacing: "0.06em", textTransform: "uppercase", padding: "10px 14px", borderBottom: "1px solid var(--border)" }}>Timestamp</th>
-                    <th style={{ width: "180px", background: "var(--surface-2)", color: "var(--muted)", fontWeight: 700, fontSize: "11px", letterSpacing: "0.06em", textTransform: "uppercase", padding: "10px 14px", borderBottom: "1px solid var(--border)" }}>Actor</th>
-                    <th style={{ width: "155px", background: "var(--surface-2)", color: "var(--muted)", fontWeight: 700, fontSize: "11px", letterSpacing: "0.06em", textTransform: "uppercase", padding: "10px 14px", borderBottom: "1px solid var(--border)" }}>Action</th>
-                    <th style={{ background: "var(--surface-2)", color: "var(--muted)", fontWeight: 700, fontSize: "11px", letterSpacing: "0.06em", textTransform: "uppercase", padding: "10px 14px", borderBottom: "1px solid var(--border)" }}>Details</th>
+                    <th style={{ width: "160px", background: "var(--surface-2)", color: "var(--muted)", fontWeight: 700, fontSize: "var(--fs-xs)", letterSpacing: "0.06em", textTransform: "uppercase", padding: "10px 14px", borderBottom: "1px solid var(--border)" }}>Timestamp</th>
+                    <th style={{ width: "180px", background: "var(--surface-2)", color: "var(--muted)", fontWeight: 700, fontSize: "var(--fs-xs)", letterSpacing: "0.06em", textTransform: "uppercase", padding: "10px 14px", borderBottom: "1px solid var(--border)" }}>Actor</th>
+                    <th style={{ width: "155px", background: "var(--surface-2)", color: "var(--muted)", fontWeight: 700, fontSize: "var(--fs-xs)", letterSpacing: "0.06em", textTransform: "uppercase", padding: "10px 14px", borderBottom: "1px solid var(--border)" }}>Action</th>
+                    <th style={{ background: "var(--surface-2)", color: "var(--muted)", fontWeight: 700, fontSize: "var(--fs-xs)", letterSpacing: "0.06em", textTransform: "uppercase", padding: "10px 14px", borderBottom: "1px solid var(--border)" }}>Details</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -249,10 +249,10 @@ export default function RecentActivityTable({
                         borderBottom: "1px solid var(--border-subtle)",
                       }}
                     >
-                      <td style={{ width: "160px", whiteSpace: "nowrap", color: "var(--text)", fontWeight: 450, fontSize: "12px", fontVariantNumeric: "tabular-nums", padding: "10px 14px" }}>
+                      <td style={{ width: "160px", whiteSpace: "nowrap", color: "var(--text)", fontWeight: 450, fontSize: "var(--fs-sm)", fontVariantNumeric: "tabular-nums", padding: "10px 14px" }}>
                         {formatDateTime(log.createdAt)}
                       </td>
-                      <td style={{ width: "180px", fontWeight: 550, fontSize: "12px", padding: "10px 14px" }}>
+                      <td style={{ width: "180px", fontWeight: 550, fontSize: "var(--fs-sm)", padding: "10px 14px" }}>
                         <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={log.actorEmail || log.performedByEmail || log.performedBy || "System"}>
                           {log.actorEmail || log.performedByEmail || log.performedBy || "System"}
                         </span>
@@ -263,7 +263,7 @@ export default function RecentActivityTable({
                             display: "inline-block",
                             padding: "2px 8px",
                             borderRadius: "6px",
-                            fontSize: "11px",
+                            fontSize: "var(--fs-xs)",
                             fontWeight: 750,
                             background: log.action?.includes("REJECT") || log.action?.includes("DELETE") || log.action?.includes("REVOKE")
                               ? "var(--danger-bg)"
@@ -288,7 +288,7 @@ export default function RecentActivityTable({
                           {formatActionLabel(log.action)}
                         </span>
                       </td>
-                      <td style={{ color: "var(--text)", fontSize: "12px", padding: "10px 14px", lineHeight: 1.4, wordBreak: "break-word" }} title={log.details || ""}>
+                      <td style={{ color: "var(--text)", fontSize: "var(--fs-sm)", padding: "10px 14px", lineHeight: 1.4, wordBreak: "break-word" }} title={log.details || ""}>
                         {log.details || log.entityId || "—"}
                       </td>
                     </tr>
@@ -306,7 +306,7 @@ export default function RecentActivityTable({
                   justifyContent: "space-between",
                   padding: "10px 16px",
                   borderTop: "1px solid var(--border)",
-                  fontSize: "12px",
+                  fontSize: "var(--fs-sm)",
                   color: "var(--muted)",
                   flexWrap: "wrap",
                   gap: "8px",
@@ -318,7 +318,7 @@ export default function RecentActivityTable({
                 </span>
 
                 <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-                  <button
+                  <button aria-label="Previous page"
                     type="button"
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={safePage <= 1}
@@ -332,12 +332,12 @@ export default function RecentActivityTable({
                       opacity: safePage <= 1 ? 0.5 : 1,
                     }}
                   >
-                    <Icon name="chevron_left" style={{ fontSize: "16px" }} />
+                    <Icon name="chevron_left" style={{ fontSize: "var(--fs-lg)" }} />
                   </button>
 
                   <span>Page {safePage} of {totalPages}</span>
 
-                  <button
+                  <button aria-label="Next page"
                     type="button"
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={safePage >= totalPages}
@@ -351,7 +351,7 @@ export default function RecentActivityTable({
                       opacity: safePage >= totalPages ? 0.5 : 1,
                     }}
                   >
-                    <Icon name="chevron_right" style={{ fontSize: "16px" }} />
+                    <Icon name="chevron_right" style={{ fontSize: "var(--fs-lg)" }} />
                   </button>
                 </div>
               </div>

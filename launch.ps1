@@ -72,7 +72,7 @@ if (Test-Command java) {
 }
 
 if (-not $javaOk) {
-    Write-Host "ERROR: Java 26 is required to run TradeX backend, but was not found or is an incompatible version!" -ForegroundColor Red
+    Write-Host "ERROR: Java 26 is required to run TradeNows backend, but was not found or is an incompatible version!" -ForegroundColor Red
     if ($verOutput) {
         Write-Host "Detected Java version output: $verOutput" -ForegroundColor Yellow
     }
@@ -132,5 +132,5 @@ Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$PR
 Write-Host ""
 Write-Host "Running:"
 Write-Host "  http://localhost:3000  (NextJS)"
-Write-Host "  http://localhost:5173  (TradeX App)"
+Write-Host "  http://localhost:5173  (TradeNows App)"
 Write-Host "  http://localhost:8080  (API)"

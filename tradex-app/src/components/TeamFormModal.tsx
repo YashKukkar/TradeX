@@ -77,7 +77,7 @@ export default function TeamFormModal({
                 />
                 <div>
                   <strong>{perm.displayName}</strong>
-                  <span style={{ fontSize: "11px", color: "var(--muted)", display: "block" }}>
+                  <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", display: "block" }}>
                     {perm.description}
                   </span>
                 </div>

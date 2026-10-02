@@ -46,7 +46,7 @@ export default function ResolveTransactionModal({
       size="sm"
     >
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        <div style={{ padding: "14px", background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "10px", fontSize: "13.5px" }}>
+        <div style={{ padding: "14px", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "10px", fontSize: "var(--fs-base)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
             <span style={{ color: "var(--muted)" }}>User:</span>
             <span style={{ fontWeight: "600" }}>{transaction.userEmail}</span>
@@ -69,7 +69,7 @@ export default function ResolveTransactionModal({
 
         {isReject && (
           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label htmlFor="rejectionReason" style={{ fontSize: "12px", fontWeight: "600", color: "var(--text)" }}>
+            <label htmlFor="rejectionReason" style={{ fontSize: "var(--fs-sm)", fontWeight: "600", color: "var(--text)" }}>
               Rejection Reason
             </label>
             <input
@@ -86,9 +86,9 @@ export default function ResolveTransactionModal({
                 padding: "10px 12px",
                 borderRadius: "8px",
                 border: "1px solid var(--border)",
-                background: "var(--bg-2)",
+                background: "var(--surface)",
                 color: "var(--text)",
-                fontSize: "13px",
+                fontSize: "var(--fs-md)",
               }}
             />
           </div>

@@ -10,8 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.tradex.api.service.AnalyticsExportService;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import com.tradex.api.util.CsvExportUtils;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -88,6 +88,6 @@ public class AdminDashboardController {
             filename = String.format("%s-analytics-%s_to_%s_asof_%s.csv", brandPrefix, startStr, endStr, timeStr);
         }
 
-        return com.tradex.api.util.CsvExportUtils.toResponseEntity(csvData, filename);
+        return CsvExportUtils.toResponseEntity(csvData, filename);
     }
 }

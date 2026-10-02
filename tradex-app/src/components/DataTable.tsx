@@ -71,7 +71,7 @@ export default function DataTable<T>({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
-      <div className={styles.tableWrap} style={{ maxHeight: "650px", overflowY: "auto" }}>
+      <div className={styles.tableWrap} style={{ maxHeight: "650px", overflowY: "auto", overflowX: "auto" }}>
         <table className={tableClass}>
           <thead>
             <tr>
@@ -120,7 +120,7 @@ export default function DataTable<T>({
 
       {totalPages > 1 && (
         <div className={styles.pagination}>
-          <span className={styles.pageInfo} style={{ fontSize: "12px", color: "var(--muted)" }}>
+          <span className={styles.pageInfo} style={{ fontSize: "var(--fs-sm)", color: "var(--muted)" }}>
             Showing {startIndex + 1}–{endIndex} of {data.length} records
           </span>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -130,7 +130,7 @@ export default function DataTable<T>({
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               className={styles.pageBtn}
             >
-              <Icon name="chevron_left" style={{ fontSize: "16px" }} />
+              <Icon name="chevron_left" style={{ fontSize: "var(--fs-lg)" }} />
               Previous
             </button>
             <span className={styles.pageInfo}>
@@ -143,7 +143,7 @@ export default function DataTable<T>({
               className={styles.pageBtn}
             >
               Next
-              <Icon name="chevron_right" style={{ fontSize: "16px" }} />
+              <Icon name="chevron_right" style={{ fontSize: "var(--fs-lg)" }} />
             </button>
           </div>
         </div>

@@ -24,7 +24,7 @@ export default function PaymentStatusStep({
         <div className={styles.spinner}></div>
         <span className={styles.loadingText}>{loadingText}</span>
         <span className={styles.secureBadge}>
-          <Icon name="verified_user" style={{ fontSize: "14px", marginRight: "4px" }} />
+          <Icon name="verified_user" style={{ fontSize: "var(--fs-base)", marginRight: "4px" }} />
           PCI-DSS Compliant Encryption
         </span>
       </div>

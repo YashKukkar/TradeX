@@ -90,7 +90,7 @@ export default function AdminUserControlModal({
   const leftPaneContent = (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "20px 24px" }}>
       {/* Inner Tab Switches */}
-      <div style={{ display: "flex", borderBottom: "1px solid var(--border)", background: "rgba(0,0,0,0.08)", borderRadius: "8px", overflow: "hidden", marginBottom: "8px" }}>
+      <div style={{ display: "flex", borderBottom: "1px solid var(--border)", background: "var(--clr-black-a04)", borderRadius: "8px", overflow: "hidden", marginBottom: "8px" }}>
         {([
           { id: "cash", label: "Cash Ledger", show: hasPermission(currentUser, "MANAGE_USERS") },
           { id: "points", label: "Points Ledger", show: hasPermission(currentUser, "MANAGE_POINTS") },
@@ -108,7 +108,7 @@ export default function AdminUserControlModal({
                 border: "none",
                 color: activeTab === tab.id ? "var(--text)" : "var(--muted)",
                 padding: "10px 12px",
-                fontSize: "11px",
+                fontSize: "var(--fs-xs)",
                 fontWeight: 700,
                 cursor: "pointer",
                 textTransform: "uppercase",
@@ -141,7 +141,7 @@ export default function AdminUserControlModal({
     <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: "16px" }}>
       {activeTickets.length > 0 && (
         <div style={{
-          background: "rgba(255, 176, 32, 0.1)",
+          background: "var(--clr-amber-a10)",
           border: "1px solid var(--accent)",
           borderRadius: "8px",
           padding: "12px 16px",
@@ -149,8 +149,8 @@ export default function AdminUserControlModal({
           gap: "10px",
           alignItems: "flex-start"
         }}>
-          <Icon name="warning" style={{ color: "var(--accent)", fontSize: "20px", marginTop: "2px" }} />
-          <div style={{ fontSize: "12px", lineHeight: "1.5" }}>
+          <Icon name="warning" style={{ color: "var(--accent)", fontSize: "var(--fs-2xl)", marginTop: "2px" }} />
+          <div style={{ fontSize: "var(--fs-sm)", lineHeight: "1.5" }}>
             <strong style={{ color: "var(--accent)" }}>Active Ticket Collision Warning</strong>
             <p style={{ margin: "4px 0 0 0", color: "var(--text)" }}>
               This user has active support tickets:
@@ -163,7 +163,7 @@ export default function AdminUserControlModal({
                 </li>
               ))}
             </ul>
-            <p style={{ margin: "6px 0 0 0", fontSize: "11px", color: "var(--muted)" }}>
+            <p style={{ margin: "6px 0 0 0", fontSize: "var(--fs-xs)", color: "var(--muted)" }}>
               Please coordinate with the assigned employee/team before making changes.
             </p>
           </div>

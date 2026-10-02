@@ -137,7 +137,7 @@ export default function DepositRequestModal({
           const currentStep = getStepNumber(step);
           if (currentStep > 0) {
             return (
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", background: "rgba(255,255,255,0.02)", padding: "10px", borderRadius: "8px", border: "1px solid var(--border)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", background: "var(--clr-white-a02)", padding: "10px", borderRadius: "8px", border: "1px solid var(--border)" }}>
                 {[
                   { num: 1, label: "Amount" },
                   { num: 2, label: "Method" },
@@ -154,10 +154,10 @@ export default function DepositRequestModal({
                       display: "inline-flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: "11px",
+                      fontSize: "var(--fs-xs)",
                       fontWeight: "800"
                     }}>{s.num}</span>
-                    <span style={{ fontSize: "11px", fontWeight: "600" }}>{s.label}</span>
+                    <span style={{ fontSize: "var(--fs-xs)", fontWeight: "600" }}>{s.label}</span>
                   </div>
                 ))}
               </div>
@@ -174,14 +174,14 @@ export default function DepositRequestModal({
               color: "var(--warning)",
               borderRadius: "8px",
               padding: "10px 12px",
-              fontSize: "12px",
+              fontSize: "var(--fs-sm)",
               fontWeight: "600",
               display: "flex",
               alignItems: "center",
               gap: "8px",
             }}
           >
-            <Icon name="warning" style={{ fontSize: "16px", flexShrink: 0 }} />
+            <Icon name="warning" style={{ fontSize: "var(--fs-lg)", flexShrink: 0 }} />
             <span>Ensure you submit valid transaction reference proof after transferring.</span>
           </div>
         )}
@@ -203,7 +203,7 @@ export default function DepositRequestModal({
             style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "8px" }}
           >
             <div className={styles.inputGroup} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label className={styles.label} style={{ fontSize: "13px", fontWeight: "600" }}>
+              <label className={styles.label} style={{ fontSize: "var(--fs-md)", fontWeight: "600" }}>
                 Amount (₹)
               </label>
               <input
@@ -226,7 +226,7 @@ export default function DepositRequestModal({
                 autoFocus
               />
             </div>
-            {errorMsg && <div className={styles.error} style={{ color: "var(--danger)", fontSize: "12px" }}>{errorMsg}</div>}
+            {errorMsg && <div className={styles.error} style={{ color: "var(--danger)", fontSize: "var(--fs-sm)" }}>{errorMsg}</div>}
             <button
               type="submit"
               className={styles.submitBtn}
@@ -283,7 +283,7 @@ export default function DepositRequestModal({
                     className={styles.bankBtn}
                     onClick={() => handleNetbankingSelect(bank.name)}
                   >
-                    <Icon name={bank.logo} style={{ fontSize: "18px" }} />
+                    <Icon name={bank.logo} style={{ fontSize: "var(--fs-xl)" }} />
                     <span>{bank.name}</span>
                   </button>
                 ))}

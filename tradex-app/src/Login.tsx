@@ -124,7 +124,7 @@ export default function Login() {
   return (
     <div className={styles.pageWrapper}>
       <a href={config.websiteUrl} className={styles.backLink}>
-        <Icon name="arrow_back" style={{ fontSize: "1.2rem" }} /> Back to home
+        <Icon name="arrow_back" style={{ fontSize: "var(--fs-xl)" }} /> Back to home
       </a>
       <div className={`${styles.container} ${shake ? styles.shake : ""}`}>
         <div>
@@ -157,7 +157,7 @@ export default function Login() {
                       type="button"
                       className={styles.link}
                       onClick={() => { setMode("reset"); setError(""); setSuccessMsg(""); }}
-                      style={{ background: "none", border: "none", fontSize: "12px", cursor: "pointer", padding: 0 }}
+                      style={{ background: "none", border: "none", fontSize: "var(--fs-sm)", cursor: "pointer", padding: 0 }}
                     >
                       Reset Password?
                     </button>
@@ -202,7 +202,7 @@ export default function Login() {
                       onClick={handleSendResetCode}
                       disabled={isSendingOtp || cooldown > 0}
                       className={styles.link}
-                      style={{ background: "none", border: "none", fontSize: "12px", cursor: cooldown > 0 ? "default" : "pointer", padding: 0 }}
+                      style={{ background: "none", border: "none", fontSize: "var(--fs-sm)", cursor: cooldown > 0 ? "default" : "pointer", padding: 0 }}
                     >
                       {isSendingOtp ? "Sending code…" : cooldown > 0 ? `Resend in ${cooldown}s` : "Send Code"}
                     </button>
@@ -272,7 +272,7 @@ export default function Login() {
           )}
 
           {error && <p className={styles.error}>{error}</p>}
-          {successMsg && <p style={{ color: "var(--primary)", fontSize: "13px", marginTop: "12px", textAlign: "center" }}>{successMsg}</p>}
+          {successMsg && <p style={{ color: "var(--primary-text)", fontSize: "var(--fs-md)", marginTop: "12px", textAlign: "center" }}>{successMsg}</p>}
 
           <p className={styles.footerText}>
             New to {branding.appName}?{" "}

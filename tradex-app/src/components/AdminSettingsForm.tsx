@@ -44,9 +44,9 @@ export default function AdminSettingsForm({
           <h3
             onClick={() => toggleCollapse("onboarding")}
             style={{
-              fontSize: "14px",
+              fontSize: "var(--fs-base)",
               fontWeight: "750",
-              color: "var(--primary)",
+              color: "var(--primary-text)",
               margin: "0 0 8px 0",
               display: "flex",
               alignItems: "center",
@@ -57,9 +57,9 @@ export default function AdminSettingsForm({
               userSelect: "none"
             }}
           >
-            <Icon name="emoji_events" style={{ fontSize: "18px" }} />
+            <Icon name="emoji_events" style={{ fontSize: "var(--fs-xl)" }} />
             <span style={{ flex: 1 }}>Onboarding Rewards</span>
-            <Icon name={collapsed.onboarding ? "expand_more" : "expand_less"} style={{ fontSize: "18px", opacity: 0.6 }} />
+            <Icon name={collapsed.onboarding ? "expand_more" : "expand_less"} style={{ fontSize: "var(--fs-xl)", opacity: 0.6 }} />
           </h3>
 
           {!collapsed.onboarding && (
@@ -114,9 +114,9 @@ export default function AdminSettingsForm({
           <h3
             onClick={() => toggleCollapse("referrals")}
             style={{
-              fontSize: "14px",
+              fontSize: "var(--fs-base)",
               fontWeight: "750",
-              color: "var(--accent)",
+              color: "var(--primary-text)",
               margin: "0 0 8px 0",
               display: "flex",
               alignItems: "center",
@@ -127,9 +127,9 @@ export default function AdminSettingsForm({
               userSelect: "none"
             }}
           >
-            <Icon name="groups" style={{ fontSize: "18px" }} />
+            <Icon name="groups" style={{ fontSize: "var(--fs-xl)" }} />
             <span style={{ flex: 1 }}>Referral Program</span>
-            <Icon name={collapsed.referrals ? "expand_more" : "expand_less"} style={{ fontSize: "18px", opacity: 0.6 }} />
+            <Icon name={collapsed.referrals ? "expand_more" : "expand_less"} style={{ fontSize: "var(--fs-xl)", opacity: 0.6 }} />
           </h3>
 
           {!collapsed.referrals && (
@@ -203,9 +203,9 @@ export default function AdminSettingsForm({
           <h3
             onClick={() => toggleCollapse("security")}
             style={{
-              fontSize: "14px",
+              fontSize: "var(--fs-base)",
               fontWeight: "750",
-              color: "var(--primary)",
+              color: "var(--primary-text)",
               margin: "0 0 8px 0",
               display: "flex",
               alignItems: "center",
@@ -216,9 +216,9 @@ export default function AdminSettingsForm({
               userSelect: "none"
             }}
           >
-            <Icon name="security" style={{ fontSize: "18px" }} />
+            <Icon name="security" style={{ fontSize: "var(--fs-xl)" }} />
             <span style={{ flex: 1 }}>Security & Conversions</span>
-            <Icon name={collapsed.security ? "expand_more" : "expand_less"} style={{ fontSize: "18px", opacity: 0.6 }} />
+            <Icon name={collapsed.security ? "expand_more" : "expand_less"} style={{ fontSize: "var(--fs-xl)", opacity: 0.6 }} />
           </h3>
 
           {!collapsed.security && (
@@ -269,7 +269,7 @@ export default function AdminSettingsForm({
                     onChange={e => setSettings({ ...settings, redirectEmailAddress: e.target.value })}
                     className={styles.inputField}
                   />
-                  <small style={{ color: "var(--muted)", fontSize: "11px", marginTop: "4px", display: "block" }}>
+                  <small style={{ color: "var(--muted)", fontSize: "var(--fs-xs)", marginTop: "4px", display: "block" }}>
                     Redirects all system emails to this address when email notifications are enabled.
                   </small>
                 </div>
@@ -287,7 +287,7 @@ export default function AdminSettingsForm({
           onClick={saveSettings}
           disabled={savingSettings || Object.keys(errors).length > 0}
         >
-          <Icon name={savingSettings ? "sync" : "save"} style={{ fontSize: "16px" }} />
+          <Icon name={savingSettings ? "sync" : "save"} style={{ fontSize: "var(--fs-lg)" }} />
           {savingSettings ? "Saving..." : "Save Settings"}
         </button>
       </div>

@@ -63,7 +63,7 @@ export default function AdminControlsSection({
               color: "var(--success)",
               padding: "10px 14px",
               borderRadius: "8px",
-              fontSize: "13px",
+              fontSize: "var(--fs-md)",
               fontWeight: 700,
             }}
           >
@@ -83,7 +83,7 @@ export default function AdminControlsSection({
               color: "var(--danger)",
               padding: "10px 14px",
               borderRadius: "8px",
-              fontSize: "13px",
+              fontSize: "var(--fs-md)",
               fontWeight: 700,
             }}
           >
@@ -105,7 +105,7 @@ export default function AdminControlsSection({
               color: "var(--success)",
               padding: "10px 14px",
               borderRadius: "8px",
-              fontSize: "13px",
+              fontSize: "var(--fs-md)",
               fontWeight: 700,
             }}
           >
@@ -125,7 +125,7 @@ export default function AdminControlsSection({
               color: "var(--danger)",
               padding: "10px 14px",
               borderRadius: "8px",
-              fontSize: "13px",
+              fontSize: "var(--fs-md)",
               fontWeight: 700,
             }}
           >
@@ -144,19 +144,19 @@ export default function AdminControlsSection({
             alignItems: "center",
             justifyContent: "center",
             gap: "8px",
-            background: "rgba(255, 178, 0, 0.08)",
+            background: "var(--clr-amber-a08)",
             border: "1px solid var(--accent)",
             color: "var(--accent)",
             padding: "10px 14px",
             borderRadius: "8px",
-            fontSize: "13px",
+            fontSize: "var(--fs-md)",
             fontWeight: 700,
             cursor: hasManagePoints ? "pointer" : "not-allowed",
             opacity: hasManagePoints ? 1 : 0.5,
             transition: "all 0.2s ease",
           }}
         >
-          <Icon name="stars" style={{ fontSize: "16px" }} /> Adjust Points
+          <Icon name="stars" style={{ fontSize: "var(--fs-lg)" }} /> Adjust Points
         </button>
 
         <ActionButton
@@ -167,12 +167,12 @@ export default function AdminControlsSection({
           iconName="key"
           title={!hasManageUsers ? "Requires User Management authority" : ""}
           style={{
-            background: "rgba(181, 95, 230, 0.08)",
+            background: "var(--clr-purple-a08)",
             border: "1px solid var(--primary)",
-            color: "var(--primary)",
+            color: "var(--primary-text)",
             padding: "10px 14px",
             borderRadius: "8px",
-            fontSize: "13px",
+            fontSize: "var(--fs-md)",
             fontWeight: 700,
           }}
         >
@@ -191,12 +191,12 @@ export default function AdminControlsSection({
             title={!hasManageUsers ? "Requires User Management authority" : ""}
             style={{
               flex: 1,
-              background: "rgba(0, 150, 255, 0.08)",
-              border: "1px solid #0096ff",
-              color: "#0096ff",
+              background: "var(--clr-sky-a08)",
+              border: "1px solid var(--info)",
+              color: "var(--info)",
               padding: "10px 14px",
               borderRadius: "8px",
-              fontSize: "13px",
+              fontSize: "var(--fs-md)",
               fontWeight: 700,
             }}
           >
@@ -215,19 +215,19 @@ export default function AdminControlsSection({
               alignItems: "center",
               justifyContent: "center",
               gap: "8px",
-              background: "rgba(255, 255, 255, 0.05)",
+              background: "var(--clr-white-a05)",
               border: "1px solid var(--border)",
               color: "var(--text)",
               padding: "10px 14px",
               borderRadius: "8px",
-              fontSize: "13px",
+              fontSize: "var(--fs-md)",
               fontWeight: 700,
               cursor: hasViewReferrals ? "pointer" : "not-allowed",
               opacity: hasViewReferrals ? 1 : 0.5,
               transition: "all 0.2s ease",
             }}
           >
-            <Icon name="account_tree" style={{ fontSize: "16px" }} /> View Network
+            <Icon name="account_tree" style={{ fontSize: "var(--fs-lg)" }} /> View Network
           </button>
         )}
       </div>

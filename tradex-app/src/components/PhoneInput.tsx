@@ -35,7 +35,7 @@ export default function PhoneInput({
   return (
     <div className={`${styles.phoneInputContainer} ${disabled ? styles.disabled : ""} ${className || ""}`}>
       <div className={styles.countryPrefix}>
-        <span className={styles.flagIcon} role="img" aria-label="India Flag">🇮🇳</span>
+        <span className={styles.flagIcon} role="img" aria-label="India">IN</span>
         <span className={styles.dialCode}>+91</span>
       </div>
       <input
@@ -51,7 +51,7 @@ export default function PhoneInput({
       />
       {isValid && (
         <div className={styles.validCheck}>
-          <Icon name="check_circle" style={{ fontSize: "16px", color: "var(--primary)" }} />
+          <Icon name="check_circle" style={{ fontSize: "var(--fs-lg)", color: "var(--primary-text)" }} />
         </div>
       )}
     </div>

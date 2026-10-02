@@ -57,14 +57,14 @@ export default function CashWalletSection({
             </div>
 
             <div className={cwStyles.rightColumn}>
-              <span className={styles.balanceLabel} style={{ fontSize: "11px", fontWeight: "700" }}>Quick Operations</span>
+              <span className={styles.balanceLabel} style={{ fontSize: "var(--fs-xs)", fontWeight: "700" }}>Quick Operations</span>
               <div className={cwStyles.operationsGrid}>
                 <button
                   onClick={() => setShowPaymentGateway(true)}
                   className={`${cwStyles.opCard} ${cwStyles.depositCard}`}
                 >
                   <div className={`${cwStyles.iconWrapper} ${cwStyles.depositIcon}`}>
-                    <Icon name="add_circle" style={{ fontSize: "26px" }} />
+                    <Icon name="add_circle" style={{ fontSize: "var(--fs-4xl)" }} />
                   </div>
                   <div className={cwStyles.opTextWrapper}>
                     <span className={cwStyles.opTitle}>Deposit</span>
@@ -79,7 +79,7 @@ export default function CashWalletSection({
                   className={`${cwStyles.opCard} ${cwStyles.withdrawCard}`}
                 >
                   <div className={`${cwStyles.iconWrapper} ${cwStyles.withdrawIcon}`}>
-                    <Icon name="arrow_circle_up" style={{ fontSize: "26px" }} />
+                    <Icon name="arrow_circle_up" style={{ fontSize: "var(--fs-4xl)" }} />
                   </div>
                   <div className={cwStyles.opTextWrapper}>
                     <span className={cwStyles.opTitle}>Withdraw</span>
@@ -94,7 +94,7 @@ export default function CashWalletSection({
                   className={`${cwStyles.opCard} ${cwStyles.convertCard}`}
                 >
                   <div className={`${cwStyles.iconWrapper} ${cwStyles.convertIcon}`}>
-                    <Icon name="currency_exchange" style={{ fontSize: "26px" }} />
+                    <Icon name="currency_exchange" style={{ fontSize: "var(--fs-4xl)" }} />
                   </div>
                   <div className={cwStyles.opTextWrapper}>
                     <span className={cwStyles.opTitle}>Convert</span>

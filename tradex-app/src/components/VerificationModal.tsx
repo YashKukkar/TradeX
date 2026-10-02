@@ -81,7 +81,7 @@ export default function VerificationModal({
             color: "var(--warning)",
             borderRadius: "8px",
             padding: "8px 10px",
-            fontSize: "11.5px",
+            fontSize: "var(--fs-sm)",
             fontWeight: "600",
             marginBottom: "16px",
             display: "flex",
@@ -89,7 +89,7 @@ export default function VerificationModal({
             gap: "6px",
           }}
         >
-          <Icon name="info" style={{ fontSize: "14px" }} />
+          <Icon name="info" style={{ fontSize: "var(--fs-base)" }} />
           <span>Test Code: Use the verification code 123456 to proceed.</span>
         </div>
 
@@ -134,7 +134,7 @@ export default function VerificationModal({
           {isLoading ? "Verifying..." : isSuccess ? "Verified!" : "Submit Code"}
         </button>
 
-        <div style={{ marginTop: "16px", textAlign: "center", fontSize: "13px" }}>
+        <div style={{ marginTop: "16px", textAlign: "center", fontSize: "var(--fs-md)" }}>
           <span>Didn't receive the code? </span>
           <button
             type="button"
@@ -153,7 +153,7 @@ export default function VerificationModal({
             {resendLoading ? "Sending..." : cooldown > 0 ? `Resend in ${cooldown}s` : "Resend Code"}
           </button>
           {resendError && (
-            <div style={{ color: "var(--danger)", fontSize: "11.5px", marginTop: "4px" }} role="alert">
+            <div style={{ color: "var(--danger)", fontSize: "var(--fs-sm)", marginTop: "4px" }} role="alert">
               {resendError}
             </div>
           )}

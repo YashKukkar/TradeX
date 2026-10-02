@@ -96,7 +96,7 @@ export default function TicketMetadataTab({
             <span className={`status-pill-${ticket.status.toLowerCase().replace("_", "")}`} style={{
               padding: "3px 8px",
               borderRadius: "6px",
-              fontSize: "11px",
+              fontSize: "var(--fs-xs)",
               fontWeight: "600",
               textTransform: "uppercase"
             }}>
@@ -113,7 +113,7 @@ export default function TicketMetadataTab({
               display: "inline-flex",
               alignItems: "center",
               gap: "4px",
-              fontSize: "11px",
+              fontSize: "var(--fs-xs)",
               fontWeight: 700,
               padding: "3px 8px",
               borderRadius: "6px",
@@ -122,7 +122,7 @@ export default function TicketMetadataTab({
               border: `1px solid ${sla.border}`,
             }}
           >
-            <Icon name={sla.icon} style={{ fontSize: "13px" }} />
+            <Icon name={sla.icon} style={{ fontSize: "var(--fs-md)" }} />
             {sla.label}
           </span>
         </div>
@@ -132,7 +132,7 @@ export default function TicketMetadataTab({
           <span className={`category-tag-${ticket.category.toLowerCase().replace("_", "")}`} style={{
             padding: "3px 8px",
             borderRadius: "6px",
-            fontSize: "11px",
+            fontSize: "var(--fs-xs)",
             fontWeight: "700",
             textTransform: "uppercase",
             letterSpacing: "0.03em"
@@ -166,7 +166,7 @@ export default function TicketMetadataTab({
                       isAdmin={isAdmin}
                     />
                     {ticket.claimedAt && (
-                      <span style={{ fontSize: "10px", color: "var(--muted)", fontStyle: "italic" }}>
+                      <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", fontStyle: "italic" }}>
                         assigned {formatDateTime(ticket.claimedAt)}
                       </span>
                     )}
@@ -207,6 +207,7 @@ export default function TicketMetadataTab({
         <div style={{ marginTop: "4px" }}>
           <ActionButton
             onClick={onCloseTicket}
+            className={styles.closeTicketBtn}
             loading={isClosePending}
             loadingText="Closing..."
             iconName="check_circle"

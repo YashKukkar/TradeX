@@ -127,7 +127,7 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
       {/* 1. Screenshots Section */}
       {images.length > 0 && (
         <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-          <span style={{ fontSize: "11px", textTransform: "uppercase", color: "var(--muted)", letterSpacing: "0.05em", fontWeight: 700 }}>
+          <span style={{ fontSize: "var(--fs-xs)", textTransform: "uppercase", color: "var(--muted)", letterSpacing: "0.05em", fontWeight: 700 }}>
             Screenshots:
           </span>
           <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap" }}>
@@ -143,8 +143,8 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
                   border: "1px solid var(--border)",
                   overflow: "hidden",
                   cursor: "zoom-in",
-                  background: "rgba(0,0,0,0.2)",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+                  background: "var(--clr-black-a12)",
+                  boxShadow: "0 2px 6px var(--clr-black-a08)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -167,7 +167,7 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
       {/* 2. Documents Section */}
       {documents.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-          <p style={{ margin: "4px 0 6px 0", fontSize: "12px", textTransform: "uppercase", color: "var(--muted)", letterSpacing: "0.05em", fontWeight: 700 }}>
+          <p style={{ margin: "4px 0 6px 0", fontSize: "var(--fs-sm)", textTransform: "uppercase", color: "var(--muted)", letterSpacing: "0.05em", fontWeight: 700 }}>
             Files ({documents.length})
           </p>
           {documents.map((doc) => (
@@ -189,15 +189,15 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
               onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "8px", overflow: "hidden" }}>
-                <Icon name="description" style={{ color: "var(--muted)", fontSize: "16px" }} />
-                <span style={{ fontSize: "12px", color: "var(--text)", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
+                <Icon name="description" style={{ color: "var(--muted)", fontSize: "var(--fs-lg)" }} />
+                <span style={{ fontSize: "var(--fs-sm)", color: "var(--text)", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
                   {doc.fileName}
                 </span>
-                <span style={{ fontSize: "10px", color: "var(--muted)" }}>
+                <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)" }}>
                   ({(doc.fileSize / 1024).toFixed(1)} KB)
                 </span>
               </div>
-              <Icon name="download" style={{ fontSize: "16px", color: "var(--muted)" }} />
+              <Icon name="download" style={{ fontSize: "var(--fs-lg)", color: "var(--muted)" }} />
             </div>
           ))}
         </div>
@@ -211,7 +211,7 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
           left: 0,
           right: 0,
           bottom: 0,
-          background: "rgba(10, 10, 10, 0.95)",
+          background: "var(--overlay)",
           backdropFilter: "blur(5px)",
           zIndex: 99999,
           display: "flex",
@@ -231,10 +231,10 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            background: "linear-gradient(to bottom, rgba(0,0,0,0.5), transparent)",
+            background: "linear-gradient(to bottom, var(--clr-black-a30), transparent)",
             zIndex: 100000
           }}>
-            <span style={{ color: "var(--text)", fontSize: "13px", fontWeight: "500" }}>
+            <span style={{ color: "var(--text)", fontSize: "var(--fs-md)", fontWeight: "500" }}>
               Screenshot {activeImageIndex + 1} of {images.length}
             </span>
             <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
@@ -242,13 +242,13 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
                 onClick={() => setZoomLevel(prev => Math.max(0.5, prev - 0.25))}
                 style={{ background: "none", border: "none", color: "var(--text)", cursor: "pointer", display: "flex", alignItems: "center" }}
               >
-                <Icon name="zoom_out" style={{ fontSize: "20px" }} />
+                <Icon name="zoom_out" style={{ fontSize: "var(--fs-2xl)" }} />
               </button>
               <button
                 onClick={() => setZoomLevel(prev => Math.min(3, prev + 0.25))}
                 style={{ background: "none", border: "none", color: "var(--text)", cursor: "pointer", display: "flex", alignItems: "center" }}
               >
-                <Icon name="zoom_in" style={{ fontSize: "20px" }} />
+                <Icon name="zoom_in" style={{ fontSize: "var(--fs-2xl)" }} />
               </button>
               <button
                 onClick={() => { setZoomLevel(1); setActiveImageIndex(null); }}
@@ -265,7 +265,7 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
                   justifyContent: "center"
                 }}
               >
-                <Icon name="close" style={{ fontSize: "20px" }} />
+                <Icon name="close" style={{ fontSize: "var(--fs-2xl)" }} />
               </button>
             </div>
           </div>
@@ -291,7 +291,7 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
                 transition: "all 0.2s"
               }}
             >
-              <Icon name="chevron_left" style={{ fontSize: "24px" }} />
+              <Icon name="chevron_left" style={{ fontSize: "var(--fs-3xl)" }} />
             </button>
           )}
 
@@ -315,7 +315,7 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
                 transition: "all 0.2s"
               }}
             >
-              <Icon name="chevron_right" style={{ fontSize: "24px" }} />
+              <Icon name="chevron_right" style={{ fontSize: "var(--fs-3xl)" }} />
             </button>
           )}
 
@@ -337,7 +337,7 @@ export default function TicketAttachments({ attachments }: TicketAttachmentsProp
                 objectFit: "contain",
                 transform: `scale(${zoomLevel})`,
                 transition: "transform 0.15s ease",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
+                boxShadow: "0 10px 30px var(--clr-black-a30)"
               }}
             />
           </div>

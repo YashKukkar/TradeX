@@ -15,12 +15,12 @@ export interface BrandConfig {
 }
 
 const DEFAULT_BRANDING: BrandConfig = {
-  appName: "TradeX",
+  appName: "TradeNows",
   brandPrefix: "Trade",
-  accentText: "X",
-  pointsName: "TradeX Points",
+  accentText: "Nows",
+  pointsName: "TradeNows Points",
   supportEmail: "support@tradenows.com",
-  legalName: "TradeX Technologies Ltd",
+  legalName: "TradeNows",
   assetVersion: "1.0.0",
   logoUrl: "/branding/logo.svg?v=1.0.0",
   faviconUrl: "/branding/favicon.svg?v=1.0.0",
@@ -41,18 +41,18 @@ export async function initBranding(): Promise<BrandConfig> {
       const u = data.urls || {};
       const version = data.assetVersion || "1.0.0";
 
-      const appName = b.appName || "TradeX";
+      const appName = b.appName || "TradeNows";
       const brandPrefix = b.brandPrefix || (b.appName ? b.appName : "Trade");
-      const accentText = b.accentText !== undefined ? b.accentText : (b.appName ? "" : "X");
+      const accentText = b.accentText !== undefined ? b.accentText : (b.appName ? "" : "Nows");
       const supportEmail = b.supportEmail || "support@tradenows.com";
 
       branding = {
         appName,
         brandPrefix,
         accentText,
-        pointsName: b.pointsName || "TradeX Points",
+        pointsName: b.pointsName || "TradeNows Points",
         supportEmail,
-        legalName: b.legalName || "TradeX Technologies Ltd",
+        legalName: b.legalName || "TradeNows",
         assetVersion: version,
         logoUrl: `/branding/logo.svg?v=${version}`,
         faviconUrl: `/branding/favicon.svg?v=${version}`,
@@ -62,7 +62,7 @@ export async function initBranding(): Promise<BrandConfig> {
         apiUrl: u.apiUrl || DEFAULT_BRANDING.apiUrl,
       };
 
-      document.title = `${branding.appName} — Trade Smarter`;
+      document.title = `${branding.appName} — Trade with clarity`;
       const favSvg = document.querySelector<HTMLLinkElement>('link[type="image/svg+xml"]');
       if (favSvg) favSvg.href = branding.faviconUrl;
     }

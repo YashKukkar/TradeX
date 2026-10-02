@@ -59,7 +59,7 @@ export default function EmployeePerformanceTable({ data, isLoading }: EmployeePe
         <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
           <span
             style={{
-              fontSize: "11px",
+              fontSize: "var(--fs-xs)",
               fontWeight: 750,
               padding: "3px 8px",
               borderRadius: "6px",
@@ -72,7 +72,7 @@ export default function EmployeePerformanceTable({ data, isLoading }: EmployeePe
           </span>
           <span
             style={{
-              fontSize: "11px",
+              fontSize: "var(--fs-xs)",
               fontWeight: 750,
               padding: "3px 8px",
               borderRadius: "6px",
@@ -85,7 +85,7 @@ export default function EmployeePerformanceTable({ data, isLoading }: EmployeePe
           </span>
           <span
             style={{
-              fontSize: "11px",
+              fontSize: "var(--fs-xs)",
               fontWeight: 750,
               padding: "3px 8px",
               borderRadius: "6px",
@@ -107,11 +107,11 @@ export default function EmployeePerformanceTable({ data, isLoading }: EmployeePe
                 Employee
               </th>
               <th colSpan={2} className={`${styles.tableGroupHeader} ${styles.tableColDivider}`} style={{ color: "var(--clr-sky)" }}>
-                <Icon name="support_agent" style={{ fontSize: "14px", verticalAlign: "middle", marginRight: "6px" }} />
+                <Icon name="support_agent" style={{ fontSize: "var(--fs-base)", verticalAlign: "middle", marginRight: "6px" }} />
                 Support Operations
               </th>
               <th colSpan={3} className={styles.tableGroupHeader} style={{ color: "var(--success)" }}>
-                <Icon name="payments" style={{ fontSize: "14px", verticalAlign: "middle", marginRight: "6px" }} />
+                <Icon name="payments" style={{ fontSize: "var(--fs-base)", verticalAlign: "middle", marginRight: "6px" }} />
                 Transaction Operations
               </th>
             </tr>
@@ -166,7 +166,7 @@ export default function EmployeePerformanceTable({ data, isLoading }: EmployeePe
                     <td className={styles.tableColDivider}>
                       {emp.avgTicketResolutionTimeSeconds > 0 ? (
                         <span className={styles.durationBadge}>
-                          <Icon name="schedule" style={{ fontSize: "12px" }} />
+                          <Icon name="schedule" style={{ fontSize: "var(--fs-sm)" }} />
                           {formatDuration(emp.avgTicketResolutionTimeSeconds)}
                         </span>
                       ) : (
@@ -194,7 +194,7 @@ export default function EmployeePerformanceTable({ data, isLoading }: EmployeePe
                     <td>
                       {hasTxPerm && emp.avgTxProcessingTimeSeconds > 0 ? (
                         <span className={styles.durationBadge} style={{ background: "var(--success-bg)", color: "var(--success)", borderColor: "var(--success-border)" }}>
-                          <Icon name="timer" style={{ fontSize: "12px" }} />
+                          <Icon name="timer" style={{ fontSize: "var(--fs-sm)" }} />
                           {formatDuration(emp.avgTxProcessingTimeSeconds)}
                         </span>
                       ) : (

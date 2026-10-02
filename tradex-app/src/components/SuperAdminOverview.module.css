@@ -1,7 +1,7 @@
 /* ════════════════════════════════════════════════════════════════
    SuperAdminOverview Module Styles
    Semantic Color Roles:
-     - Primary Interactive Triggers: var(--primary) (Groww Mint Teal)
+     - Primary Interactive Triggers: var(--primary) (brand colour)
      - Successful / Clear States:    var(--success) (Emerald Green)
      - Attention / Pending Queues:  var(--warning) (Warm Amber)
      - Failed / Withdrawals:         var(--danger)  (Rose Crimson)
@@ -28,7 +28,7 @@
   color: var(--muted);
   padding: 8px 16px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: var(--fs-md);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -51,16 +51,16 @@
 .filterBtnActive:hover {
   background: var(--primary-2);
   border-color: var(--primary-2);
-  color: var(--text);
+  color: var(--on-primary);
 }
 
 .exportBtn {
   background: var(--primary-bg);
   border: 1px solid var(--primary-border);
-  color: var(--primary);
+  color: var(--primary-text);
   padding: 8px 16px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: var(--fs-md);
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
@@ -75,7 +75,6 @@
   border-color: var(--primary);
   color: var(--on-primary);
   box-shadow: 0 4px 14px var(--primary-bg), 0 0 0 1px var(--primary-border);
-  transform: translateY(-1px);
 }
 
 .exportBtn:active:not(:disabled) {
@@ -109,7 +108,7 @@
 }
 
 .dateLabel {
-  font-size: 11.5px;
+  font-size: var(--fs-sm);
   color: var(--muted);
   font-weight: 600;
   text-transform: uppercase;
@@ -118,12 +117,12 @@
 
 .dateInput {
   color-scheme: dark;
-  background: lch(7% 4 265 / 0.7);
+  background: var(--surface);
   border: 1px solid var(--clr-white-a12);
   color: var(--text);
   padding: 6px 12px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: var(--fs-md);
   font-weight: 500;
   outline: none;
   font-family: inherit;
@@ -134,13 +133,13 @@
 
 .dateInput:hover {
   border-color: var(--primary-border);
-  background: lch(9% 6 265 / 0.85);
+  background: var(--surface);
 }
 
 .dateInput:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 12px var(--primary-bg);
-  background: lch(11% 8 265 / 0.95);
+  box-shadow: var(--shadow-recessed-focus);
+  background: var(--surface);
 }
 
 /* ── Operational Top Banners ── */
@@ -165,7 +164,7 @@
   align-items: center;
   gap: 10px;
   color: var(--success);
-  font-size: 13.5px;
+  font-size: var(--fs-base);
   font-weight: 600;
 }
 
@@ -173,7 +172,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: var(--fs-md);
   font-weight: 700;
   color: var(--warning);
   text-transform: uppercase;
@@ -194,7 +193,7 @@
   border: 1px solid var(--border);
   padding: 8px 14px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: var(--fs-md);
   color: var(--text);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -203,7 +202,6 @@
 .actionBannerPill:hover {
   background: var(--surface-elevated);
   border-color: var(--warning);
-  transform: translateY(-1px);
 }
 
 /* ── Metrics Grid & Visual Distribution Bars ── */
@@ -269,7 +267,7 @@
 }
 
 .txBreakdownLabel {
-  font-size: 11.5px;
+  font-size: var(--fs-sm);
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -277,13 +275,13 @@
 }
 
 .txBreakdownValue {
-  font-size: 15px;
+  font-size: var(--fs-lg);
   font-weight: 800;
   color: var(--text);
 }
 
 .txBreakdownCount {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--muted);
 }
 
@@ -302,7 +300,7 @@
 }
 
 .healthLabel {
-  font-size: 13px;
+  font-size: var(--fs-md);
   color: var(--muted);
   display: flex;
   align-items: center;
@@ -344,8 +342,8 @@
 .cardFooterLinkBtn {
   background: none;
   border: none;
-  color: var(--primary);
-  font-size: 12px;
+  color: var(--primary-text);
+  font-size: var(--fs-sm);
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
@@ -378,7 +376,7 @@
 }
 
 .perfTitle {
-  font-size: 16px;
+  font-size: var(--fs-lg);
   font-weight: 700;
   color: var(--text);
   margin: 0;
@@ -400,13 +398,13 @@
   border-collapse: separate;
   border-spacing: 0;
   text-align: left;
-  font-size: 13px;
+  font-size: var(--fs-md);
 }
 
 .perfTable th {
   background: var(--surface-elevated);
   color: var(--text);
-  font-size: 11.5px;
+  font-size: var(--fs-sm);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -465,7 +463,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11.5px;
+  font-size: var(--fs-sm);
   text-transform: uppercase;
 }
 
@@ -476,7 +474,6 @@
 }
 
 /* ── Harmonized Status Badges & Pills ── */
-.badgeMuted,
 .tagNone {
   background: var(--clr-white-a04);
   color: var(--muted);
@@ -487,7 +484,7 @@
   padding: 3px 8px;
   border-radius: 6px;
   font-weight: 700;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   text-transform: uppercase;
 }
 
@@ -499,7 +496,7 @@
 }
 
 .permTag {
-  font-size: 10px;
+  font-size: var(--fs-xs);
   font-weight: 700;
   text-transform: uppercase;
   padding: 3px 8px;
@@ -520,7 +517,7 @@
   padding: 3px 9px;
   border-radius: 6px;
   font-weight: 700;
-  font-size: 12.5px;
+  font-size: var(--fs-md);
 }
 
 .tag_manage_withdrawals,
@@ -534,13 +531,13 @@
   padding: 3px 9px;
   border-radius: 6px;
   font-weight: 700;
-  font-size: 12.5px;
+  font-size: var(--fs-md);
 }
 
 .tag_manage_users,
 .tag_manage_settings {
   background: var(--primary-bg);
-  color: var(--primary);
+  color: var(--primary-text);
   border: 1px solid var(--primary-border);
 }
 
@@ -558,10 +555,10 @@
   gap: 4px;
   padding: 3px 8px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   font-weight: 600;
   background: var(--primary-bg);
-  color: var(--primary);
+  color: var(--primary-text);
   border: 1px solid var(--primary-border);
 }
 
@@ -569,13 +566,13 @@
   color: var(--muted);
   opacity: 0.4;
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--fs-base);
   letter-spacing: 1px;
 }
 
 .tableGroupHeader {
   text-align: center;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -590,7 +587,7 @@
 
 .metricPill {
   font-weight: 600;
-  font-size: 13px;
+  font-size: var(--fs-md);
 }
 
 /* ── Developer Tools & Seed Panel ── */
@@ -598,7 +595,7 @@
   background: none;
   border: none;
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--fs-md);
   font-weight: 600;
   cursor: pointer;
   display: flex;
@@ -626,7 +623,7 @@
 .dangerZoneTitle {
   margin: 0 0 6px;
   color: var(--danger);
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-weight: 700;
 }
 
@@ -637,7 +634,7 @@
   color: var(--danger);
   padding: 8px 16px;
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: var(--fs-md);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -645,21 +642,21 @@
 
 .dangerZoneBtn:hover:not(:disabled) {
   background: var(--danger);
-  color: var(--text);
+  color: var(--on-primary);
 }
 
 /* ── Recent Activity Stream Table ── */
 .activityTable {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: var(--fs-md);
 }
 
 .activityTable th {
   text-align: left;
   padding: 10px 12px;
   color: var(--muted);
-  font-size: 11.5px;
+  font-size: var(--fs-sm);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;

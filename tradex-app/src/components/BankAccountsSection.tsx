@@ -126,7 +126,7 @@ export default function BankAccountsSection({
             onClick={() => setShowAddForm(true)}
             className={localStyles.linkBtn}
           >
-            <Icon name="add" style={{ fontSize: "16px" }} />
+            <Icon name="add" style={{ fontSize: "var(--fs-lg)" }} />
             Link New Bank
           </button>
         )}
@@ -180,7 +180,7 @@ export default function BankAccountsSection({
                           disabled={deleteBankMutation.isPending}
                           aria-label="Remove bank account"
                         >
-                          <Icon name="delete" style={{ fontSize: "18px" }} />
+                          <Icon name="delete" style={{ fontSize: "var(--fs-xl)" }} />
                         </button>
                       </>
                     )}

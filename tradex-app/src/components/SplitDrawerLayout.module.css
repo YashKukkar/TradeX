@@ -4,8 +4,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--clr-black-a70);
-  backdrop-filter: blur(10px);
+  background: var(--overlay);
+  backdrop-filter: blur(3px);
   z-index: 1000;
   animation: fadeIn 0.25s ease-out;
 }
@@ -15,9 +15,9 @@
   top: 0;
   right: 0;
   height: 100vh;
-  background: var(--bg-2);
+  background: var(--bg);
   border-left: 1px solid var(--border);
-  box-shadow: -10px 0 40px var(--clr-black-a50);
+  box-shadow: -12px 0 40px var(--overlay-soft);
   z-index: 1001;
   display: flex;
   flex-direction: column;
@@ -37,14 +37,14 @@
 
 .title {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--fs-2xl);
   color: var(--text);
   font-weight: 700;
 }
 
 .sub {
   margin: 4px 0 0 0;
-  font-size: 13px;
+  font-size: var(--fs-md);
   color: var(--muted);
 }
 
@@ -65,7 +65,7 @@
 
 .closeBtn:hover {
   background: var(--border);
-  transform: rotate(90deg);
+  
 }
 
 .bodySplit {

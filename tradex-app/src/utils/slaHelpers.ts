@@ -87,7 +87,7 @@ export function getTicketSlaInfo(
     status: "ON_TRACK",
     label: `On Track • ${durationStr}`,
     shortLabel: `${durationStr} (Active)`,
-    color: "var(--primary)",
+    color: "var(--primary-text)",
     bg: "var(--primary-bg)",
     border: "var(--primary-border)",
     icon: "schedule",

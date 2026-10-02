@@ -57,21 +57,22 @@ export default function SupportTickets() {
           <button 
             onClick={() => navigate("/dashboard")}
             style={{
-              background: "var(--surface-2)",
+              background: "var(--surface)",
               border: "1px solid var(--border)",
               borderRadius: "10px",
-              color: "var(--text)",
-              padding: "8px 16px",
+              color: "var(--muted)",
+              fontFamily: "inherit",
+              padding: "8px 14px",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              gap: "8px",
-              fontSize: "14px",
-              fontWeight: "500",
+              gap: "6px",
+              fontSize: "var(--fs-base)",
+              fontWeight: "600",
               transition: "all 0.2s ease"
             }}
           >
-            <Icon name="arrow_back" style={{ fontSize: "18px" }} />
+            <Icon name="arrow_back" style={{ fontSize: "var(--fs-xl)" }} />
             Dashboard
           </button>
           <div className={styles.titleSection}>
@@ -190,7 +191,7 @@ export default function SupportTickets() {
                 border: "1px solid var(--border)",
                 borderRadius: "8px",
                 color: "var(--text)",
-                fontSize: "13px",
+                fontSize: "var(--fs-md)",
                 outline: "none"
               }}
             >
@@ -209,16 +210,16 @@ export default function SupportTickets() {
         <main className={styles.ticketsSection}>
           {isLoading && (
             <div style={{ textAlign: "center", padding: "60px", color: "var(--muted)" }}>
-              <Icon name="progress_activity" className="spin" style={{ fontSize: "36px", marginBottom: "12px" }} />
+              <Icon name="progress_activity" className="spin" style={{ fontSize: "var(--fs-6xl)", marginBottom: "12px" }} />
               <p>Loading support tickets...</p>
             </div>
           )}
 
           {!isLoading && filteredTickets.length === 0 && (
             <div className={styles.noTickets}>
-              <Icon name="chat_bubble_outline" style={{ fontSize: "40px", color: "var(--muted)" }} />
-              <p style={{ margin: 0, fontWeight: "600", fontSize: "15px" }}>All clear here!</p>
-              <p style={{ margin: 0, fontSize: "13px", color: "var(--muted)" }}>
+              <Icon name="chat_bubble_outline" style={{ fontSize: "var(--fs-6xl)", color: "var(--muted)" }} />
+              <p style={{ margin: 0, fontWeight: "600", fontSize: "var(--fs-lg)" }}>All clear here!</p>
+              <p style={{ margin: 0, fontSize: "var(--fs-md)", color: "var(--muted)" }}>
                 {tickets.length === 0 
                   ? "Have a question or need assistance? Click 'Raise Ticket' and our support team will help you right away." 
                   : "No tickets match your search or filter."}
@@ -253,7 +254,7 @@ export default function SupportTickets() {
                             display: "inline-flex",
                             alignItems: "center",
                             gap: "4px",
-                            fontSize: "11px",
+                            fontSize: "var(--fs-xs)",
                             fontWeight: 600,
                             padding: "2px 6px",
                             borderRadius: "4px",
@@ -262,7 +263,7 @@ export default function SupportTickets() {
                             border: `1px solid ${sla.border}`,
                           }}
                         >
-                          <Icon name={sla.icon} style={{ fontSize: "12px" }} />
+                          <Icon name={sla.icon} style={{ fontSize: "var(--fs-sm)" }} />
                           {sla.label}
                         </span>
                       </div>

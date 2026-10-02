@@ -88,10 +88,10 @@ export default function StaffDirectoryTable({
       label: "Employee Account",
       render: (emp) => (
         <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-          <span style={{ fontWeight: 700, fontSize: "14px", color: "var(--text)" }}>
+          <span style={{ fontWeight: 700, fontSize: "var(--fs-base)", color: "var(--text)" }}>
             {emp.fullName || getDisplayName(emp.email)}
           </span>
-          <span className={styles.employeeEmail} style={{ fontSize: "12px", color: "var(--muted)" }}>
+          <span className={styles.employeeEmail} style={{ fontSize: "var(--fs-sm)", color: "var(--muted)" }}>
             {emp.email}
           </span>
         </div>
@@ -111,7 +111,7 @@ export default function StaffDirectoryTable({
                   border: "1px solid var(--clr-indigo)",
                   borderRadius: "4px",
                   padding: "2px 6px",
-                  fontSize: "11px",
+                  fontSize: "var(--fs-xs)",
                   fontWeight: 650,
                 }}
               >
@@ -138,7 +138,7 @@ export default function StaffDirectoryTable({
             <span className={styles.noTeamTag}>None</span>
           )}
           {emp.permissions && emp.permissions.length > 3 && (
-            <span style={{ fontSize: "10px", color: "var(--muted)" }}>
+            <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)" }}>
               +{emp.permissions.length - 3} more
             </span>
           )}
@@ -167,7 +167,7 @@ export default function StaffDirectoryTable({
           }}
           style={{
             padding: "5px 12px",
-            fontSize: "11.5px",
+            fontSize: "var(--fs-sm)",
             gap: "5px",
             background: "var(--clr-indigo-a10)",
             border: "1px solid var(--clr-indigo)",
@@ -180,7 +180,7 @@ export default function StaffDirectoryTable({
             transition: "all 0.15s ease",
           }}
         >
-          <Icon name="visibility" style={{ fontSize: "14px" }} />
+          <Icon name="visibility" style={{ fontSize: "var(--fs-base)" }} />
           View Details
         </button>
       ),
@@ -202,7 +202,7 @@ export default function StaffDirectoryTable({
               <span>{opt === "ALL" ? "All Staff" : opt === "SUPER_ADMIN" ? "Super Admins" : opt.charAt(0) + opt.slice(1).toLowerCase()}</span>
               <span
                 style={{
-                  fontSize: "10px",
+                  fontSize: "var(--fs-xs)",
                   fontWeight: 750,
                   padding: "1px 5px",
                   borderRadius: "10px",
@@ -230,7 +230,7 @@ export default function StaffDirectoryTable({
           </div>
 
           <div className={adminStyles.controlsGroup}>
-            <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--muted)" }}>Sort:</span>
+            <span style={{ fontSize: "var(--fs-sm)", fontWeight: 600, color: "var(--muted)" }}>Sort:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as StaffSortBy)}
@@ -244,7 +244,7 @@ export default function StaffDirectoryTable({
           </div>
 
           <div className={adminStyles.controlsGroup}>
-            <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--muted)" }}>Rows:</span>
+            <span style={{ fontSize: "var(--fs-sm)", fontWeight: 600, color: "var(--muted)" }}>Rows:</span>
             <select
               value={pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}

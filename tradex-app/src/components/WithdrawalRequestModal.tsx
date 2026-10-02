@@ -126,7 +126,7 @@ export default function WithdrawalRequestModal({
               color: "var(--warning)",
               borderRadius: "8px",
               padding: "10px 12px",
-              fontSize: "12px",
+              fontSize: "var(--fs-sm)",
               fontWeight: "600",
               marginBottom: "16px",
               display: "flex",
@@ -134,7 +134,7 @@ export default function WithdrawalRequestModal({
               gap: "8px",
             }}
           >
-            <Icon name="info" style={{ fontSize: "16px" }} />
+            <Icon name="info" style={{ fontSize: "var(--fs-lg)" }} />
             <span>Note: Withdrawals are simulated in this preview. No real money will be transferred to your bank.</span>
           </div>
 

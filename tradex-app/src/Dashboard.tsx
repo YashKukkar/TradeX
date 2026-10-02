@@ -174,7 +174,7 @@ export default function Dashboard() {
             aria-expanded={menuOpen}
           >
             <div className={`${styles.avatar} ${isAdmin ? styles.adminAvatar : ""}`}>
-              {isAdmin ? "⚡" : getInitials(displayName)}
+              {isAdmin ? <Icon name="bolt" style={{ fontSize: "var(--fs-xl)" }} /> : getInitials(displayName)}
             </div>
             <span className={styles.userName}>{displayName || "Loading..."}</span>
             <span className={styles.chevron}>
@@ -191,7 +191,7 @@ export default function Dashboard() {
                   className={styles.dropdownItem}
                   onClick={() => navigate("/settings")}
                 >
-                  <Icon name="manage_accounts" style={{ fontSize: "16px", color: "var(--primary)" }} />
+                  <Icon name="manage_accounts" style={{ fontSize: "var(--fs-lg)", color: "var(--primary-text)" }} />
                   Profile & Settings
                 </button>
                 <button className={styles.dropdownLogout} onClick={handleLogout}>

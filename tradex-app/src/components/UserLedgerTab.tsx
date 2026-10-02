@@ -31,7 +31,7 @@ import ActionBadge from "./ActionBadge";
 import ActionButton from "./ActionButton";
 
 function TxStatusBadge({ status }: { status: string }) {
-  return <ActionBadge action={status} style={{ padding: "2px 8px", fontSize: "10px" }} />;
+  return <ActionBadge action={status} style={{ padding: "2px 8px", fontSize: "var(--fs-xs)" }} />;
 }
 
 export default function UserLedgerTab({ userId, type }: UserLedgerTabProps) {
@@ -68,11 +68,11 @@ export default function UserLedgerTab({ userId, type }: UserLedgerTabProps) {
               <div
                 key={tx.id}
                 style={{
-                  background: "rgba(255, 255, 255, 0.02)",
+                  background: "var(--clr-white-a02)",
                   border: "1px solid var(--border)",
                   borderRadius: "10px",
                   padding: "12px 14px",
-                  fontSize: "13px"
+                  fontSize: "var(--fs-md)"
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
@@ -81,12 +81,12 @@ export default function UserLedgerTab({ userId, type }: UserLedgerTabProps) {
                     {tx.amount >= 0 ? "+" : ""}₹{tx.amount.toLocaleString("en-IN")}
                   </span>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11.5px", color: "var(--muted)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "var(--fs-sm)", color: "var(--muted)" }}>
                   <span>{formatTime(tx.createdAt)}</span>
                   <TxStatusBadge status={tx.status} />
                 </div>
                 {tx.notes && (
-                  <div style={{ marginTop: "8px", fontSize: "12px", color: "var(--muted)", fontStyle: "italic", borderTop: "1px dashed rgba(255,255,255,0.04)", paddingTop: "6px" }}>
+                  <div style={{ marginTop: "8px", fontSize: "var(--fs-sm)", color: "var(--muted)", fontStyle: "italic", borderTop: "1px dashed var(--clr-white-a04)", paddingTop: "6px" }}>
                     {tx.notes}
                   </div>
                 )}
@@ -115,10 +115,10 @@ export default function UserLedgerTab({ userId, type }: UserLedgerTabProps) {
           style={{
             background: "var(--primary-bg)",
             border: "1px solid var(--primary-border)",
-            color: "var(--primary)",
+            color: "var(--primary-text)",
             padding: "4px 10px",
             borderRadius: "6px",
-            fontSize: "12px",
+            fontSize: "var(--fs-sm)",
             fontWeight: 700,
           }}
           title="Export points conversions to CSV"
@@ -136,11 +136,11 @@ export default function UserLedgerTab({ userId, type }: UserLedgerTabProps) {
             <div
               key={tx.id}
               style={{
-                background: "rgba(255, 255, 255, 0.02)",
+                background: "var(--clr-white-a02)",
                 border: "1px solid var(--border)",
                 borderRadius: "10px",
                 padding: "12px 14px",
-                fontSize: "13px"
+                fontSize: "var(--fs-md)"
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
@@ -149,11 +149,11 @@ export default function UserLedgerTab({ userId, type }: UserLedgerTabProps) {
                   {tx.amount >= 0 ? "+" : ""}{tx.amount.toLocaleString()} pts
                 </span>
               </div>
-              <div style={{ fontSize: "11.5px", color: "var(--muted)" }}>
+              <div style={{ fontSize: "var(--fs-sm)", color: "var(--muted)" }}>
                 {formatTime(tx.createdAt)}
               </div>
               {tx.notes && (
-                <div style={{ marginTop: "8px", fontSize: "12px", color: "var(--muted)", fontStyle: "italic", borderTop: "1px dashed rgba(255, 255, 255, 0.04)", paddingTop: "6px" }}>
+                <div style={{ marginTop: "8px", fontSize: "var(--fs-sm)", color: "var(--muted)", fontStyle: "italic", borderTop: "1px dashed var(--clr-white-a04)", paddingTop: "6px" }}>
                   {tx.notes}
                 </div>
               )}

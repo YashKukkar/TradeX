@@ -1,8 +1,9 @@
 import Icon from "./Icon";
 import Card from "./Card";
+import Modal from "./Modal";
 import styles from "../Dashboard.module.css";
-import { TICKERS_DATA } from "../utils/dashboardHelpers";
 import { branding } from "../config";
+import { useState } from "react";
 import type { NavigateFunction } from "react-router-dom";
 import { useWalletData, usePublicSettings, useCurrentUser } from "../hooks/useDashboard";
 import CashWalletSection from "./CashWalletSection";
@@ -41,6 +42,7 @@ export default function UserDashboard({
   withdrawableBalance,
   bonusBalance,
 }: UserDashboardProps) {
+  const [tradingInfoOpen, setTradingInfoOpen] = useState(false);
   const { data: user } = useCurrentUser();
   const primaryBank = user?.bankAccounts?.find((b: any) => b.isPrimary);
   const accountNumber = primaryBank?.accountNumber || "";
@@ -71,40 +73,49 @@ export default function UserDashboard({
                 Welcome back, <span className={styles.heroName}>{user?.firstName || displayName}</span>
               </h1>
               <p className={styles.heroSub}>
-                Manage your funds, track referrals, and trace your wallet history in real-time.
+                Manage your funds, points and referrals, then head to trading.
               </p>
             </div>
           </div>
           <div className={styles.heroRight}>
             <div className={styles.heroPointsCard}>
               <div className={styles.pointsBadge}>
-                <Icon name="stars" style={{ fontSize: "16px", color: "var(--accent)" }} />
+                <Icon name="stars" style={{ fontSize: "var(--fs-lg)", color: "var(--accent)" }} />
                 <span>{branding.pointsName}</span>
               </div>
               <div className={styles.pointsValue}>
                 {pointsBalance.toLocaleString()} <span className={styles.ptsLabel}>PTS</span>
               </div>
             </div>
+            <div className={styles.tradeBlock}>
+              <button
+                type="button"
+                className={styles.tradeBtn}
+                onClick={() => setTradingInfoOpen(true)}
+              >
+                Start trading
+                <Icon name="arrow_outward" style={{ fontSize: "var(--fs-xl)" }} />
+              </button>
+              <div className={styles.tradeNote}>NSE futures, MCX and COMEX</div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Enhanced Market Ticker Row */}
-      <div className={styles.tickerRow}>
-        {TICKERS_DATA.map((t) => (
-          <div key={t.symbol} className={styles.tickerCard}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-              <div className={styles.tickerSymbol}>{t.symbol}</div>
-              <span className={styles.tickerLivePulse} />
-            </div>
-            <div className={styles.tickerValue}>{t.value}</div>
-            <div className={`${styles.tickerChange} ${t.up ? styles.up : styles.down}`}>
-              <Icon name={t.up ? "arrow_drop_up" : "arrow_drop_down"} style={{ fontSize: "18px" }} />
-              {t.change}
-            </div>
-          </div>
-        ))}
-      </div>
+      <Modal
+        isOpen={tradingInfoOpen}
+        onClose={() => setTradingInfoOpen(false)}
+        title="Trading platform coming soon"
+        subtitle="We're still setting up the trading platform."
+      >
+        <p className={styles.tradeModalText}>
+          Soon this button will take you to the trading platform to trade NSE futures, MCX and COMEX.
+          Your wallet, points and referrals here stay exactly as they are.
+        </p>
+        <button type="button" className={styles.tradeBtn} onClick={() => setTradingInfoOpen(false)}>
+          Got it
+        </button>
+      </Modal>
 
       <div className={styles.grid}>
         <CashWalletSection
@@ -122,9 +133,9 @@ export default function UserDashboard({
           <Card.Body>
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               <div>
-                You have <strong style={{ color: "var(--accent)", fontSize: "16px" }}>{pointsBalance}</strong> {branding.pointsName}.
+                You have <strong style={{ color: "var(--accent)", fontSize: "var(--fs-lg)" }}>{pointsBalance}</strong> {branding.pointsName}.
               </div>
-              <div style={{ fontSize: "13.5px", color: "var(--muted)" }}>
+              <div style={{ fontSize: "var(--fs-base)", color: "var(--muted)" }}>
                 Invite Code: <strong style={{ color: "var(--text)" }}>{referralCode || "..."}</strong>
               </div>
               <span className={styles.metaLabel} style={{ marginTop: "4px" }}>
@@ -156,7 +167,7 @@ export default function UserDashboard({
                 >
                   <Icon
                     name={emailVerified ? "mark_email_read" : "mail_lock"}
-                    style={{ fontSize: "13px" }}
+                    style={{ fontSize: "var(--fs-md)" }}
                   />
                   {email}
                   <span className={styles.pillStatus}>
@@ -184,7 +195,7 @@ export default function UserDashboard({
                   >
                     <Icon
                       name={phoneVerified ? "phonelink_ring" : "phonelink_lock"}
-                      style={{ fontSize: "13px" }}
+                      style={{ fontSize: "var(--fs-md)" }}
                     />
                     {phoneNumber}
                     <span className={styles.pillStatus}>

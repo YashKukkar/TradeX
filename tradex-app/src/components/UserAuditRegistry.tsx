@@ -30,7 +30,7 @@ function HighlightText({ text, indices }: { text: string; indices: number[] }) {
     <>
       {text.split("").map((char, i) =>
         indexSet.has(i) ? (
-          <mark key={i} style={{ backgroundColor: "var(--accent)", color: "var(--bg)", borderRadius: "2px", padding: "0 2px" }}>
+          <mark key={i} style={{ backgroundColor: "var(--accent)", color: "var(--on-primary)", borderRadius: "2px", padding: "0 2px" }}>
             {char}
           </mark>
         ) : char
@@ -46,10 +46,10 @@ const COLUMNS: ColumnDef<FilteredUser>[] = [
     render: ({ user: u, emailIndices }) => {
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-          <span style={{ fontWeight: 750, fontSize: "14px", color: "var(--text)", lineHeight: 1.2 }}>
+          <span style={{ fontWeight: 750, fontSize: "var(--fs-base)", color: "var(--text)", lineHeight: 1.2 }}>
             {u.fullName || getDisplayName(u.email)}
           </span>
-          <span className={styles.userEmail} style={{ fontSize: "12px", color: "var(--muted)" }}>
+          <span className={styles.userEmail} style={{ fontSize: "var(--fs-sm)", color: "var(--muted)" }}>
             <HighlightText text={u.email} indices={emailIndices} />
           </span>
         </div>
@@ -64,10 +64,10 @@ const COLUMNS: ColumnDef<FilteredUser>[] = [
       const bonus = u.bonusBalance ?? 0;
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-          <span style={{ fontWeight: 700, fontSize: "14px", color: "var(--text)" }}>
+          <span style={{ fontWeight: 700, fontSize: "var(--fs-base)", color: "var(--text)" }}>
             {formatCurrency(withdrawable)}
           </span>
-          <span style={{ fontSize: "11px", color: "var(--muted)" }}>
+          <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)" }}>
             +{formatCurrency(bonus)} bonus
           </span>
         </div>
@@ -82,10 +82,10 @@ const COLUMNS: ColumnDef<FilteredUser>[] = [
       const acquired = u.pointsAcquired ?? 0;
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-          <span style={{ fontWeight: 700, fontSize: "14px", color: "var(--text)" }}>
+          <span style={{ fontWeight: 700, fontSize: "var(--fs-base)", color: "var(--text)" }}>
             {active.toLocaleString()} pts
           </span>
-          <span style={{ fontSize: "11px", color: "var(--muted)" }}>
+          <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)" }}>
             {acquired.toLocaleString()} earned
           </span>
         </div>
@@ -99,7 +99,7 @@ const COLUMNS: ColumnDef<FilteredUser>[] = [
       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
         <span
           style={{
-            fontSize: "10.5px",
+            fontSize: "var(--fs-xs)",
             fontWeight: 700,
             padding: "2px 6px",
             borderRadius: "4px",
@@ -108,11 +108,11 @@ const COLUMNS: ColumnDef<FilteredUser>[] = [
             border: u.emailVerified ? "1px solid var(--primary-border)" : "1px solid var(--border)",
           }}
         >
-          {u.emailVerified ? "✓ Email" : "Email"}
+          {u.emailVerified ? <><Icon name="check" style={{ fontSize: "var(--fs-sm)" }} /> Email</> : "Email"}
         </span>
         <span
           style={{
-            fontSize: "10.5px",
+            fontSize: "var(--fs-xs)",
             fontWeight: 700,
             padding: "2px 6px",
             borderRadius: "4px",
@@ -121,7 +121,7 @@ const COLUMNS: ColumnDef<FilteredUser>[] = [
             border: u.phoneVerified ? "1px solid var(--primary-border)" : "1px solid var(--border)",
           }}
         >
-          {u.phoneVerified ? "✓ Phone" : "Phone"}
+          {u.phoneVerified ? <><Icon name="check" style={{ fontSize: "var(--fs-sm)" }} /> Phone</> : "Phone"}
         </span>
       </div>
     ),
@@ -264,12 +264,12 @@ export default function UserAuditRegistry({ users, loading, onRowClick }: UserAu
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "11.5px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>Total Customers</span>
-            <Icon name="people" style={{ fontSize: "16px", color: "var(--primary)" }} />
+            <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>Total Customers</span>
+            <Icon name="people" style={{ fontSize: "var(--fs-lg)", color: "var(--primary-text)" }} />
           </div>
           <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-            <span style={{ fontSize: "20px", fontWeight: 800, color: "var(--text)" }}>{summary.totalUsers}</span>
-            <span style={{ fontSize: "11px", color: "var(--success)", fontWeight: 700 }}>{summary.activeUsers} active</span>
+            <span style={{ fontSize: "var(--fs-2xl)", fontWeight: 800, color: "var(--text)" }}>{summary.totalUsers}</span>
+            <span style={{ fontSize: "var(--fs-xs)", color: "var(--success)", fontWeight: 700 }}>{summary.activeUsers} active</span>
           </div>
         </div>
 
@@ -285,12 +285,12 @@ export default function UserAuditRegistry({ users, loading, onRowClick }: UserAu
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "11.5px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>Customer Capital</span>
-            <Icon name="account_balance_wallet" style={{ fontSize: "16px", color: "var(--primary)" }} />
+            <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>Customer Capital</span>
+            <Icon name="account_balance_wallet" style={{ fontSize: "var(--fs-lg)", color: "var(--primary-text)" }} />
           </div>
           <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-            <span style={{ fontSize: "20px", fontWeight: 800, color: "var(--text)" }}>{formatCurrency(summary.totalWithdrawable)}</span>
-            <span style={{ fontSize: "11px", color: "var(--muted)" }}>+{formatCurrency(summary.totalBonus)} bonus</span>
+            <span style={{ fontSize: "var(--fs-2xl)", fontWeight: 800, color: "var(--text)" }}>{formatCurrency(summary.totalWithdrawable)}</span>
+            <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)" }}>+{formatCurrency(summary.totalBonus)} bonus</span>
           </div>
         </div>
 
@@ -306,12 +306,12 @@ export default function UserAuditRegistry({ users, loading, onRowClick }: UserAu
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "11.5px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>Points in Circulation</span>
-            <Icon name="stars" style={{ fontSize: "16px", color: "var(--accent)" }} />
+            <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>Points in Circulation</span>
+            <Icon name="stars" style={{ fontSize: "var(--fs-lg)", color: "var(--accent)" }} />
           </div>
           <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-            <span style={{ fontSize: "20px", fontWeight: 800, color: "var(--accent)" }}>{formatNumber(summary.totalPoints)} pts</span>
-            <span style={{ fontSize: "11px", color: "var(--muted)" }}>across accounts</span>
+            <span style={{ fontSize: "var(--fs-2xl)", fontWeight: 800, color: "var(--accent)" }}>{formatNumber(summary.totalPoints)} pts</span>
+            <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)" }}>across accounts</span>
           </div>
         </div>
 
@@ -327,14 +327,14 @@ export default function UserAuditRegistry({ users, loading, onRowClick }: UserAu
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "11.5px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>Account Health</span>
-            <Icon name="verified_user" style={{ fontSize: "16px", color: summary.lockedUsers > 0 ? "var(--warning)" : "var(--success)" }} />
+            <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>Account Health</span>
+            <Icon name="verified_user" style={{ fontSize: "var(--fs-lg)", color: summary.lockedUsers > 0 ? "var(--warning)" : "var(--success)" }} />
           </div>
           <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-            <span style={{ fontSize: "20px", fontWeight: 800, color: "var(--text)" }}>{summary.fullyVerified}</span>
-            <span style={{ fontSize: "11px", color: "var(--muted)" }}>verified</span>
+            <span style={{ fontSize: "var(--fs-2xl)", fontWeight: 800, color: "var(--text)" }}>{summary.fullyVerified}</span>
+            <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)" }}>verified</span>
             {summary.lockedUsers > 0 && (
-              <span style={{ fontSize: "11px", color: "var(--danger)", fontWeight: 700, marginLeft: "auto" }}>
+              <span style={{ fontSize: "var(--fs-xs)", color: "var(--danger)", fontWeight: 700, marginLeft: "auto" }}>
                 {summary.lockedUsers} locked
               </span>
             )}
@@ -355,7 +355,7 @@ export default function UserAuditRegistry({ users, loading, onRowClick }: UserAu
               gap: "6px",
               padding: "7px 12px",
               borderRadius: "8px",
-              fontSize: "12px",
+              fontSize: "var(--fs-sm)",
               fontWeight: 700,
               cursor: sorted.length === 0 ? "not-allowed" : "pointer",
               background: "var(--surface-2)",
@@ -364,7 +364,7 @@ export default function UserAuditRegistry({ users, loading, onRowClick }: UserAu
               transition: "all 0.2s ease",
             }}
           >
-            <Icon name="download" style={{ fontSize: "15px", color: "var(--primary)" }} />
+            <Icon name="download" style={{ fontSize: "var(--fs-lg)", color: "var(--primary-text)" }} />
             <span>Export CSV</span>
           </button>
 
@@ -394,7 +394,7 @@ export default function UserAuditRegistry({ users, loading, onRowClick }: UserAu
               <span>{filterOpt === "ALL" ? "All Users" : filterOpt.charAt(0) + filterOpt.slice(1).toLowerCase()}</span>
               <span
                 style={{
-                  fontSize: "10px",
+                  fontSize: "var(--fs-xs)",
                   fontWeight: 750,
                   padding: "1px 5px",
                   borderRadius: "10px",
@@ -410,7 +410,7 @@ export default function UserAuditRegistry({ users, loading, onRowClick }: UserAu
         </div>
 
         <div className={styles.controlsGroup}>
-          <span style={{ fontSize: "12.5px", fontWeight: 600, color: "var(--muted)" }}>Sort by:</span>
+          <span style={{ fontSize: "var(--fs-md)", fontWeight: 600, color: "var(--muted)" }}>Sort by:</span>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortByType)}

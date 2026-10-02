@@ -1,4 +1,5 @@
 import React from "react";
+import Icon from "./Icon";
 import Modal from "./Modal";
 import styles from "./EmployeeManagement.module.css";
 import type { TeamData, PermissionRegistryData } from "../hooks/useAdmin";
@@ -138,8 +139,8 @@ export default function CreateEmployeeModal({
                     className={styles.effectiveBadge}
                   >
                     {label}
-                    {isInherited && <span title="Inherited from Team" style={{ cursor: "help" }}>🛡️</span>}
-                    {isDirect && <span title="Directly Assigned Override" style={{ cursor: "help" }}>👤</span>}
+                    {isInherited && <span title="Inherited from Team" style={{ cursor: "help" }}><Icon name="shield" style={{ fontSize: "var(--fs-base)" }} /></span>}
+                    {isDirect && <span title="Directly Assigned Override" style={{ cursor: "help" }}><Icon name="person" style={{ fontSize: "var(--fs-base)" }} /></span>}
                   </span>
                 );
               })}

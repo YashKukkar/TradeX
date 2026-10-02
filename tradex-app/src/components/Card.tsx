@@ -22,7 +22,7 @@ interface CardIconProps {
 Card.Icon = function CardIcon({ name, color, className }: CardIconProps) {
   return (
     <div className={`${styles.icon} ${className || ""}`} style={color ? { color } : undefined}>
-      <Icon name={name} style={{ fontSize: "28px" }} />
+      <Icon name={name} style={{ fontSize: "var(--fs-4xl)" }} />
     </div>
   );
 };

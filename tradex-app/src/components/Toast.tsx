@@ -36,7 +36,7 @@ export default function Toast({ message, type = "success", onClose, duration = 3
       </span>
       <span className={styles.message}>{message}</span>
       <button className={styles.closeBtn} onClick={onClose}>
-        <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>close</span>
+        <span className="material-symbols-outlined" style={{ fontSize: "var(--fs-lg)" }}>close</span>
       </button>
     </div>
   );

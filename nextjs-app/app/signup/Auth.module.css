@@ -1,4 +1,4 @@
-/* Auth.module.css */
+/* Auth.module.css — tokens come from /public/css/styles.css */
 
 .pageWrapper {
   display: flex;
@@ -21,7 +21,7 @@
   left: 24px;
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--muted);
+  color: var(--color-text-muted);
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -31,18 +31,17 @@
 }
 
 .backLink:hover {
-  color: var(--primary);
+  color: var(--color-text);
 }
 
 .container {
-  padding: 44px 40px;
+  padding: 30px 40px 32px;
   width: 100%;
   max-width: 480px;
-  background: linear-gradient(160deg, rgba(21, 28, 59, 0.95), rgba(27, 36, 80, 0.92));
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(0, 224, 164, 0.06);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
   transition: max-width 0.2s ease;
 }
 
@@ -59,39 +58,42 @@
 
 .logoRow {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 14px;
 }
 
 .brand {
+  font-family: var(--font-heading);
   font-size: 28px;
   font-weight: 800;
-  letter-spacing: -0.5px;
-  color: var(--text);
+  letter-spacing: -0.04em;
+  color: var(--color-text);
 }
 
 .brandAccent {
-  color: var(--primary);
+  color: var(--color-brand);
 }
 
 .title {
+  font-family: var(--font-heading);
   text-align: center;
   margin: 0 0 6px;
-  color: var(--text);
+  color: var(--color-text);
   font-weight: 800;
-  font-size: 22px;
+  letter-spacing: -0.03em;
+  font-size: 24px;
 }
 
 .subtitle {
   text-align: center;
-  margin: 0 0 28px;
+  margin: 0 0 20px;
   font-size: 14px;
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .fieldGroup {
@@ -102,20 +104,20 @@
 
 .label {
   font-size: 12px;
-  font-weight: 700;
-  color: var(--muted);
+  font-weight: 600;
+  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
 .input {
   width: 100%;
-  padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border);
+  padding: 11px 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 10px;
-  color: var(--text);
-  font-size: 14.5px;
+  color: var(--color-text);
+  font-size: 16px;
   font-family: inherit;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -123,18 +125,17 @@
 }
 
 .input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 224, 164, 0.12);
+  border-color: var(--color-text);
+  box-shadow: 0 0 0 3px rgba(20, 33, 61, 0.1);
 }
 
 .inputInvalid {
-  border-color: #ff4a76 !important;
-  box-shadow: 0 0 10px rgba(255, 74, 118, 0.25) !important;
-  animation: errorSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1), borderBlink 1.5s infinite ease-in-out !important;
+  border-color: var(--color-danger) !important;
+  box-shadow: 0 0 0 3px rgba(198, 45, 63, 0.12) !important;
 }
 
 .input::placeholder {
-  color: rgba(154, 166, 207, 0.45);
+  color: #8a93a3;
 }
 
 .passwordWrapper {
@@ -156,41 +157,48 @@
   font-size: 20px;
   line-height: 1;
   padding: 0;
-  color: var(--muted);
-  transition: opacity 0.2s;
+  color: var(--color-text-muted);
+  transition: color 0.2s;
   display: flex;
   align-items: center;
 }
 
-.eyeBtn:hover { opacity: 0.7; }
+.eyeBtn:hover { color: var(--color-text); }
 
 .button {
-  padding: 13px 20px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-2));
-  color: #05231c;
-  border: none;
-  border-radius: 10px;
+  padding: 12px 20px;
+  background: var(--color-brand);
+  color: #fff;
+  border: 1px solid var(--color-brand);
+  border-radius: 999px;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 15px;
   font-family: inherit;
-  transition: transform 0.15s, opacity 0.15s;
+  transition: background 0.15s, border-color 0.15s;
   margin-top: 4px;
-  letter-spacing: 0.01em;
 }
 
 .button:hover:not(:disabled) {
-  transform: translateY(-1px);
+  background: var(--color-brand-hover);
+  border-color: var(--color-brand-hover);
+}
+
+.button:active:not(:disabled) {
+  background: var(--color-brand-active);
+  border-color: var(--color-brand-active);
 }
 
 .button:disabled {
-  opacity: 0.6;
+  background: var(--color-disabled-bg);
+  border-color: var(--color-border);
+  color: var(--color-disabled-text);
   cursor: not-allowed;
 }
 
 .error {
   margin-top: 14px;
-  color: var(--danger);
+  color: var(--color-danger);
   text-align: center;
   font-size: 13.5px;
   font-weight: 500;
@@ -198,21 +206,21 @@
 
 .success {
   margin-top: 14px;
-  color: var(--primary);
+  color: var(--color-success);
   text-align: center;
   font-size: 13.5px;
   font-weight: 500;
 }
 
 .footerText {
-  margin-top: 24px;
+  margin-top: 18px;
   font-size: 14px;
-  color: var(--muted);
+  color: var(--color-text-muted);
   text-align: center;
 }
 
 .link {
-  color: var(--primary);
+  color: var(--color-brand-strong);
   text-decoration: none;
   font-weight: 600;
 }
@@ -235,7 +243,7 @@
 .formFields {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .phoneInputGroup {
@@ -247,12 +255,12 @@
 .countryCodeSelect {
   width: 110px;
   flex-shrink: 0;
-  padding: 12px 10px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border);
+  padding: 11px 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 10px;
-  color: var(--text);
-  font-size: 14.5px;
+  color: var(--color-text);
+  font-size: 16px;
   font-family: inherit;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -260,19 +268,19 @@
 }
 
 .countryCodeSelect:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 224, 164, 0.12);
+  border-color: var(--color-text);
+  box-shadow: 0 0 0 3px rgba(20, 33, 61, 0.1);
 }
 
 .countryCodeSelect option {
-  background: #11162d;
-  color: var(--text);
+  background: var(--color-surface);
+  color: var(--color-text);
 }
 
 .optionalTag {
   font-size: 0.72rem;
   font-weight: 400;
-  color: #7a8aaa;
+  color: var(--color-text-muted);
   margin-left: 4px;
 }
 
@@ -285,34 +293,23 @@
 
 .errorLabel {
   font-size: 11px;
-  font-weight: 700;
-  color: #ff4a76;
+  font-weight: 600;
+  color: var(--color-danger);
   text-transform: none;
   letter-spacing: normal;
-  background: rgba(255, 74, 118, 0.08);
-  border: 1px solid #ff4a76;
+  background: var(--color-danger-tint);
+  border: 1px solid var(--color-danger);
   border-radius: 4px;
   padding: 2px 8px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  animation: errorSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1), borderBlink 1.5s infinite ease-in-out !important;
+  animation: errorSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes errorSlideIn {
   from { opacity: 0; transform: translateY(-2px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes borderBlink {
-  0%, 100% {
-    border-color: #ff4a76;
-    box-shadow: 0 0 10px rgba(255, 74, 118, 0.25);
-  }
-  50% {
-    border-color: rgba(255, 74, 118, 0.3);
-    box-shadow: 0 0 4px rgba(255, 74, 118, 0.05);
-  }
 }
 
 .containerRedirecting {
@@ -333,10 +330,10 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(9, 7, 15, 0.65);
+  background: rgba(243, 244, 246, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -354,11 +351,10 @@
 .spinner {
   width: 48px;
   height: 48px;
-  border: 4px solid rgba(0, 224, 164, 0.1);
-  border-left-color: var(--primary);
+  border: 4px solid var(--color-brand-tint);
+  border-left-color: var(--color-brand);
   border-radius: 50%;
   animation: spin 1.2s linear infinite;
-  box-shadow: 0 0 15px rgba(0, 224, 164, 0.15);
 }
 
 @keyframes spin {
@@ -367,10 +363,9 @@
 }
 
 .overlayText {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-heading);
   font-size: 16px;
   font-weight: 700;
-  color: var(--text);
-  letter-spacing: 0.02em;
-  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  color: var(--color-text);
+  letter-spacing: 0.01em;
 }

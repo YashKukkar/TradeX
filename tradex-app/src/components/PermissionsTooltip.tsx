@@ -16,21 +16,21 @@ export default function PermissionsTooltip({ email, permissions, isAdmin, align 
           {children ? (
             children
           ) : (
-            <span style={{ color: "var(--primary)", fontWeight: "600", borderBottom: "1px dashed var(--primary)", paddingBottom: "1px", cursor: "pointer" }}>
+            <span style={{ color: "var(--primary-text)", fontWeight: "600", borderBottom: "1px dashed var(--primary)", paddingBottom: "1px", cursor: "pointer" }}>
               {email}
             </span>
           )}
           <div className="tooltip-box">
-            <div style={{ fontWeight: "600", marginBottom: "6px", color: "var(--text)", fontSize: "11px" }}>Agent Permissions:</div>
+            <div style={{ fontWeight: "600", marginBottom: "6px", color: "var(--text)", fontSize: "var(--fs-xs)" }}>Agent Permissions:</div>
             {permissions && permissions.length > 0 ? (
               <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
                 {permissions.map((perm) => (
                   <span
                     key={perm}
                     style={{
-                      fontSize: "9px",
-                      background: "rgba(0, 224, 164, 0.15)",
-                      color: "var(--primary)",
+                      fontSize: "var(--fs-xs)",
+                      background: "var(--brand-a15)",
+                      color: "var(--primary-text)",
                       padding: "2px 6px",
                       borderRadius: "4px",
                       fontWeight: "bold"

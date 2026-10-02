@@ -27,7 +27,7 @@ export default function TeamsManagementPanel({
             <div>
               <div className={styles.teamHeader}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <Icon name="groups" style={{ fontSize: "20px", color: "var(--primary)" }} />
+                  <Icon name="groups" style={{ fontSize: "var(--fs-2xl)", color: "var(--primary-text)" }} />
                   <h3 className={styles.teamTitle}>{team.name}</h3>
                 </div>
                 <div style={{ display: "flex", gap: "4px" }}>
@@ -36,7 +36,7 @@ export default function TeamsManagementPanel({
                     className={styles.iconBtn}
                     title="Configure Team Permissions"
                   >
-                    <Icon name="edit" style={{ fontSize: "16px" }} />
+                    <Icon name="edit" style={{ fontSize: "var(--fs-lg)" }} />
                   </button>
                 </div>
               </div>

@@ -84,7 +84,7 @@ export default function Settings() {
             aria-expanded={menuOpen}
           >
             <div className={`${dashboardStyles.avatar} ${isAdmin ? dashboardStyles.adminAvatar : ""}`}>
-              {isAdmin ? "⚡" : getInitials(displayName)}
+              {isAdmin ? <Icon name="bolt" style={{ fontSize: "var(--fs-xl)" }} /> : getInitials(displayName)}
             </div>
             <span className={dashboardStyles.userName}>{displayName || "Loading..."}</span>
             <span className={dashboardStyles.chevron}>
@@ -101,7 +101,7 @@ export default function Settings() {
                   className={dashboardStyles.dropdownItem}
                   onClick={() => navigate("/dashboard")}
                 >
-                  <Icon name="dashboard" style={{ fontSize: "16px", color: "var(--primary)" }} />
+                  <Icon name="dashboard" style={{ fontSize: "var(--fs-lg)", color: "var(--primary-text)" }} />
                   Dashboard
                 </button>
                 <button className={dashboardStyles.dropdownLogout} onClick={handleLogout}>
@@ -121,7 +121,7 @@ export default function Settings() {
               onClick={() => navigate("/dashboard")}
               className={localStyles.backBtn}
             >
-              <Icon name="arrow_back" style={{ fontSize: "18px" }} />
+              <Icon name="arrow_back" style={{ fontSize: "var(--fs-xl)" }} />
               Back
             </button>
             <div className={localStyles.pageTitleSection}>
@@ -134,14 +134,14 @@ export default function Settings() {
 
           {errorMsg && (
             <div className={`${localStyles.alert} ${localStyles.alertError}`}>
-              <Icon name="error" style={{ fontSize: "16px" }} />
+              <Icon name="error" style={{ fontSize: "var(--fs-lg)" }} />
               {errorMsg}
             </div>
           )}
 
           {successMsg && (
             <div className={`${localStyles.alert} ${localStyles.alertSuccess}`}>
-              <Icon name="check_circle" style={{ fontSize: "16px" }} />
+              <Icon name="check_circle" style={{ fontSize: "var(--fs-lg)" }} />
               {successMsg}
             </div>
           )}

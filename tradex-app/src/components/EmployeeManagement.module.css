@@ -1,36 +1,21 @@
-.headerRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  width: 100%;
-}
-
-.subTitle {
-  color: var(--muted);
-  font-size: 13px;
-  margin-top: 4px;
-}
-
 .addBtn {
   display: flex;
   align-items: center;
   gap: 8px;
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   border: none;
   padding: 10px 18px;
-  border-radius: 10px;
-  font-size: 13.5px;
+  border-radius: var(--btn-radius);
+  font-size: var(--fs-base);
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px var(--clr-purple-a25);
+  box-shadow: 0 4px 12px var(--overlay-soft);
   transition: all 0.2s ease;
 }
 
 .addBtn:hover {
-  background: var(--primary-hover, var(--clr-purple));
-  transform: translateY(-1px);
+  background: var(--primary-2);
 }
 
 .emptyState {
@@ -43,19 +28,19 @@
 }
 
 .emptyIcon {
-  font-size: 48px;
+  font-size: var(--fs-6xl);
   margin-bottom: 12px;
   color: var(--border);
 }
 
 .emptyTitle {
   font-weight: 600;
-  font-size: 15px;
+  font-size: var(--fs-lg);
   margin: 0;
 }
 
 .emptySub {
-  font-size: 13px;
+  font-size: var(--fs-md);
   margin-top: 4px;
 }
 
@@ -74,7 +59,7 @@
   border: none;
   padding: 5px 12px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   font-weight: 700;
   cursor: pointer;
   display: flex;
@@ -85,71 +70,28 @@
 
 .subTabBtnActive {
   background: var(--surface-2);
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 /* Table Badge Tags */
-.teamTag {
-  background: var(--clr-cyan-a12);
-  color: var(--accent);
-  border: 1px solid var(--clr-cyan-a25);
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 11px;
-  font-weight: 600;
-}
 
 .noTeamTag {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--muted);
   font-style: italic;
 }
 
 .permTag {
   background: var(--clr-purple-a10);
-  color: var(--primary);
+  color: var(--primary-text);
   border: 1px solid var(--clr-purple-a20);
   border-radius: 4px;
   padding: 1px 5px;
-  font-size: 10.5px;
+  font-size: var(--fs-xs);
   font-weight: 600;
 }
 
 /* Teams Control Panel */
-.tokenCard {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 20px;
-}
-
-.tokenInputRow {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.tokenInput {
-  flex: 1;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 12px;
-  color: var(--text);
-  font-size: 13px;
-}
-
-.tokenBtn {
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-}
 
 .teamsGrid {
   display: grid;
@@ -176,14 +118,14 @@
 
 .teamTitle {
   margin: 0;
-  font-size: 15px;
+  font-size: var(--fs-lg);
   font-weight: 750;
   color: var(--text);
 }
 
 .teamDesc {
   margin: 0 0 12px;
-  font-size: 12.5px;
+  font-size: var(--fs-md);
   color: var(--muted);
 }
 
@@ -193,7 +135,7 @@
 }
 
 .teamPermHeader {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   font-weight: 700;
   color: var(--muted);
   display: block;
@@ -204,14 +146,6 @@
   background: none;
   border: none;
   color: var(--muted);
-  cursor: pointer;
-  padding: 4px;
-}
-
-.iconBtnDelete {
-  background: none;
-  border: none;
-  color: var(--danger);
   cursor: pointer;
   padding: 4px;
 }
@@ -230,7 +164,7 @@
 }
 
 .label {
-  font-size: 12px;
+  font-size: var(--fs-sm);
   font-weight: 600;
   color: var(--muted);
   text-transform: uppercase;
@@ -238,12 +172,12 @@
 }
 
 .input {
-  background: var(--bg);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 10px 12px;
   color: var(--text);
-  font-size: 13.5px;
+  font-size: var(--fs-base);
   outline: none;
   transition: border-color 0.2s ease;
 }
@@ -268,7 +202,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--text);
   background: var(--surface-2);
   padding: 4px 8px;
@@ -283,19 +217,19 @@
 
 .submitBtn {
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   border: none;
   padding: 12px;
-  border-radius: 10px;
+  border-radius: var(--btn-radius);
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--fs-base);
   cursor: pointer;
   margin-top: 8px;
   transition: all 0.2s ease;
 }
 
 .submitBtn:hover {
-  background: var(--primary-hover, var(--clr-purple));
+  background: var(--primary-2);
 }
 
 .checkboxDesc {

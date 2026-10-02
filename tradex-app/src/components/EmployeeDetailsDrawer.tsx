@@ -98,7 +98,7 @@ export default function EmployeeDetailsDrawer({
                 alignItems: "center",
                 justifyContent: "center",
                 fontWeight: 800,
-                fontSize: "15px",
+                fontSize: "var(--fs-lg)",
                 letterSpacing: "0.05em",
               }}
             >
@@ -106,22 +106,22 @@ export default function EmployeeDetailsDrawer({
             </div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 800, color: "var(--text)" }}>
+                <h3 style={{ margin: 0, fontSize: "var(--fs-lg)", fontWeight: 800, color: "var(--text)" }}>
                   {employee.fullName || getDisplayName(employee.email)}
                 </h3>
                 <span
                   className={`${styles.statusPill} ${employee.enabled ? styles.statusActive : styles.statusDisabled}`}
-                  style={{ fontSize: "10px", padding: "2px 6px" }}
+                  style={{ fontSize: "var(--fs-xs)", padding: "2px 6px" }}
                 >
                   {employee.enabled ? "Active" : "Disabled"}
                 </span>
               </div>
-              <span style={{ fontSize: "12px", color: "var(--muted)" }}>{employee.email}</span>
+              <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)" }}>{employee.email}</span>
             </div>
           </div>
 
           <button className={adminStyles.drawerCloseBtn} onClick={onClose} title="Close drawer">
-            <Icon name="close" style={{ fontSize: "18px" }} />
+            <Icon name="close" style={{ fontSize: "var(--fs-xl)" }} />
           </button>
         </div>
 
@@ -137,16 +137,16 @@ export default function EmployeeDetailsDrawer({
           }}
         >
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontSize: "10.5px", color: "var(--muted)", textTransform: "uppercase", fontWeight: 700 }}>Account ID</span>
-            <span style={{ fontSize: "13px", fontWeight: 800, color: "var(--text)" }}>#{employee.id}</span>
+            <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", textTransform: "uppercase", fontWeight: 700 }}>Account ID</span>
+            <span style={{ fontSize: "var(--fs-md)", fontWeight: 800, color: "var(--text)" }}>#{employee.id}</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontSize: "10.5px", color: "var(--muted)", textTransform: "uppercase", fontWeight: 700 }}>Assigned Teams</span>
-            <span style={{ fontSize: "13px", fontWeight: 800, color: "var(--clr-indigo)" }}>{(employee.teams || []).length} Squads</span>
+            <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", textTransform: "uppercase", fontWeight: 700 }}>Assigned Teams</span>
+            <span style={{ fontSize: "var(--fs-md)", fontWeight: 800, color: "var(--clr-indigo)" }}>{(employee.teams || []).length} Squads</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontSize: "10.5px", color: "var(--muted)", textTransform: "uppercase", fontWeight: 700 }}>Total Access</span>
-            <span style={{ fontSize: "13px", fontWeight: 800, color: "var(--accent)" }}>{totalEffectivePerms} Perms</span>
+            <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", textTransform: "uppercase", fontWeight: 700 }}>Total Access</span>
+            <span style={{ fontSize: "var(--fs-md)", fontWeight: 800, color: "var(--accent)" }}>{totalEffectivePerms} Perms</span>
           </div>
         </div>
 
@@ -170,14 +170,14 @@ export default function EmployeeDetailsDrawer({
               borderBottom: activeTab === "permissions" ? "2px solid var(--clr-indigo)" : "2px solid transparent",
               color: activeTab === "permissions" ? "var(--clr-indigo)" : "var(--muted)",
               fontWeight: 750,
-              fontSize: "13px",
+              fontSize: "var(--fs-md)",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               gap: "6px",
             }}
           >
-            <Icon name="shield" style={{ fontSize: "15px" }} />
+            <Icon name="shield" style={{ fontSize: "var(--fs-lg)" }} />
             <span>Authorities Matrix ({totalEffectivePerms})</span>
           </button>
 
@@ -191,14 +191,14 @@ export default function EmployeeDetailsDrawer({
               borderBottom: activeTab === "teams" ? "2px solid var(--clr-indigo)" : "2px solid transparent",
               color: activeTab === "teams" ? "var(--clr-indigo)" : "var(--muted)",
               fontWeight: 750,
-              fontSize: "13px",
+              fontSize: "var(--fs-md)",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               gap: "6px",
             }}
           >
-            <Icon name="groups" style={{ fontSize: "15px" }} />
+            <Icon name="groups" style={{ fontSize: "var(--fs-lg)" }} />
             <span>Assigned Squads ({(employee.teams || []).length})</span>
           </button>
 
@@ -212,14 +212,14 @@ export default function EmployeeDetailsDrawer({
               borderBottom: activeTab === "security" ? "2px solid var(--clr-indigo)" : "2px solid transparent",
               color: activeTab === "security" ? "var(--clr-indigo)" : "var(--muted)",
               fontWeight: 750,
-              fontSize: "13px",
+              fontSize: "var(--fs-md)",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               gap: "6px",
             }}
           >
-            <Icon name="settings" style={{ fontSize: "15px" }} />
+            <Icon name="settings" style={{ fontSize: "var(--fs-lg)" }} />
             <span>Settings & Access</span>
           </button>
         </div>
@@ -230,7 +230,7 @@ export default function EmployeeDetailsDrawer({
           {activeTab === "permissions" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
-                <span style={{ fontSize: "12px", color: "var(--muted)" }}>
+                <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)" }}>
                   Active permissions are ordered at the top. Direct authorities override squad defaults.
                 </span>
               </div>
@@ -267,13 +267,13 @@ export default function EmployeeDetailsDrawer({
                     >
                       <div style={{ display: "flex", flexDirection: "column", gap: "3px", maxWidth: "68%" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <span style={{ fontSize: "13.5px", fontWeight: 750, color: "var(--text)" }}>
+                          <span style={{ fontSize: "var(--fs-base)", fontWeight: 750, color: "var(--text)" }}>
                             {perm.displayName || perm.key}
                           </span>
                           {isDirect && (
                             <span
                               style={{
-                                fontSize: "10px",
+                                fontSize: "var(--fs-xs)",
                                 fontWeight: 800,
                                 padding: "1px 6px",
                                 borderRadius: "4px",
@@ -288,7 +288,7 @@ export default function EmployeeDetailsDrawer({
                           {isInherited && (
                             <span
                               style={{
-                                fontSize: "10px",
+                                fontSize: "var(--fs-xs)",
                                 fontWeight: 800,
                                 padding: "1px 6px",
                                 borderRadius: "4px",
@@ -302,13 +302,13 @@ export default function EmployeeDetailsDrawer({
                           )}
                         </div>
 
-                        <div style={{ fontSize: "11.5px", color: "var(--muted)", lineHeight: 1.4 }}>
+                        <div style={{ fontSize: "var(--fs-sm)", color: "var(--muted)", lineHeight: 1.4 }}>
                           {perm.description || perm.key}
                         </div>
 
                         {isInherited && (
-                          <div style={{ fontSize: "11px", color: "var(--accent)", display: "flex", alignItems: "center", gap: "4px", marginTop: "2px" }}>
-                            <Icon name="link" style={{ fontSize: "13px" }} />
+                          <div style={{ fontSize: "var(--fs-xs)", color: "var(--accent)", display: "flex", alignItems: "center", gap: "4px", marginTop: "2px" }}>
+                            <Icon name="link" style={{ fontSize: "var(--fs-md)" }} />
                             <span>Granted via squad: {sources.join(", ")}</span>
                           </div>
                         )}
@@ -324,7 +324,7 @@ export default function EmployeeDetailsDrawer({
                             style={{
                               padding: "6px 12px",
                               borderRadius: "6px",
-                              fontSize: "11.5px",
+                              fontSize: "var(--fs-sm)",
                               fontWeight: 750,
                               border: "1px solid var(--danger-border)",
                               background: "var(--danger-bg)",
@@ -338,7 +338,7 @@ export default function EmployeeDetailsDrawer({
                             style={{
                               padding: "6px 12px",
                               borderRadius: "6px",
-                              fontSize: "11.5px",
+                              fontSize: "var(--fs-sm)",
                               fontWeight: 750,
                               border: "1px solid var(--warning-border)",
                               background: "var(--warning-bg)",
@@ -348,7 +348,7 @@ export default function EmployeeDetailsDrawer({
                               gap: "4px",
                             }}
                           >
-                            <Icon name="lock" style={{ fontSize: "14px" }} />
+                            <Icon name="lock" style={{ fontSize: "var(--fs-base)" }} />
                             <span>Inherited (Squad)</span>
                           </span>
                         ) : (
@@ -360,7 +360,7 @@ export default function EmployeeDetailsDrawer({
                             style={{
                               padding: "6px 14px",
                               borderRadius: "6px",
-                              fontSize: "12px",
+                              fontSize: "var(--fs-sm)",
                               fontWeight: 750,
                               border: "1px solid var(--success-border)",
                               background: "var(--success-bg)",
@@ -393,7 +393,7 @@ export default function EmployeeDetailsDrawer({
           {/* TAB 2: TEAMS / SQUADS */}
           {activeTab === "teams" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-              <span style={{ fontSize: "12px", color: "var(--muted)" }}>
+              <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)" }}>
                 Assign staff member to functional squads. Squad membership automatically inherits group permissions.
               </span>
 
@@ -414,9 +414,9 @@ export default function EmployeeDetailsDrawer({
                       }}
                     >
                       <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                        <div style={{ fontSize: "14px", fontWeight: 750, color: "var(--text)" }}>{t.name}</div>
-                        <div style={{ fontSize: "11.5px", color: "var(--muted)" }}>{t.description || "No description provided"}</div>
-                        <div style={{ fontSize: "11px", color: "var(--primary)", marginTop: "2px" }}>
+                        <div style={{ fontSize: "var(--fs-base)", fontWeight: 750, color: "var(--text)" }}>{t.name}</div>
+                        <div style={{ fontSize: "var(--fs-sm)", color: "var(--muted)" }}>{t.description || "No description provided"}</div>
+                        <div style={{ fontSize: "var(--fs-xs)", color: "var(--primary-text)", marginTop: "2px" }}>
                           Includes {t.permissions?.length || 0} permissions
                         </div>
                       </div>
@@ -428,14 +428,14 @@ export default function EmployeeDetailsDrawer({
                         style={{
                           padding: "6px 14px",
                           borderRadius: "6px",
-                          fontSize: "12px",
+                          fontSize: "var(--fs-sm)",
                           fontWeight: 750,
                           border: isAssigned ? "1px solid var(--primary-border)" : "1px solid var(--border)",
                           background: isAssigned ? "var(--primary)" : "var(--surface)",
                           color: isAssigned ? "var(--on-primary)" : "var(--text)",
                         }}
                       >
-                        {isAssigned ? "Assigned ✓" : "+ Add to Squad"}
+                        {isAssigned ? "Assigned" : "+ Add to Squad"}
                       </ActionButton>
                     </div>
                   );
@@ -450,11 +450,11 @@ export default function EmployeeDetailsDrawer({
               <div className={adminStyles.drawerSection}>
                 <p className={adminStyles.drawerSectionTitle}>Account Identity</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--fs-md)" }}>
                     <span style={{ color: "var(--muted)" }}>Console Role</span>
                     <span style={{ fontWeight: 700, color: "var(--text)" }}>{employee.role || "EMPLOYEE"}</span>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--fs-md)" }}>
                     <span style={{ color: "var(--muted)" }}>Status</span>
                     <span style={{ fontWeight: 700, color: employee.enabled ? "var(--success)" : "var(--danger)" }}>
                       {employee.enabled ? "Operational" : "Disabled / Suspended"}
@@ -476,17 +476,17 @@ export default function EmployeeDetailsDrawer({
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <Icon name="security" style={{ color: "var(--danger)", fontSize: "18px" }} />
-                    <span style={{ fontSize: "13px", fontWeight: 800, color: "var(--danger)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    <Icon name="security" style={{ color: "var(--danger)", fontSize: "var(--fs-xl)" }} />
+                    <span style={{ fontSize: "var(--fs-md)", fontWeight: 800, color: "var(--danger)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                       Account Suspension & Access Control
                     </span>
                   </div>
 
-                  <p style={{ fontSize: "12px", color: "var(--muted)", margin: 0, lineHeight: 1.5 }}>
+                  <p style={{ fontSize: "var(--fs-sm)", color: "var(--muted)", margin: 0, lineHeight: 1.5 }}>
                     Deactivating this staff member will immediately:
                   </p>
 
-                  <ul style={{ margin: 0, paddingLeft: "18px", fontSize: "12px", color: "var(--muted)", display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <ul style={{ margin: 0, paddingLeft: "18px", fontSize: "var(--fs-sm)", color: "var(--muted)", display: "flex", flexDirection: "column", gap: "4px" }}>
                     <li>Revoke all active console sessions and JWT tokens</li>
                     <li>Freeze direct authorities and squad access</li>
                     <li>Retain all historical audit logs for compliance</li>
@@ -506,7 +506,7 @@ export default function EmployeeDetailsDrawer({
                       background: "var(--danger)",
                       color: "var(--clr-white-a95)",
                       fontWeight: 750,
-                      fontSize: "13px",
+                      fontSize: "var(--fs-md)",
                     }}
                   >
                     Deactivate Staff Account
@@ -524,10 +524,10 @@ export default function EmployeeDetailsDrawer({
                     gap: "10px",
                   }}
                 >
-                  <Icon name="block" style={{ color: "var(--danger)", fontSize: "20px" }} />
+                  <Icon name="block" style={{ color: "var(--danger)", fontSize: "var(--fs-2xl)" }} />
                   <div>
-                    <div style={{ fontSize: "13px", fontWeight: 750, color: "var(--text)" }}>Account is currently deactivated</div>
-                    <div style={{ fontSize: "11.5px", color: "var(--muted)" }}>This staff member cannot log in or perform system operations.</div>
+                    <div style={{ fontSize: "var(--fs-md)", fontWeight: 750, color: "var(--text)" }}>Account is currently deactivated</div>
+                    <div style={{ fontSize: "var(--fs-sm)", color: "var(--muted)" }}>This staff member cannot log in or perform system operations.</div>
                   </div>
                 </div>
               )}

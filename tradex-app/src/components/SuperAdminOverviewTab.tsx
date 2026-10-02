@@ -104,10 +104,10 @@ export default function SuperAdminOverviewTab({
           </div>
 
           <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
-            <span style={{ fontSize: "26px", fontWeight: 800, color: "var(--text)" }}>
+            <span style={{ fontSize: "var(--fs-4xl)", fontWeight: 800, color: "var(--text)" }}>
               {metricsLoading ? <LoadingState compact /> : (dashboardMetrics?.totalUsers ?? 0).toLocaleString()}
             </span>
-            <span style={{ fontSize: "12px", color: "var(--muted)", fontWeight: 500 }}>registered accounts</span>
+            <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)", fontWeight: 500 }}>registered accounts</span>
           </div>
 
           {(() => {
@@ -126,10 +126,10 @@ export default function SuperAdminOverviewTab({
 
                 <div className={overviewStyles.txBreakdownGrid}>
                   <div className={overviewStyles.txBreakdownItem}>
-                    <span className={overviewStyles.txBreakdownLabel} style={{ color: "var(--primary)" }}>
+                    <span className={overviewStyles.txBreakdownLabel} style={{ color: "var(--primary-text)" }}>
                       ● New Signups
                     </span>
-                    <span className={overviewStyles.txBreakdownValue} style={{ color: "var(--primary)" }}>
+                    <span className={overviewStyles.txBreakdownValue} style={{ color: "var(--primary-text)" }}>
                       {metricsLoading ? <LoadingState compact /> : `+${newRegs}`}
                     </span>
                     <span className={overviewStyles.txBreakdownCount}>Selected period</span>
@@ -164,9 +164,9 @@ export default function SuperAdminOverviewTab({
             </div>
             <span className={styles.telemetryLabel}>Transaction Volumes</span>
           </div>
-          <div style={{ fontSize: "22px", fontWeight: 800, color: "var(--text)" }}>
+          <div style={{ fontSize: "var(--fs-3xl)", fontWeight: 800, color: "var(--text)" }}>
             {metricsLoading ? <LoadingState compact /> : `₹${totalVolume.toLocaleString()}`}
-            <span style={{ fontSize: "12px", color: "var(--muted)", fontWeight: 400, marginLeft: "6px" }}>total volume</span>
+            <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)", fontWeight: 400, marginLeft: "6px" }}>total volume</span>
           </div>
 
           <div className={overviewStyles.txDistContainer}>
@@ -212,10 +212,10 @@ export default function SuperAdminOverviewTab({
             <span className={styles.telemetryLabel}>Support & Operations</span>
           </div>
           <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
-            <span style={{ fontSize: "26px", fontWeight: 800, color: openTicketsCount > 0 ? "var(--warning)" : "var(--success)" }}>
+            <span style={{ fontSize: "var(--fs-4xl)", fontWeight: 800, color: openTicketsCount > 0 ? "var(--warning)" : "var(--success)" }}>
               {metricsLoading ? <LoadingState compact /> : openTicketsCount}
             </span>
-            <span style={{ fontSize: "12px", color: "var(--muted)", fontWeight: 500 }}>active tickets in queue</span>
+            <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)", fontWeight: 500 }}>active tickets in queue</span>
           </div>
 
           {(() => {
@@ -278,7 +278,7 @@ export default function SuperAdminOverviewTab({
                 <span className={`${overviewStyles.healthStatusDot} ${healthLoading ? overviewStyles.healthDotWarning : systemHealth?.databaseOperational !== false ? overviewStyles.healthDotOperational : overviewStyles.healthDotDanger}`} />
                 API & Database
               </span>
-              <span style={{ fontSize: "11.5px", color: healthLoading ? "var(--warning)" : systemHealth?.databaseOperational !== false ? "var(--success)" : "var(--danger)", fontWeight: 600 }}>
+              <span style={{ fontSize: "var(--fs-sm)", color: healthLoading ? "var(--warning)" : systemHealth?.databaseOperational !== false ? "var(--success)" : "var(--danger)", fontWeight: 600 }}>
                 {healthLoading ? "Checking..." : systemHealth?.databaseOperational !== false ? "Operational" : "Degraded"}
               </span>
             </div>
@@ -287,7 +287,7 @@ export default function SuperAdminOverviewTab({
                 <span className={`${overviewStyles.healthStatusDot} ${healthLoading ? overviewStyles.healthDotWarning : systemHealth?.storageOperational ? overviewStyles.healthDotOperational : overviewStyles.healthDotDanger}`} />
                 Image Storage ({(systemHealth?.storageProvider?.split(" ")[0]) || "Local"})
               </span>
-              <span style={{ fontSize: "11.5px", color: healthLoading ? "var(--warning)" : systemHealth?.storageOperational ? "var(--success)" : "var(--danger)", fontWeight: 600 }}>
+              <span style={{ fontSize: "var(--fs-sm)", color: healthLoading ? "var(--warning)" : systemHealth?.storageOperational ? "var(--success)" : "var(--danger)", fontWeight: 600 }}>
                 {healthLoading ? "Checking..." : systemHealth?.storageOperational ? "Operational" : "Offline / Unconfigured"}
               </span>
             </div>
@@ -296,11 +296,11 @@ export default function SuperAdminOverviewTab({
                 <span className={`${overviewStyles.healthStatusDot} ${overviewStyles.healthDotOperational}`} />
                 Real-Time Sync Engine
               </span>
-              <span style={{ fontSize: "11.5px", color: "var(--success)", fontWeight: 600 }}>Active (15s)</span>
+              <span style={{ fontSize: "var(--fs-sm)", color: "var(--success)", fontWeight: 600 }}>Active (15s)</span>
             </div>
             <div className={overviewStyles.healthItem}>
               <span className={overviewStyles.healthLabel}>
-                <Icon name="stars" style={{ color: "var(--accent)", fontSize: "14px", marginRight: "4px" }} />
+                <Icon name="stars" style={{ color: "var(--accent)", fontSize: "var(--fs-base)", marginRight: "4px" }} />
                 Minted Pool
               </span>
               <span className={overviewStyles.cardSubMetricValue} style={{ color: "var(--accent)" }}>
@@ -327,7 +327,7 @@ export default function SuperAdminOverviewTab({
       />
 
       {/* ── 6. Developer Tools ── */}
-      {currentUser.role === "SUPER_ADMIN" && (
+      {currentUser.role === "SUPER_ADMIN" && import.meta.env.DEV && (
         <DevToolsPanel
           onSeedTestData={() => seedMutation.mutate()}
           isPending={seedMutation.isPending}

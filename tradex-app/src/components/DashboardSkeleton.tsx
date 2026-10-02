@@ -24,16 +24,6 @@ export default function DashboardSkeleton() {
           <div className={`${styles.skeleton} ${styles.skeletonBar}`} style={{ width: "320px", height: "15px" }} />
         </div>
 
-        <div className={styles.tickerRow}>
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className={styles.tickerCard} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <div className={`${styles.skeleton} ${styles.skeletonBar}`} style={{ width: "60px", height: "10px" }} />
-              <div className={`${styles.skeleton} ${styles.skeletonBar}`} style={{ width: "100px", height: "20px" }} />
-              <div className={`${styles.skeleton} ${styles.skeletonBar}`} style={{ width: "40px", height: "12px" }} />
-            </div>
-          ))}
-        </div>
-
         <div className={styles.grid}>
           {[1, 2, 3].map((i) => (
             <div key={i} className={styles.skeletonCard} style={{ display: "flex", flexDirection: "column" }}>

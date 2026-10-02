@@ -17,16 +17,16 @@ export default function DevToolsPanel({ onSeedTestData, isPending }: DevToolsPan
         onClick={() => setShowDevTools(!showDevTools)}
         className={overviewStyles.devToolsToggle}
       >
-        <Icon name={showDevTools ? "expand_less" : "expand_more"} style={{ fontSize: "16px" }} />
+        <Icon name={showDevTools ? "expand_less" : "expand_more"} style={{ fontSize: "var(--fs-lg)" }} />
         Developer Tools (Dev Mode Only)
       </button>
       {showDevTools && (
         <div className={`${styles.fadeInContainer} ${overviewStyles.devToolsPanel}`}>
           <h4 className={overviewStyles.dangerZoneTitle} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <Icon name="database" style={{ fontSize: "16px" }} />
+            <Icon name="database" style={{ fontSize: "var(--fs-lg)" }} />
             Database Reset & Seeding Environment
           </h4>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: "13px", lineHeight: 1.5 }}>
+          <p style={{ margin: 0, color: "var(--muted)", fontSize: "var(--fs-md)", lineHeight: 1.5 }}>
             Reset & Seed Test Data: This will wipe all test transactions, audit logs, and test accounts (u1–u5), repopulating the database with synchronized test telemetry.
           </p>
           <button
@@ -34,7 +34,7 @@ export default function DevToolsPanel({ onSeedTestData, isPending }: DevToolsPan
             disabled={isPending}
             className={overviewStyles.dangerZoneBtn}
           >
-            {isPending ? "Seeding..." : "⚡ Reset & Seed Test Data"}
+            {isPending ? "Seeding..." : "Reset & Seed Test Data"}
           </button>
         </div>
       )}

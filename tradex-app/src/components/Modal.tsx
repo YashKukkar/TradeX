@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import styles from "./Modal.module.css";
 import Icon from "./Icon";
 import { useRegisterOverlay } from "../context/OverlayContext";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 
 interface ModalProps {
   isOpen: boolean;
@@ -23,6 +24,9 @@ export default function Modal({
   closeBtnRef,
   children,
 }: ModalProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, isOpen);
+
   useRegisterOverlay("modal-" + (typeof title === "string" ? title.toLowerCase().replace(/\s+/g, "-") : "generic"), isOpen);
 
   useEffect(() => {
@@ -59,7 +63,7 @@ export default function Modal({
 
   return createPortal(
     <div className={styles.overlay} onClick={handleOverlayClick}>
-      <div className={modalClass} role="dialog" aria-modal="true">
+      <div ref={dialogRef} className={modalClass} role="dialog" aria-modal="true">
         <button
           ref={closeBtnRef}
           className={styles.closeBtn}

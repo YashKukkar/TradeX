@@ -60,10 +60,10 @@ const BASE_COLUMNS: ColumnDef<PendingTransaction>[] = [
     width: "170px",
     render: (t) => (
       <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-        <span style={{ fontWeight: 600, fontSize: "14px", color: "var(--text)", lineHeight: 1.2 }}>
+        <span style={{ fontWeight: 600, fontSize: "var(--fs-base)", color: "var(--text)", lineHeight: 1.2 }}>
           {getDisplayName(t.userEmail)}
         </span>
-        <span style={{ fontSize: "12px", color: "var(--muted)" }}>
+        <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)" }}>
           {t.userEmail}
         </span>
       </div>
@@ -82,7 +82,7 @@ const BASE_COLUMNS: ColumnDef<PendingTransaction>[] = [
     label: "Amount",
     width: "160px",
     render: (t) => (
-      <span style={{ fontWeight: 700, fontSize: "14px", color: "var(--text)" }}>
+      <span style={{ fontWeight: 700, fontSize: "var(--fs-base)", color: "var(--text)" }}>
         ₹{t.amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </span>
     ),
@@ -96,7 +96,7 @@ const BASE_COLUMNS: ColumnDef<PendingTransaction>[] = [
         alignItems: "center",
         padding: "4px 10px",
         borderRadius: "999px",
-        fontSize: "11px",
+        fontSize: "var(--fs-xs)",
         fontWeight: 700,
         textTransform: "uppercase",
         ...statusStyle(t.status),
@@ -115,7 +115,7 @@ const BASE_COLUMNS: ColumnDef<PendingTransaction>[] = [
       return (
         <span
           title={tooltip}
-          style={{ fontSize: "13px", color: "var(--text)", cursor: tooltip ? "help" : "default" }}
+          style={{ fontSize: "var(--fs-md)", color: "var(--text)", cursor: tooltip ? "help" : "default" }}
         >
           {formatDateTime(t.createdAt)}
         </span>
@@ -131,7 +131,7 @@ const BASE_COLUMNS: ColumnDef<PendingTransaction>[] = [
         whiteSpace: "nowrap",
         overflow: "hidden",
         textOverflow: "ellipsis",
-        fontSize: "13px",
+        fontSize: "var(--fs-md)",
         color: "var(--muted)",
       }}>
         {t.notes || "—"}
@@ -189,7 +189,7 @@ export default function PendingTransactionsRegistry({ user }: PendingTransaction
 
       if (noDepositPerm || noWithdrawPerm) {
         return (
-          <span style={{ fontSize: "12px", color: "var(--muted)", fontStyle: "italic" }}>
+          <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)", fontStyle: "italic" }}>
             No permission
           </span>
         );
@@ -199,7 +199,7 @@ export default function PendingTransactionsRegistry({ user }: PendingTransaction
       if (procType) {
         return (
           <div className={styles.processingCellText}>
-            <Icon name="sync" className={styles.spinnerRotate} style={{ fontSize: "16px" }} />
+            <Icon name="sync" className={styles.spinnerRotate} style={{ fontSize: "var(--fs-lg)" }} />
             {procType === "approve" ? "Approving..." : "Rejecting..."}
           </div>
         );
@@ -212,7 +212,7 @@ export default function PendingTransactionsRegistry({ user }: PendingTransaction
             onClick={(e) => { e.stopPropagation(); handleApprove(t.id); }}
             disabled={approveMutationPending}
           >
-            <Icon name="check_circle" style={{ fontSize: "15px" }} />
+            <Icon name="check_circle" style={{ fontSize: "var(--fs-lg)" }} />
             Approve
           </button>
           <button
@@ -220,7 +220,7 @@ export default function PendingTransactionsRegistry({ user }: PendingTransaction
             onClick={(e) => { e.stopPropagation(); handleRejectClick(t.id); }}
             disabled={approveMutationPending || rejectMutationPending}
           >
-            <Icon name="cancel" style={{ fontSize: "15px" }} />
+            <Icon name="cancel" style={{ fontSize: "var(--fs-lg)" }} />
             Reject
           </button>
         </div>
@@ -251,7 +251,7 @@ export default function PendingTransactionsRegistry({ user }: PendingTransaction
                   border: "none",
                   color: activeTab === tab ? "var(--primary)" : "var(--muted)",
                   fontWeight: 700,
-                  fontSize: "14px",
+                  fontSize: "var(--fs-base)",
                   cursor: "pointer",
                   padding: "8px 18px",
                   borderBottom: activeTab === tab ? "2px solid var(--primary)" : "2px solid transparent",
@@ -262,7 +262,7 @@ export default function PendingTransactionsRegistry({ user }: PendingTransaction
               >
                 {tab === "pending"
                   ? `Pending (${pendingTransactionsCount})`
-                  : `All Transactions (${allLoading && allTransactionsCount === 0 ? "..." : allTransactionsCount})`}
+                  : `All Transactions (${allLoading && !allTransactionsCount ? "..." : (allTransactionsCount ?? 0)})`}
               </button>
             ))}
           </div>
@@ -270,7 +270,7 @@ export default function PendingTransactionsRegistry({ user }: PendingTransaction
           {/* Right side tools: Fuzzy Search Box + Export CSV ActionButton */}
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <div className={styles.searchBox} style={{ padding: "6px 12px" }}>
-              <Icon name="search" className={styles.searchIcon} style={{ fontSize: "16px" }} />
+              <Icon name="search" className={styles.searchIcon} style={{ fontSize: "var(--fs-lg)" }} />
               <label htmlFor="transactionSearch" style={{ display: "none" }}>Search Transactions</label>
               <input
                 id="transactionSearch"
@@ -280,7 +280,7 @@ export default function PendingTransactionsRegistry({ user }: PendingTransaction
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={styles.searchInput}
-                style={{ fontSize: "13px", width: "220px" }}
+                style={{ fontSize: "var(--fs-md)", width: "220px" }}
               />
             </div>
             {/* Shared Export Button Helper */}
@@ -295,10 +295,10 @@ export default function PendingTransactionsRegistry({ user }: PendingTransaction
                   style={{
                     background: "var(--primary-bg)",
                     border: "1px solid var(--primary-border)",
-                    color: "var(--primary)",
+                    color: "var(--primary-text)",
                     padding: "6px 12px",
                     borderRadius: "6px",
-                    fontSize: "12.5px",
+                    fontSize: "var(--fs-md)",
                     fontWeight: 700,
                   }}
                   title={`Export ${label} report to CSV`}

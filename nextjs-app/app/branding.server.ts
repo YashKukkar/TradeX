@@ -19,11 +19,11 @@ export function loadServerBranding(): BrandConfig {
 
         return {
           appName,
-          brandPrefix: b.brandPrefix || (b.appName ? b.appName : "Trade"),
-          accentText: b.accentText !== undefined ? b.accentText : (b.appName ? "" : "X"),
-          pointsName: b.pointsName || "TradeX Points",
+          brandPrefix: b.brandPrefix || "Trade",
+          accentText: b.accentText !== undefined ? b.accentText : "Nows",
+          pointsName: b.pointsName || "TradeNows Points",
           supportEmail: b.supportEmail || "support@tradenows.com",
-          legalName: b.legalName || "TradeX Technologies Ltd",
+          legalName: b.legalName || "TradeNows",
           assetVersion: version,
           logoUrl: `/branding/logo.svg?v=${version}`,
           faviconUrl: `/branding/favicon.svg?v=${version}`,

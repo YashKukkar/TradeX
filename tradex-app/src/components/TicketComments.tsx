@@ -86,7 +86,7 @@ export default function TicketComments({
       for (let i = 0; i < email.length; i++) {
         hash = email.charCodeAt(i) + ((hash << 5) - hash);
       }
-      const colors = ["var(--primary)", "var(--success)", "var(--warning)", "var(--danger)"];
+      const colors = ["var(--primary)", "var(--success)", "var(--warning)", "var(--info)"];
       return colors[Math.abs(hash) % colors.length];
     };
 
@@ -111,8 +111,8 @@ export default function TicketComments({
     return (
       <div className={styles.timelineThread}>
         {comments.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "40px 20px", color: "var(--muted)", fontSize: "14px" }}>
-            <Icon name="forum" style={{ fontSize: "36px", marginBottom: "8px", color: "var(--border)" }} />
+          <div style={{ textAlign: "center", padding: "40px 20px", color: "var(--muted)", fontSize: "var(--fs-base)" }}>
+            <Icon name="forum" style={{ fontSize: "var(--fs-6xl)", marginBottom: "8px", color: "var(--border)" }} />
             <p>No comments yet. Type in the box below to start the conversation.</p>
           </div>
         ) : (
@@ -222,7 +222,7 @@ export default function TicketComments({
               </ActionButton>
             </div>
             {reopenCount >= 2 && (
-              <span style={{ fontSize: "12px", color: "var(--danger)", textAlign: "center" }}>
+              <span style={{ fontSize: "var(--fs-sm)", color: "var(--danger)", textAlign: "center" }}>
                 This ticket has been reopened 2 times. You must close this ticket and raise a new one if you still need help.
               </span>
             )}
@@ -231,7 +231,7 @@ export default function TicketComments({
 
         {ticketStatus === "CLOSED" && (
           <div className={styles.closedNotice}>
-            <Icon name="lock" style={{ fontSize: "16px" }} />
+            <Icon name="lock" style={{ fontSize: "var(--fs-lg)" }} />
             <span>This ticket is closed. Chat is disabled.</span>
           </div>
         )}
@@ -239,7 +239,7 @@ export default function TicketComments({
         {ticketStatus !== "RESOLVED" && ticketStatus !== "CLOSED" && (
           <form onSubmit={handleSubmit} className={styles.unifiedInputBox}>
             {(errorMsg || validationError) && (
-              <div style={{ color: "var(--danger)", padding: "8px 12px", borderRadius: "6px", background: "rgba(255, 90, 106, 0.1)", fontSize: "12px", border: "1px solid rgba(255, 90, 106, 0.15)", marginBottom: "8px" }}>
+              <div style={{ color: "var(--danger)", padding: "8px 12px", borderRadius: "6px", background: "var(--clr-red-a10)", fontSize: "var(--fs-sm)", border: "1px solid var(--clr-red-a15)", marginBottom: "8px" }}>
                 {errorMsg || validationError}
               </div>
             )}
@@ -275,11 +275,11 @@ export default function TicketComments({
                           style={{ width: "100%", height: "100%", borderRadius: "4px", objectFit: "cover" }}
                         />
                       ) : (
-                        <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.15)", borderRadius: "4px" }}>
-                          <Icon name="insert_drive_file" style={{ fontSize: "18px", color: "var(--muted)" }} />
+                        <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--clr-black-a08)", borderRadius: "4px" }}>
+                          <Icon name="insert_drive_file" style={{ fontSize: "var(--fs-xl)", color: "var(--muted)" }} />
                         </div>
                       )}
-                      <button
+                      <button aria-label="Remove attachment"
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -290,7 +290,7 @@ export default function TicketComments({
                           top: "-4px",
                           right: "-4px",
                           background: "var(--danger)",
-                          color: "var(--text)",
+                          color: "var(--on-primary)",
                           border: "none",
                           borderRadius: "50%",
                           width: "14px",
@@ -301,7 +301,7 @@ export default function TicketComments({
                           cursor: "pointer"
                         }}
                       >
-                        <Icon name="close" style={{ fontSize: "8px" }} />
+                        <Icon name="close" style={{ fontSize: "var(--fs-xs)" }} />
                       </button>
                     </div>
                   );
@@ -317,7 +317,7 @@ export default function TicketComments({
                   const isLimitReached = remainingAllowed <= 0;
                   return (
                     <label className={styles.attachButtonLabel}>
-                      <Icon name="attach_file" style={{ fontSize: "15px" }} />
+                      <Icon name="attach_file" style={{ fontSize: "var(--fs-lg)" }} />
                       <span>{isLimitReached ? "Limit Reached" : "Attach"}</span>
                       <input
                         type="file"
@@ -361,7 +361,7 @@ export default function TicketComments({
                   );
                 })()}
                 {!isAdmin && selectedFiles.length > 0 && (
-                  <span style={{ fontSize: "11px", color: "var(--success)", fontWeight: "600" }}>
+                  <span style={{ fontSize: "var(--fs-xs)", color: "var(--success)", fontWeight: "600" }}>
                     {selectedFiles.length} file(s)
                   </span>
                 )}

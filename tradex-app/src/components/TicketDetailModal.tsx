@@ -93,8 +93,8 @@ export default function TicketDetailModal({ isOpen, onClose, ticketId, isAdmin }
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px" }}>
         <div>
-          <p className={styles.infoSectionTitle} style={{ fontSize: "11px" }}>Issue Summary</p>
-          <h3 style={{ margin: "4px 0 0 0", fontSize: "16px", color: "var(--text)", fontWeight: 700 }}>
+          <p className={styles.infoSectionTitle} style={{ fontSize: "var(--fs-xs)" }}>Issue Summary</p>
+          <h3 style={{ margin: "4px 0 0 0", fontSize: "var(--fs-lg)", color: "var(--text)", fontWeight: 700 }}>
             {ticket.subject}
           </h3>
         </div>
@@ -106,7 +106,7 @@ export default function TicketDetailModal({ isOpen, onClose, ticketId, isAdmin }
             color: "var(--text)",
             borderRadius: "6px",
             padding: "4px 8px",
-            fontSize: "11px",
+            fontSize: "var(--fs-xs)",
             fontWeight: 600,
             cursor: "pointer",
             display: "flex",
@@ -115,12 +115,12 @@ export default function TicketDetailModal({ isOpen, onClose, ticketId, isAdmin }
           }}
         >
           <span>{descExpanded ? "Show Less" : "Show More"}</span>
-          <Icon name={descExpanded ? "expand_less" : "expand_more"} style={{ fontSize: "14px" }} />
+          <Icon name={descExpanded ? "expand_less" : "expand_more"} style={{ fontSize: "var(--fs-base)" }} />
         </button>
       </div>
 
       <div style={{
-        fontSize: "13.5px",
+        fontSize: "var(--fs-base)",
         color: "var(--text)",
         lineHeight: "1.5",
         whiteSpace: "pre-line",
@@ -216,20 +216,20 @@ export default function TicketDetailModal({ isOpen, onClose, ticketId, isAdmin }
                       </div>
                       <div style={{ flex: 1, paddingBottom: "20px" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "8px" }}>
-                          <span style={{ fontWeight: "700", color: "var(--text)", fontSize: "14px" }}>
+                          <span style={{ fontWeight: "700", color: "var(--text)", fontSize: "var(--fs-base)" }}>
                             {h.action.replace(/_/g, " ")}
                           </span>
-                          <span style={{ fontSize: "11px", color: "var(--muted)" }}>
+                          <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)" }}>
                             {formatDateTime(h.createdAt)}
                           </span>
                         </div>
-                        <p style={{ margin: "6px 0", color: "var(--muted)", fontSize: "13px", lineHeight: "1.4" }}>
+                        <p style={{ margin: "6px 0", color: "var(--muted)", fontSize: "var(--fs-md)", lineHeight: "1.4" }}>
                           {h.details}
                         </p>
                         {h.performedBy && (
-                          <div style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "11px" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "var(--fs-xs)" }}>
                             <span style={{ color: "var(--muted)" }}>By:</span>
-                            <span style={{ color: "var(--primary)", fontWeight: "600" }}>{h.performedBy}</span>
+                            <span style={{ color: "var(--primary-text)", fontWeight: "600" }}>{h.performedBy}</span>
                           </div>
                         )}
                       </div>
@@ -252,7 +252,7 @@ export default function TicketDetailModal({ isOpen, onClose, ticketId, isAdmin }
   const composerSection = ticket && (
     <div style={{
       borderTop: "1px solid var(--border)",
-      background: "var(--bg-2)",
+      background: "var(--bg)",
       padding: "16px 24px",
       boxSizing: "border-box",
       flexShrink: 0

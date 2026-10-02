@@ -138,13 +138,13 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
     >
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         {errorMsg && (
-          <div style={{ color: "var(--danger)", padding: "10px", borderRadius: "8px", background: "rgba(255, 90, 106, 0.1)", fontSize: "14px", border: "1px solid rgba(255, 90, 106, 0.15)" }}>
+          <div style={{ color: "var(--danger)", padding: "10px", borderRadius: "8px", background: "var(--clr-red-a10)", fontSize: "var(--fs-base)", border: "1px solid var(--clr-red-a15)" }}>
             {errorMsg}
           </div>
         )}
 
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-          <label style={{ fontSize: "14px", color: "var(--muted)" }}>Category</label>
+          <label style={{ fontSize: "var(--fs-base)", color: "var(--muted)" }}>Category</label>
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -154,7 +154,7 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
               border: "1px solid var(--border)",
               borderRadius: "10px",
               color: "var(--text)",
-              fontSize: "14px",
+              fontSize: "var(--fs-base)",
               outline: "none"
             }}
           >
@@ -167,7 +167,7 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-          <label style={{ fontSize: "14px", color: "var(--muted)" }}>Subject</label>
+          <label style={{ fontSize: "var(--fs-base)", color: "var(--muted)" }}>Subject</label>
           <input
             type="text"
             placeholder="Brief summary of the issue"
@@ -179,7 +179,7 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
               border: "1px solid var(--border)",
               borderRadius: "10px",
               color: "var(--text)",
-              fontSize: "14px",
+              fontSize: "var(--fs-base)",
               outline: "none"
             }}
             maxLength={200}
@@ -187,7 +187,7 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-          <label style={{ fontSize: "14px", color: "var(--muted)" }}>Description</label>
+          <label style={{ fontSize: "var(--fs-base)", color: "var(--muted)" }}>Description</label>
           <textarea
             placeholder="Describe your issue in detail..."
             value={description}
@@ -198,7 +198,7 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
               border: "1px solid var(--border)",
               borderRadius: "10px",
               color: "var(--text)",
-              fontSize: "14px",
+              fontSize: "var(--fs-base)",
               outline: "none",
               minHeight: "120px",
               resize: "vertical"
@@ -209,7 +209,7 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
 
         {/* Drag & Drop File Upload Area */}
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-          <label style={{ fontSize: "14px", color: "var(--muted)" }}>Attachments (Max 5, JPEG/PNG under 5MB)</label>
+          <label style={{ fontSize: "var(--fs-base)", color: "var(--muted)" }}>Attachments (Max 5, JPEG/PNG under 5MB)</label>
 
           <div
             onDragEnter={handleDrag}
@@ -219,7 +219,7 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
             onClick={() => fileInputRef.current?.click()}
             style={{
               padding: "24px",
-              background: dragActive ? "rgba(0, 224, 164, 0.05)" : "var(--surface-2)",
+              background: dragActive ? "var(--brand-a05)" : "var(--surface-2)",
               border: dragActive ? "2px dashed var(--primary)" : "2px dashed var(--border)",
               borderRadius: "12px",
               textAlign: "center",
@@ -239,9 +239,9 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
               accept="image/png, image/jpeg"
               onChange={handleFileChange}
             />
-            <Icon name="cloud_upload" style={{ fontSize: "32px", color: "var(--primary)" }} />
-            <p style={{ margin: 0, fontSize: "14px" }}>
-              Drag and drop screenshots here, or <span style={{ color: "var(--primary)", fontWeight: "500" }}>browse</span>
+            <Icon name="cloud_upload" style={{ fontSize: "var(--fs-5xl)", color: "var(--primary-text)" }} />
+            <p style={{ margin: 0, fontSize: "var(--fs-base)" }}>
+              Drag and drop screenshots here, or <span style={{ color: "var(--primary-text)", fontWeight: "500" }}>browse</span>
             </p>
           </div>
 
@@ -258,7 +258,7 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
                     borderRadius: "8px",
                     overflow: "hidden",
                     border: "1px solid var(--border)",
-                    background: "var(--bg-2)"
+                    background: "var(--surface-2)"
                   }}
                 >
                   <img
@@ -266,7 +266,7 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
                     alt="preview"
                     style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   />
-                  <button
+                  <button aria-label="Remove attachment"
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -276,9 +276,9 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
                       position: "absolute",
                       top: "4px",
                       right: "4px",
-                      background: "rgba(255, 90, 106, 0.8)",
+                      background: "var(--clr-red-a80)",
                       border: "none",
-                      color: "white",
+                      color: "var(--on-primary)",
                       width: "20px",
                       height: "20px",
                       borderRadius: "50%",
@@ -286,10 +286,10 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: "12px"
+                      fontSize: "var(--fs-sm)"
                     }}
                   >
-                    <Icon name="close" style={{ fontSize: "14px" }} />
+                    <Icon name="close" style={{ fontSize: "var(--fs-base)" }} />
                   </button>
                 </div>
               ))}
@@ -304,7 +304,7 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
             marginTop: "8px",
             padding: "14px",
             background: "var(--primary)",
-            color: "var(--bg)",
+            color: "var(--on-primary)",
             border: "none",
             borderRadius: "10px",
             fontWeight: "600",
@@ -325,7 +325,7 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
                   display: inline-block;
                   width: 14px;
                   height: 14px;
-                  border: 2px solid rgba(255, 255, 255, 0.2);
+                  border: 2px solid var(--clr-white-a20);
                   border-top-color: currentColor;
                   border-radius: 50%;
                   animation: create-ticket-spin 0.8s linear infinite;
@@ -338,7 +338,7 @@ export default function CreateTicketModal({ isOpen, onClose, onSuccess }: Create
           ) : (
             <>
               <span>Raise Ticket</span>
-              <Icon name="send" style={{ fontSize: "18px" }} />
+              <Icon name="send" style={{ fontSize: "var(--fs-xl)" }} />
             </>
           )}
         </button>

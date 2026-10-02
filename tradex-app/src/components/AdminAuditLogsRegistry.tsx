@@ -42,7 +42,7 @@ const BASE_COLUMNS: ColumnDef<AuditLogItem>[] = [
       <span
         style={{
           whiteSpace: "nowrap",
-          fontSize: "12px",
+          fontSize: "var(--fs-sm)",
           fontWeight: 450,
           color: "var(--text)",
           fontVariantNumeric: "tabular-nums",
@@ -62,7 +62,7 @@ const BASE_COLUMNS: ColumnDef<AuditLogItem>[] = [
       return (
         <span
           style={{
-            fontSize: "12px",
+            fontSize: "var(--fs-sm)",
             fontWeight: 650,
             color: isSuper ? "var(--primary)" : "var(--text)",
             display: "block",
@@ -94,7 +94,7 @@ const BASE_COLUMNS: ColumnDef<AuditLogItem>[] = [
       <span
         className={styles.userEmail}
         style={{
-          fontSize: "12px",
+          fontSize: "var(--fs-sm)",
           display: "block",
           overflow: "hidden",
           textOverflow: "ellipsis",
@@ -119,7 +119,7 @@ const BASE_COLUMNS: ColumnDef<AuditLogItem>[] = [
           {(isCurrency || isPoints) && (
             <span
               style={{
-                fontSize: "10px",
+                fontSize: "var(--fs-xs)",
                 fontWeight: 800,
                 padding: "1px 5px",
                 borderRadius: "3px",
@@ -135,7 +135,7 @@ const BASE_COLUMNS: ColumnDef<AuditLogItem>[] = [
           )}
           <span
             style={{
-              fontSize: "12px",
+              fontSize: "var(--fs-sm)",
               fontWeight: 500,
               color: "var(--text)",
               lineHeight: 1.4,
@@ -223,12 +223,12 @@ export default function AdminAuditLogsRegistry({
           <h2 className={styles.tableTitle} style={{ margin: 0 }}>System Audit Logs</h2>
           <span
             style={{
-              fontSize: "11px",
+              fontSize: "var(--fs-xs)",
               fontWeight: 750,
               padding: "2px 8px",
               borderRadius: "10px",
               background: "var(--surface-2)",
-              color: "var(--primary)",
+              color: "var(--primary-text)",
               border: "1px solid var(--border)",
             }}
           >
@@ -244,10 +244,10 @@ export default function AdminAuditLogsRegistry({
           style={{
             background: "var(--primary-bg)",
             border: "1px solid var(--primary-border)",
-            color: "var(--primary)",
+            color: "var(--primary-text)",
             padding: "6px 14px",
             borderRadius: "6px",
-            fontSize: "12.5px",
+            fontSize: "var(--fs-md)",
             fontWeight: 700,
           }}
           title="Export all system audit logs to CSV"
@@ -285,7 +285,7 @@ export default function AdminAuditLogsRegistry({
               maxWidth: "320px",
             }}
           >
-            <Icon name="search" style={{ fontSize: "16px", color: "var(--muted)" }} />
+            <Icon name="search" style={{ fontSize: "var(--fs-lg)", color: "var(--muted)" }} />
             <input
               type="text"
               placeholder="Search actor, target, or details..."
@@ -296,7 +296,7 @@ export default function AdminAuditLogsRegistry({
                 border: "none",
                 outline: "none",
                 color: "var(--text)",
-                fontSize: "12.5px",
+                fontSize: "var(--fs-md)",
                 width: "100%",
               }}
             />
@@ -306,13 +306,13 @@ export default function AdminAuditLogsRegistry({
                 onClick={() => setSearchQuery("")}
                 style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", padding: 0, display: "flex" }}
               >
-                <Icon name="close" style={{ fontSize: "14px" }} />
+                <Icon name="close" style={{ fontSize: "var(--fs-base)" }} />
               </button>
             )}
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <Icon name="filter_list" style={{ fontSize: "16px", color: "var(--muted)" }} />
+            <Icon name="filter_list" style={{ fontSize: "var(--fs-lg)", color: "var(--muted)" }} />
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
@@ -322,7 +322,7 @@ export default function AdminAuditLogsRegistry({
                 borderRadius: "6px",
                 padding: "6px 10px",
                 color: "var(--text)",
-                fontSize: "12px",
+                fontSize: "var(--fs-sm)",
                 fontWeight: 600,
                 outline: "none",
                 cursor: "pointer",
@@ -347,8 +347,8 @@ export default function AdminAuditLogsRegistry({
             style={{
               background: "none",
               border: "none",
-              color: "var(--primary)",
-              fontSize: "12px",
+              color: "var(--primary-text)",
+              fontSize: "var(--fs-sm)",
               fontWeight: 650,
               cursor: "pointer",
             }}
@@ -380,7 +380,7 @@ export default function AdminAuditLogsRegistry({
               >
                 <Icon name="chevron_left" /> Prev
               </button>
-              <span className={styles.mutedText} style={{ margin: "0 16px", alignSelf: "center", fontSize: "13.5px", fontWeight: 700 }}>
+              <span className={styles.mutedText} style={{ margin: "0 16px", alignSelf: "center", fontSize: "var(--fs-base)", fontWeight: 700 }}>
                 Page {page + 1} of {totalPages}
               </span>
               <button

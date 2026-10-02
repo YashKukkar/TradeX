@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   color: var(--text);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   gap: 16px;
 }
 
@@ -17,7 +17,7 @@
   align-items: center;
   width: 100%;
   padding: 16px;
-  background: var(--bg-2);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   cursor: pointer;
@@ -28,7 +28,6 @@
 .methodBtn:hover {
   background: var(--surface-2);
   border-color: var(--primary);
-  transform: translateY(-2px);
 }
 
 .btnIconWrapper {
@@ -44,12 +43,12 @@
 
 .upiIcon {
   color: var(--accent);
-  font-size: 24px;
+  font-size: var(--fs-3xl);
 }
 
 .cardIcon {
-  color: var(--primary);
-  font-size: 24px;
+  color: var(--primary-text);
+  font-size: var(--fs-3xl);
 }
 
 .btnInfo {
@@ -59,19 +58,19 @@
 }
 
 .btnTitle {
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-weight: 700;
   color: var(--text);
 }
 
 .btnDesc {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--muted);
   margin-top: 2px;
 }
 
 .chevronIcon {
-  font-size: 20px;
+  font-size: var(--fs-2xl);
   color: var(--muted);
 }
 
@@ -82,7 +81,7 @@
 }
 
 .nbTitle {
-  font-size: 11.5px;
+  font-size: var(--fs-sm);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -102,11 +101,11 @@
   align-items: center;
   gap: 8px;
   padding: 12px;
-  background: var(--bg-2);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   font-weight: 600;
   color: var(--text);
   transition: all 0.2s;
@@ -115,7 +114,6 @@
 .bankBtn:hover {
   background: var(--surface-2);
   border-color: var(--primary);
-  transform: translateY(-1px);
 }
 
 .upiContent {
@@ -144,7 +142,7 @@
 }
 
 .qrLabel {
-  font-size: 10.5px;
+  font-size: var(--fs-xs);
   color: var(--lch-neutral-950);
   text-align: center;
   font-weight: 600;
@@ -161,10 +159,10 @@
   width: 100%;
   padding: 12px;
   background: var(--primary);
-  color: lch(7% 12 268);
+  color: var(--on-primary);
   border: none;
-  border-radius: 10px;
-  font-size: 13.5px;
+  border-radius: var(--btn-radius);
+  font-size: var(--fs-base);
   font-weight: 700;
   cursor: pointer;
   text-align: center;
@@ -172,8 +170,7 @@
 }
 
 .upiIntentBtn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--clr-teal-a15);
+  box-shadow: 0 4px 12px var(--brand-a15);
 }
 
 @media (max-width: 768px) {
@@ -209,7 +206,7 @@
 .divider span {
   background: var(--surface);
   padding: 0 10px;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   font-weight: 700;
   color: var(--muted);
   z-index: 1;
@@ -229,7 +226,7 @@
 }
 
 .label {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -237,12 +234,12 @@
 }
 
 .input {
-  background: var(--bg-2);
+  background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
   padding: 12px 14px;
   border-radius: 10px;
-  font-size: 13.5px;
+  font-size: var(--fs-base);
   font-weight: 600;
   transition: all 0.2s ease;
   width: 100%;
@@ -251,9 +248,9 @@
 
 .input:focus {
   outline: none;
-  border-color: var(--primary);
-  background: var(--surface-2);
-  box-shadow: 0 0 0 2px var(--clr-teal-a15);
+  border-color: var(--primary) !important;
+  background: var(--surface);
+  box-shadow: var(--shadow-recessed-focus);
 }
 
 .row {
@@ -274,7 +271,7 @@
   color: var(--muted);
   padding: 12px;
   border-radius: 10px;
-  font-size: 13px;
+  font-size: var(--fs-md);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
@@ -292,16 +289,15 @@
   color: var(--on-primary);
   border: none;
   padding: 12px;
-  border-radius: 10px;
-  font-size: 13px;
+  border-radius: var(--btn-radius);
+  font-size: var(--fs-md);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .submitBtn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--clr-teal-a15);
+  box-shadow: 0 4px 12px var(--brand-a15);
 }
 
 .error {
@@ -310,7 +306,7 @@
   color: var(--clr-red);
   padding: 8px 12px;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   font-weight: 600;
   text-align: center;
 }
@@ -324,21 +320,21 @@
 }
 
 .otpLogo {
-  font-size: 36px;
-  color: var(--primary);
-  background: var(--clr-teal-a08);
+  font-size: var(--fs-6xl);
+  color: var(--primary-text);
+  background: var(--brand-a08);
   padding: 10px;
   border-radius: 50%;
   margin-bottom: 4px;
 }
 
 .otpInput {
-  background: var(--bg-2);
+  background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
   padding: 12px;
   border-radius: 10px;
-  font-size: 20px;
+  font-size: var(--fs-2xl);
   font-weight: 700;
   text-align: center;
   letter-spacing: 6px;
@@ -353,12 +349,12 @@
 }
 
 .hint {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--muted);
 }
 
 .hint strong {
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .nbRedirect {
@@ -371,7 +367,7 @@
 }
 
 .nbLogo {
-  font-size: 36px;
+  font-size: var(--fs-6xl);
   color: var(--accent);
   background: var(--clr-amber-a08);
   padding: 10px;
@@ -379,20 +375,20 @@
 }
 
 .bankName {
-  font-size: 15px;
+  font-size: var(--fs-lg);
   font-weight: 700;
   margin: 0;
 }
 
 .nbText {
-  font-size: 13px;
+  font-size: var(--fs-md);
   color: var(--muted);
   line-height: 1.5;
   margin: 0;
 }
 
 .nbSimulatorPill {
-  font-size: 10px;
+  font-size: var(--fs-xs);
   font-weight: 700;
   background: var(--clr-amber-a10);
   color: var(--accent);
@@ -426,7 +422,7 @@
 }
 
 .loadingText {
-  font-size: 13.5px;
+  font-size: var(--fs-base);
   font-weight: 600;
   color: var(--text);
   min-height: 20px;
@@ -435,7 +431,7 @@
 .secureBadge {
   display: inline-flex;
   align-items: center;
-  font-size: 10.5px;
+  font-size: var(--fs-xs);
   color: var(--muted);
   font-weight: 600;
   opacity: 0.8;
@@ -455,29 +451,29 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: var(--clr-teal-a10);
-  border: 1px solid var(--clr-teal-a30);
+  background: var(--brand-a10);
+  border: 1px solid var(--brand-a30);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 15px var(--clr-teal-a20);
+  box-shadow: 0 0 15px var(--brand-a20);
 }
 
 .checkIcon {
-  font-size: 32px;
-  color: var(--primary);
+  font-size: var(--fs-5xl);
+  color: var(--primary-text);
 }
 
 .successAmt {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 22px;
+  font-size: var(--fs-3xl);
   font-weight: 800;
   margin: 0;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .successDesc {
-  font-size: 13px;
+  font-size: var(--fs-md);
   color: var(--muted);
   line-height: 1.5;
   margin: 0;
@@ -489,8 +485,8 @@
   color: var(--on-primary);
   border: none;
   padding: 12px;
-  border-radius: 10px;
-  font-size: 13px;
+  border-radius: var(--btn-radius);
+  font-size: var(--fs-md);
   font-weight: 750;
   cursor: pointer;
   transition: all 0.2s;
@@ -498,8 +494,7 @@
 }
 
 .doneBtn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--clr-teal-a15);
+  box-shadow: 0 4px 12px var(--brand-a15);
 }
 
 .errorView {
@@ -523,12 +518,12 @@
 }
 
 .errorIcon {
-  font-size: 32px;
+  font-size: var(--fs-5xl);
   color: var(--danger);
 }
 
 .errorText {
-  font-size: 13px;
+  font-size: var(--fs-md);
   color: var(--muted);
   line-height: 1.5;
   margin: 0;

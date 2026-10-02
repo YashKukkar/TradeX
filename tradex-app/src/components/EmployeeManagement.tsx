@@ -142,12 +142,12 @@ export default function EmployeeManagement() {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "11.5px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>Total Staff</span>
-            <Icon name="badge" style={{ fontSize: "16px", color: "var(--clr-indigo)" }} />
+            <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>Total Staff</span>
+            <Icon name="badge" style={{ fontSize: "var(--fs-lg)", color: "var(--clr-indigo)" }} />
           </div>
           <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-            <span style={{ fontSize: "20px", fontWeight: 800, color: "var(--text)" }}>{employees.length}</span>
-            <span style={{ fontSize: "11px", color: "var(--muted)" }}>{staffCount} operators • {superAdminCount} super admins</span>
+            <span style={{ fontSize: "var(--fs-2xl)", fontWeight: 800, color: "var(--text)" }}>{employees.length}</span>
+            <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)" }}>{staffCount} operators • {superAdminCount} super admins</span>
           </div>
         </div>
 
@@ -163,12 +163,12 @@ export default function EmployeeManagement() {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "11.5px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>Functional Teams</span>
-            <Icon name="groups" style={{ fontSize: "16px", color: "var(--clr-indigo)" }} />
+            <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>Functional Teams</span>
+            <Icon name="groups" style={{ fontSize: "var(--fs-lg)", color: "var(--clr-indigo)" }} />
           </div>
           <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-            <span style={{ fontSize: "20px", fontWeight: 800, color: "var(--clr-indigo)" }}>{teams.length}</span>
-            <span style={{ fontSize: "11px", color: "var(--clr-indigo)", fontWeight: 700 }}>active squads</span>
+            <span style={{ fontSize: "var(--fs-2xl)", fontWeight: 800, color: "var(--clr-indigo)" }}>{teams.length}</span>
+            <span style={{ fontSize: "var(--fs-xs)", color: "var(--clr-indigo)", fontWeight: 700 }}>active squads</span>
           </div>
         </div>
 
@@ -184,12 +184,12 @@ export default function EmployeeManagement() {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "11.5px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>System Authorities</span>
-            <Icon name="shield" style={{ fontSize: "16px", color: "var(--accent)" }} />
+            <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>System Authorities</span>
+            <Icon name="shield" style={{ fontSize: "var(--fs-lg)", color: "var(--accent)" }} />
           </div>
           <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-            <span style={{ fontSize: "20px", fontWeight: 800, color: "var(--accent)" }}>{systemPermissions.length}</span>
-            <span style={{ fontSize: "11px", color: "var(--muted)" }}>granular permissions</span>
+            <span style={{ fontSize: "var(--fs-2xl)", fontWeight: 800, color: "var(--accent)" }}>{systemPermissions.length}</span>
+            <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)" }}>granular permissions</span>
           </div>
         </div>
       </div>
@@ -198,7 +198,7 @@ export default function EmployeeManagement() {
       <div className={adminStyles.tableHeader}>
         <div>
           <h2 className={adminStyles.tableTitle}>Staff & Team Management Console</h2>
-          <span style={{ fontSize: "12px", color: "var(--muted)" }}>
+          <span style={{ fontSize: "var(--fs-sm)", color: "var(--muted)" }}>
             Delegate system authorities, assign functional teams, and manage staff operations.
           </span>
         </div>
@@ -208,14 +208,14 @@ export default function EmployeeManagement() {
               onClick={() => setActiveSubPanel("directory")}
               className={`${styles.subTabBtn} ${activeSubPanel === "directory" ? styles.subTabBtnActive : ""}`}
             >
-              <Icon name="badge" style={{ fontSize: "14px" }} />
+              <Icon name="badge" style={{ fontSize: "var(--fs-base)" }} />
               Staff Directory ({employees.length})
             </button>
             <button
               onClick={() => setActiveSubPanel("teams")}
               className={`${styles.subTabBtn} ${activeSubPanel === "teams" ? styles.subTabBtnActive : ""}`}
             >
-              <Icon name="groups" style={{ fontSize: "14px" }} />
+              <Icon name="groups" style={{ fontSize: "var(--fs-base)" }} />
               Teams Directory ({teams.length})
             </button>
           </div>
@@ -232,7 +232,7 @@ export default function EmployeeManagement() {
                   gap: "6px",
                   padding: "7px 12px",
                   borderRadius: "8px",
-                  fontSize: "12px",
+                  fontSize: "var(--fs-sm)",
                   fontWeight: 700,
                   cursor: employees.length === 0 ? "not-allowed" : "pointer",
                   background: "var(--surface-2)",
@@ -242,7 +242,7 @@ export default function EmployeeManagement() {
                   height: "36px",
                 }}
               >
-                <Icon name="download" style={{ fontSize: "15px", color: "var(--clr-indigo)" }} />
+                <Icon name="download" style={{ fontSize: "var(--fs-lg)", color: "var(--clr-indigo)" }} />
                 <span>Export CSV</span>
               </button>
 
@@ -255,7 +255,7 @@ export default function EmployeeManagement() {
                 className={styles.addBtn}
                 style={{ background: "var(--clr-indigo)", color: "var(--on-primary)" }}
               >
-                <Icon name="person_add" style={{ fontSize: "16px" }} />
+                <Icon name="person_add" style={{ fontSize: "var(--fs-lg)" }} />
                 Add Staff Member
               </button>
             </>
@@ -272,7 +272,7 @@ export default function EmployeeManagement() {
                 gap: "6px",
                 padding: "7px 12px",
                 borderRadius: "8px",
-                fontSize: "12px",
+                fontSize: "var(--fs-sm)",
                 fontWeight: 700,
                 cursor: teams.length === 0 ? "not-allowed" : "pointer",
                 background: "var(--surface-2)",
@@ -282,7 +282,7 @@ export default function EmployeeManagement() {
                 height: "36px",
               }}
             >
-              <Icon name="download" style={{ fontSize: "15px", color: "var(--clr-indigo)" }} />
+              <Icon name="download" style={{ fontSize: "var(--fs-lg)", color: "var(--clr-indigo)" }} />
               <span>Export Teams CSV</span>
             </button>
           )}

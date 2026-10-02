@@ -18,12 +18,12 @@ export interface BrandConfig {
 }
 
 export const DEFAULT_BRANDING: BrandConfig = {
-  appName: "TradeX",
+  appName: "TradeNows",
   brandPrefix: "Trade",
-  accentText: "X",
-  pointsName: "TradeX Points",
+  accentText: "Nows",
+  pointsName: "TradeNows Points",
   supportEmail: "support@tradenows.com",
-  legalName: "TradeX Technologies Ltd",
+  legalName: "TradeNows",
   assetVersion: "1.0.0",
   logoUrl: "/branding/logo.svg?v=1.0.0",
   faviconUrl: "/branding/favicon.svg?v=1.0.0",

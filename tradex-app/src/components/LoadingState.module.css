@@ -23,7 +23,7 @@
 }
 
 .loadingText {
-  font-size: 13px;
+  font-size: var(--fs-md);
   font-weight: 600;
   color: var(--muted);
   letter-spacing: 0.02em;

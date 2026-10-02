@@ -2,8 +2,8 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: var(--clr-scene-modal);
-  backdrop-filter: blur(8px);
+  background: var(--overlay);
+  backdrop-filter: blur(3px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -12,7 +12,7 @@
 
 .modal {
   background: var(--surface-elevated);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   width: 90%;
   padding: 32px;
@@ -59,14 +59,14 @@
 }
 
 .title {
-  font-size: 20px;
+  font-size: var(--fs-2xl);
   font-weight: 700;
   color: var(--text);
   margin: 0;
 }
 
 .subtitle {
-  font-size: 14px;
+  font-size: var(--fs-base);
   color: var(--muted);
   margin-top: 4px;
   margin-bottom: 0;

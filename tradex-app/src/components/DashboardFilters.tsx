@@ -110,7 +110,7 @@ export default function DashboardFilters({ onChange, onExport, isExporting }: Da
         className={`${styles.filterBtn} ${filterType === "custom" ? styles.filterBtnActive : ""}`}
         onClick={() => setFilterType("custom")}
       >
-        <Icon name="date_range" style={{ fontSize: "14px", verticalAlign: "middle", marginRight: "4px" }} />
+        <Icon name="date_range" style={{ fontSize: "var(--fs-base)", verticalAlign: "middle", marginRight: "4px" }} />
         Custom Range
       </button>
 
@@ -132,7 +132,7 @@ export default function DashboardFilters({ onChange, onExport, isExporting }: Da
                 className={styles.dateInput}
               />
             </div>
-            <span style={{ color: "var(--muted)", opacity: 0.5 }}>➔</span>
+            <Icon name="arrow_forward" style={{ fontSize: "var(--fs-lg)", color: "var(--muted)", opacity: 0.5 }} />
             <div className={styles.dateFieldGroup}>
               <span className={styles.dateLabel}>To:</span>
               <input
@@ -165,8 +165,8 @@ export default function DashboardFilters({ onChange, onExport, isExporting }: Da
         )}
       </div>
 
-      <div style={{ width: "100%", marginTop: "2px", fontSize: "11.5px", color: "var(--muted)", display: "flex", alignItems: "center", gap: "6px" }}>
-        <Icon name="info" style={{ fontSize: "13px", color: "var(--primary)" }} />
+      <div style={{ width: "100%", marginTop: "2px", fontSize: "var(--fs-sm)", color: "var(--muted)", display: "flex", alignItems: "center", gap: "6px" }}>
+        <Icon name="info" style={{ fontSize: "var(--fs-md)", color: "var(--primary-text)" }} />
         <span>Telemetry period: <strong>{filterType === "today" ? "Today (Live)" : filterType === "yesterday" ? "Yesterday" : filterType === "7days" ? "Last 7 Days" : filterType === "30days" ? "Last 30 Days" : filterType === "thisMonth" ? "This Month" : "Custom Range"}</strong></span>
       </div>
     </div>

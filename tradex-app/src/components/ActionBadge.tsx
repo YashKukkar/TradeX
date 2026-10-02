@@ -69,7 +69,7 @@ export default function ActionBadge({ action, style }: ActionBadgeProps) {
         gap: "5px",
         padding: "3px 9px",
         borderRadius: "6px",
-        fontSize: "11.5px",
+        fontSize: "var(--fs-sm)",
         fontWeight: 700,
         background: bg,
         color: color,
@@ -78,7 +78,7 @@ export default function ActionBadge({ action, style }: ActionBadgeProps) {
         ...style,
       }}
     >
-      <Icon name={icon} style={{ fontSize: "13px" }} />
+      <Icon name={icon} style={{ fontSize: "var(--fs-md)" }} />
       <span>{formatActionLabel(action)}</span>
     </span>
   );
