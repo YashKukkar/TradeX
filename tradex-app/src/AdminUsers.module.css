@@ -234,53 +234,12 @@
   }
 }
 
-
-.settingsFooter {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 16px;
-  margin-top: 28px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
-}
-
 .saveBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 22px;
-  border-radius: var(--btn-radius);
-  border: none;
-  background: var(--primary);
-  color: var(--on-primary);
-  font-size: var(--fs-base);
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.25s ease;
   box-shadow: 0 4px 15px var(--overlay-soft);
 }
 
 .saveBtn:hover:not(:disabled) {
-  opacity: 0.95;
   box-shadow: 0 6px 20px var(--overlay-soft);
-}
-
-.saveBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.successText {
-  color: var(--primary-text);
-  font-size: var(--fs-base);
-  font-weight: 700;
-}
-
-.errorText {
-  color: var(--danger);
-  font-size: var(--fs-base);
-  font-weight: 700;
 }
 
 /* Table Section */
@@ -707,18 +666,6 @@
 
 /* -- Actions Dropdown ------------------------------------------- */
 
-@keyframes dropIn {
-  from {
-    opacity: 0;
-    transform: translateY(-6px) scale(0.97);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 /* -- Drawer Overlay --------------------------------------------- */
 
 .drawer {
@@ -750,16 +697,6 @@
   }
 }
 
-.drawerHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: 24px 24px 20px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-2);
-  flex-shrink: 0;
-}
-
 .drawerSection {
   display: flex;
   flex-direction: column;
@@ -767,11 +704,6 @@
 }
 
 .drawerSectionTitle {
-  font-size: var(--fs-xs);
-  font-weight: 800;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
   padding-bottom: 6px;
   border-bottom: 1px solid var(--clr-white-a04);
 }
@@ -812,18 +744,20 @@
 .cancelBtn {
   padding: 9px 20px;
   border-radius: 10px;
-  border: 1px solid var(--border);
-  background: none;
+  border: 1px solid var(--btn-secondary-border);
+  background: var(--surface);
   color: var(--muted);
   font-size: var(--fs-base);
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: var(--btn-secondary-shadow);
 }
 
 .cancelBtn:hover {
-  border-color: var(--clr-white-a12);
+  background: var(--surface-hover);
+  border-color: var(--muted);
   color: var(--text);
 }
 
@@ -910,17 +844,18 @@
   padding: 6px 12px;
   border-radius: 6px;
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--btn-secondary-border);
   color: var(--text);
   font-size: var(--fs-md);
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition);
+  box-shadow: var(--btn-secondary-shadow);
 }
 
 .pageBtn:hover:not(:disabled) {
-  background: var(--surface-elevated);
-  border-color: var(--primary);
+  background: var(--surface-hover);
+  border-color: var(--muted);
 }
 
 .pageBtn:disabled {
@@ -967,6 +902,7 @@
 
 .filterTabBtn:hover {
   color: var(--text);
+  background: var(--clr-white-a08);
 }
 
 .filterTabActive {

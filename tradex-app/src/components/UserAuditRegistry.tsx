@@ -358,9 +358,10 @@ export default function UserAuditRegistry({ users, loading, onRowClick }: UserAu
               fontSize: "var(--fs-sm)",
               fontWeight: 700,
               cursor: sorted.length === 0 ? "not-allowed" : "pointer",
-              background: "var(--surface-2)",
+              background: "var(--surface)",
               color: "var(--text)",
-              border: "1px solid var(--border)",
+              border: "1px solid var(--btn-secondary-border)",
+              boxShadow: "var(--btn-secondary-shadow)",
               transition: "all 0.2s ease",
             }}
           >

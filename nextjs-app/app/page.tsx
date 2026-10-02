@@ -8,30 +8,7 @@ export default function Home() {
           __html: `if (typeof window !== 'undefined' && localStorage.getItem('token')) { window.location.href = '${branding.urls.portalUrl}/dashboard'; }`,
         }}
       />
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `window.addEventListener('DOMContentLoaded', function(){
-(function(){
-  function tick(){
-    var p={};
-    new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date()).forEach(function(x){p[x.type]=x.value;});
-    var dow={Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6}[p.weekday];
-    var h=parseInt(p.hour,10)%24, mi=parseInt(p.minute,10), m=h*60+mi, wk=dow<5;
-    var open={
-      nse: wk && m>=555 && m<930,
-      mcx: wk && m>=540 && m<1410,
-      comex: !((dow===5&&m>=150)||dow===6||(dow===0&&m<210)) && !(m>=150&&m<210)
-    };
-    var pct=(m/1440*100)+'%';
-    document.querySelectorAll('.hours .now').forEach(function(e){e.style.left=pct;e.style.display='block';});
-    document.querySelectorAll('.hours .st').forEach(function(e){var o=open[e.getAttribute('data-m')];e.textContent=o?'Open':'Closed';e.className='st '+(o?'on':'off');});
-    var l=document.getElementById('nowLabel'); if(l) l.textContent='Now '+('0'+h).slice(-2)+':'+('0'+mi).slice(-2)+' IST';
-  }
-  tick(); setInterval(tick,30000);
-})();});`,
-        }}
-      />
-    <main suppressHydrationWarning dangerouslySetInnerHTML={{
+      <main suppressHydrationWarning dangerouslySetInnerHTML={{
       __html: `
 <header class="site-header">
   <div class="container nav">
@@ -67,15 +44,15 @@ export default function Home() {
   </section>
 
   <section class="hours">
-    <div class="hhead"><b>Three markets, across the day</b><span id="nowLabel">Exchange session hours · IST</span></div>
-    <div class="hrow"><div class="lbl"><b>NSE <em class="st" data-m="nse"></em></b><span class="mono">09:15–15:30</span></div>
-      <div class="track"><div class="seg seg-nse mono" style="left:38.54%;width:26.04%">Futures</div><i class="now"></i></div></div>
-    <div class="hrow"><div class="lbl"><b>MCX <em class="st" data-m="mcx"></em></b><span class="mono">09:00–23:30</span></div>
-      <div class="track"><div class="seg seg-mcx mono" style="left:37.5%;width:60.42%">Commodities</div><i class="now"></i></div></div>
-    <div class="hrow"><div class="lbl"><b>COMEX <em class="st" data-m="comex"></em></b><span class="mono">24 hours</span></div>
-      <div class="track"><div class="seg seg-comex mono" style="left:0;width:10.42%" title="Trades 00:00–02:30"></div><div class="seg seg-comex mono" style="left:14.58%;width:85.42%" title="Trades 03:30–24:00">Commodities</div><i class="now"></i></div></div>
+    <div class="hhead"><b>Three markets, across the day</b><span>Exchange session hours · IST</span></div>
+    <div class="hrow"><div class="lbl"><b>NSE</b><span class="mono">09:15–15:30</span></div>
+      <div class="track"><div class="seg seg-nse mono" style="left:38.54%;width:26.04%">Futures</div></div></div>
+    <div class="hrow"><div class="lbl"><b>MCX</b><span class="mono">09:00–23:30</span></div>
+      <div class="track"><div class="seg seg-mcx mono" style="left:37.5%;width:60.42%">Commodities</div></div></div>
+    <div class="hrow"><div class="lbl"><b>COMEX</b><span class="mono">23 hours</span></div>
+      <div class="track"><div class="seg seg-comex mono" style="left:0;width:10.42%" title="Trades 00:00–02:30"></div><div class="seg seg-comex mono" style="left:14.58%;width:85.42%" title="Trades 03:30–24:00 (Break 02:30–03:30)">Commodities</div></div></div>
     <div class="axis mono"><span>00:00</span><span>03:00</span><span>06:00</span><span>09:00</span><span>12:00</span><span>15:00</span><span>18:00</span><span>21:00</span><span>24:00</span></div>
-    <p class="hfoot">All times IST. NSE and MCX trade Mon–Fri. COMEX runs 24 hours, Sun–Fri, except a one-hour break each day. Exact hours follow the exchanges and shift slightly with US clock changes.</p>
+    <p class="hfoot">All times IST. NSE and MCX trade Mon–Fri. COMEX trades nearly 24 hours Sun–Fri, pausing for a 1-hour daily maintenance break (02:30–03:30 IST) and closing for the weekend (Sat morning to Mon morning). Exact hours follow the exchanges.</p>
   </section>
 
   <section class="features">

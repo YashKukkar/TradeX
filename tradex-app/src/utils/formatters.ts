@@ -49,10 +49,6 @@ export function formatTime(val: number | string | Date | null | undefined): stri
   });
 }
 
-export function formatFullDateTime(val: number | string | Date | null | undefined): string {
-  return formatDateTime(val, true);
-}
-
 export function formatCurrency(amount: number | null | undefined, currencySymbol = "₹"): string {
   if (amount === undefined || amount === null || isNaN(amount)) return `${currencySymbol}0.00`;
   return `${currencySymbol}${amount.toLocaleString("en-IN", {

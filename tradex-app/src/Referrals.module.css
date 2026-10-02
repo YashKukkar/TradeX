@@ -24,7 +24,7 @@
   align-items: center;
   gap: 6px;
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--btn-secondary-border);
   color: var(--muted);
   font-family: inherit;
   padding: 8px 14px;
@@ -33,11 +33,13 @@
   font-weight: 600;
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s;
+  box-shadow: var(--btn-secondary-shadow);
 }
 
 .backBtn:hover {
+  background: var(--surface-hover);
+  border-color: var(--muted);
   color: var(--text);
-  border-color: var(--border-hover);
 }
 
 .pageTitle {

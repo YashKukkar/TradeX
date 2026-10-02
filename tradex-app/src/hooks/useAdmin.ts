@@ -128,33 +128,6 @@ export function useAdjustUserPoints(options?: {
   });
 }
 
-export function useAdjustUserWallet(options?: {
-  onSuccess?: () => void;
-  onError?: (err: Error) => void;
-}) {
-  const queryClient = useQueryClient();
-  const { data: currentUser } = useCurrentUser();
-  return useMutation<
-    UserInfo,
-    Error,
-    { userId: number; delta: number; walletType: "CASH" | "BONUS"; reason: string }
-  >({
-    mutationFn: ({ userId, delta, walletType, reason }) =>
-      api(`/admin/users/${userId}/wallet`, {
-        method: "POST",
-        body: JSON.stringify({ delta, walletType, reason }),
-      }),
-    onSuccess: (data) => {
-      updateTelemetryCache(queryClient, currentUser?.email, data);
-      queryClient.invalidateQueries({ queryKey: ["adminTelemetry"] });
-      options?.onSuccess?.();
-    },
-    onError: (err) => {
-      options?.onError?.(err);
-    },
-  });
-}
-
 export function useSaveSystemSettings(options?: {
   onSuccess?: (data: SystemSetting) => void;
   onError?: (err: Error) => void;
@@ -311,24 +284,6 @@ export function useTeams() {
   });
 }
 
-export function useCreateTeam(options?: { onSuccess?: () => void; onError?: (err: Error) => void }) {
-  const queryClient = useQueryClient();
-  return useMutation<TeamData, Error, { name: string; description: string; permissions: string[] }>({
-    mutationFn: (body) =>
-      api("/admin/teams", {
-        method: "POST",
-        body: JSON.stringify(body),
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teamsList"] });
-      options?.onSuccess?.();
-    },
-    onError: (err) => {
-      options?.onError?.(err);
-    },
-  });
-}
-
 export function useUpdateTeam(options?: { onSuccess?: () => void; onError?: (err: Error) => void }) {
   const queryClient = useQueryClient();
   return useMutation<TeamData, Error, { id: number; name: string; description: string; permissions: string[] }>({
@@ -340,23 +295,6 @@ export function useUpdateTeam(options?: { onSuccess?: () => void; onError?: (err
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teamsList"] });
       queryClient.invalidateQueries({ queryKey: ["employeesList"] });
-      options?.onSuccess?.();
-    },
-    onError: (err) => {
-      options?.onError?.(err);
-    },
-  });
-}
-
-export function useDeleteTeam(options?: { onSuccess?: () => void; onError?: (err: Error) => void }) {
-  const queryClient = useQueryClient();
-  return useMutation<void, Error, number>({
-    mutationFn: (id) =>
-      api(`/admin/teams/${id}`, {
-        method: "DELETE",
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teamsList"] });
       options?.onSuccess?.();
     },
     onError: (err) => {

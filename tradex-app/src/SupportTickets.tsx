@@ -58,7 +58,8 @@ export default function SupportTickets() {
             onClick={() => navigate("/dashboard")}
             style={{
               background: "var(--surface)",
-              border: "1px solid var(--border)",
+              border: "1px solid var(--btn-secondary-border)",
+              boxShadow: "var(--btn-secondary-shadow)",
               borderRadius: "10px",
               color: "var(--muted)",
               fontFamily: "inherit",

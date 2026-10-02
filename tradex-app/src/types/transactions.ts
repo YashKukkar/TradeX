@@ -19,6 +19,3 @@ export const WALLET_TRANSACTION_TYPE_LABELS: Record<WalletTransactionType, strin
   ADMIN_ADJUSTMENT: "Admin Adjustment",
 };
 
-export function getTransactionTypeLabel(type: string): string {
-  return WALLET_TRANSACTION_TYPE_LABELS[type as WalletTransactionType] || type;
-}

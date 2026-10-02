@@ -27,29 +27,9 @@
   border-left: 3px solid var(--primary);
 }
 
-.authorEmail {
-  font-size: var(--fs-md);
-  font-weight: 600;
-  color: var(--text);
-}
-
-.roleBadge {
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  padding: 2px 6px;
-  border-radius: 4px;
-  letter-spacing: 0.05em;
-}
-
 .roleUser {
   background: var(--clr-white-a08);
   color: var(--muted);
-}
-
-.roleAdmin {
-  background: var(--brand-a15);
-  color: var(--brand);
 }
 
 /* Reply Input Footer */
@@ -122,25 +102,6 @@
 /* Admin Panel notes */
 
 /* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-  }
-
-  to {
-    transform: translateX(0);
-  }
-}
 
 .resolvedNotice {
   padding: var(--space-5) var(--space-6);
@@ -451,7 +412,7 @@
 }
 
 .attachButtonLabel:hover {
-  background: var(--clr-white-a05);
+  background: var(--clr-white-a08);
   color: var(--text);
 }
 

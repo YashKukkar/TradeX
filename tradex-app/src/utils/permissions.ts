@@ -11,15 +11,6 @@ export const ALL_PERMISSIONS = [
 
 export type PermissionKey = (typeof ALL_PERMISSIONS)[number];
 
-/** Human-readable labels for permissions */
-export const PERMISSION_LABELS: Record<PermissionKey, string> = {
-  MANAGE_USERS: "User Management",
-  MANAGE_POINTS: "Points Management",
-  MANAGE_DEPOSITS: "Approve/Reject Deposits",
-  MANAGE_WITHDRAWALS: "Approve/Reject Withdrawals",
-  MANAGE_SETTINGS: "System Settings",
-};
-
 /** Human-readable labels for routing support tickets (max 2 words) */
 export const ROUTE_QUEUE_LABELS: Record<string, string> = {
   MANAGE_USERS: "User Ops",

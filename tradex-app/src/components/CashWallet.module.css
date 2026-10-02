@@ -254,17 +254,19 @@
   flex: 1;
   padding: 12px;
   border-radius: 8px;
-  border: 1px solid var(--border);
-  background: transparent;
+  border: 1px solid var(--btn-secondary-border);
+  background: var(--surface);
   color: var(--text);
   cursor: pointer;
   font-weight: 600;
   transition: all 0.2s;
   font-family: inherit;
+  box-shadow: var(--btn-secondary-shadow);
 }
 
 .modalCancelBtn:hover {
-  background: var(--clr-white-a05);
+  background: var(--surface-hover);
+  border-color: var(--muted);
 }
 
 .modalSubmitBtn {
