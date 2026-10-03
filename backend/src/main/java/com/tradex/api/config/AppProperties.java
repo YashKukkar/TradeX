@@ -43,6 +43,17 @@ public class AppProperties {
             String sanitized = getAppName().replaceAll("[^a-zA-Z0-9_-]", "");
             return sanitized.isBlank() ? "TradeX" : sanitized;
         }
+
+        public String getEmailDomain() {
+            String email = getSupportEmail();
+            if (email != null && email.contains("@")) {
+                String[] parts = email.split("@");
+                if (parts.length > 1 && !parts[1].isBlank()) {
+                    return parts[1].trim();
+                }
+            }
+            return "tradenows.com";
+        }
     }
 
     @Getter

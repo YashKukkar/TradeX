@@ -10,9 +10,9 @@
     "legalName": "TradeNows"
   },
   "urls": {
-    "portalUrl": "http://localhost:5173",
-    "landingUrl": "http://localhost:3000",
-    "apiUrl": "http://localhost:8080/api"
+    "portalUrl": "https://control.tradenows.com",
+    "landingUrl": "https://tradenows.com",
+    "apiUrl": "https://api.tradenows.com/api"
   },
   "theme": {
     "primaryColor": "#b5552b",

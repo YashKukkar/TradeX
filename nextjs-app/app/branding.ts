@@ -1,3 +1,5 @@
+import appConfig from "../public/branding/app.json";
+
 export interface BrandConfig {
   appName: string;
   brandPrefix: string;
@@ -17,21 +19,25 @@ export interface BrandConfig {
   year: number;
 }
 
+const b = (appConfig as any).brand || {};
+const u = (appConfig as any).urls || {};
+const version = (appConfig as any).assetVersion || "1.0.0";
+
 export const DEFAULT_BRANDING: BrandConfig = {
-  appName: "TradeNows",
-  brandPrefix: "Trade",
-  accentText: "Nows",
-  pointsName: "TradeNows Points",
-  supportEmail: "support@tradenows.com",
-  legalName: "TradeNows",
-  assetVersion: "1.0.0",
-  logoUrl: "/branding/logo.svg?v=1.0.0",
-  faviconUrl: "/branding/favicon.svg?v=1.0.0",
-  faviconIcoUrl: "/branding/favicon.ico?v=1.0.0",
+  appName: b.appName || "TradeNows",
+  brandPrefix: b.brandPrefix || "Trade",
+  accentText: b.accentText !== undefined ? b.accentText : "Nows",
+  pointsName: b.pointsName || "TradeNows Points",
+  supportEmail: b.supportEmail || "support@tradenows.com",
+  legalName: b.legalName || "TradeNows",
+  assetVersion: version,
+  logoUrl: `/branding/logo.svg?v=${version}`,
+  faviconUrl: `/branding/favicon.svg?v=${version}`,
+  faviconIcoUrl: `/branding/favicon.ico?v=${version}`,
   urls: {
-    portalUrl: "http://localhost:5173",
-    landingUrl: "http://localhost:3000",
-    apiUrl: "http://localhost:8080/api",
+    portalUrl: u.portalUrl || "https://control.tradenows.com",
+    landingUrl: u.landingUrl || "https://tradenows.com",
+    apiUrl: u.apiUrl || "https://api.tradenows.com/api",
   },
   year: new Date().getFullYear(),
 };

@@ -14,20 +14,27 @@ export interface BrandConfig {
   apiUrl: string;
 }
 
+import appConfig from "../../../config/app.json";
+
+const b = (appConfig as any).brand || {};
+const u = (appConfig as any).urls || {};
+const version = (appConfig as any).assetVersion || "1.0.0";
+const defaultEmail = b.supportEmail || "support@tradenows.com";
+
 const DEFAULT_BRANDING: BrandConfig = {
-  appName: "TradeNows",
-  brandPrefix: "Trade",
-  accentText: "Nows",
-  pointsName: "TradeNows Points",
-  supportEmail: "support@tradenows.com",
-  legalName: "TradeNows",
-  assetVersion: "1.0.0",
-  logoUrl: "/branding/logo.svg?v=1.0.0",
-  faviconUrl: "/branding/favicon.svg?v=1.0.0",
-  emailDomain: "tradenows.com",
-  portalUrl: "http://localhost:5173",
-  landingUrl: "http://localhost:3000",
-  apiUrl: "http://localhost:8080/api",
+  appName: b.appName || "TradeNows",
+  brandPrefix: b.brandPrefix || (b.appName ? b.appName : "Trade"),
+  accentText: b.accentText !== undefined ? b.accentText : "Nows",
+  pointsName: b.pointsName || "TradeNows Points",
+  supportEmail: defaultEmail,
+  legalName: b.legalName || "TradeNows",
+  assetVersion: version,
+  logoUrl: `/branding/logo.svg?v=${version}`,
+  faviconUrl: `/branding/favicon.svg?v=${version}`,
+  emailDomain: defaultEmail.split("@")[1] || "tradenows.com",
+  portalUrl: u.portalUrl || "https://control.tradenows.com",
+  landingUrl: u.landingUrl || "https://tradenows.com",
+  apiUrl: u.apiUrl || "https://api.tradenows.com/api",
 };
 
 export let branding: BrandConfig = { ...DEFAULT_BRANDING };

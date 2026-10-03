@@ -59,8 +59,8 @@ public record SystemSettingDTO(
                 (smtpPort == null || smtpPort < 1 || smtpPort > 65535) ? 587 : smtpPort,
                 smtpUsername,
                 smtpPassword,
-                smtpFromEmail != null ? smtpFromEmail : "noreply@tradex.com",
-                smtpFromName != null ? smtpFromName : "TradeX",
+                smtpFromEmail != null ? smtpFromEmail : "support@tradenows.com",
+                smtpFromName != null ? smtpFromName : "TradeNows",
                 emailNotificationsEnabled,
                 redirectEmailAddress != null ? redirectEmailAddress : ""
             ),

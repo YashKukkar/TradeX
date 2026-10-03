@@ -80,15 +80,15 @@ cd tradex-app && npm install && npm run dev
 For development and testing purposes, the application is pre-seeded with the following default accounts.
 
 ### Admin Account
-- **Email:** `admin@tradex.com`
+- **Email:** `admin@tradenows.com`
 - **Password:** `123456789`
 
 ### Employee Accounts
 All employee accounts share the default password: `123456789`.
 
-- `e1@tradex.com` (Permissions: `MANAGE_USERS`, `MANAGE_POINTS`)
-- `e2@tradex.com` (Permissions: `MANAGE_DEPOSITS`, `MANAGE_WITHDRAWALS`)
-- `e3@tradex.com` (Permissions: `MANAGE_SETTINGS`)
+- `e1@tradenows.com` (Permissions: `MANAGE_USERS`, `MANAGE_POINTS`)
+- `e2@tradenows.com` (Permissions: `MANAGE_DEPOSITS`, `MANAGE_WITHDRAWALS`)
+- `e3@tradenows.com` (Permissions: `MANAGE_SETTINGS`)
 
 ### Test Users
 All test users share the same default password: `123456789`.

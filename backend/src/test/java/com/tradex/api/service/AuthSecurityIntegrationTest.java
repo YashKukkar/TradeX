@@ -128,7 +128,7 @@ class AuthSecurityIntegrationTest {
         testUser = userRepository.save(testUser);
 
         // Admin unlocks user
-        adminUserService.unlockUser("admin@tradex.com", testUser.getId());
+        adminUserService.unlockUser("admin@tradenows.com", testUser.getId());
 
         User unlockedUser = userRepository.findByEmail(testEmail).orElseThrow();
         assertFalse(unlockedUser.isLocked());

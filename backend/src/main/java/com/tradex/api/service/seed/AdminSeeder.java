@@ -30,7 +30,10 @@ public class AdminSeeder {
 
     @Transactional
     public void seedAdmin() {
-        String adminEmail = appProperties.getSeed().getAdminEmail();
+        String domain = appProperties.getBranding().getEmailDomain();
+        String adminEmail = (appProperties.getSeed().getAdminEmail() != null && !appProperties.getSeed().getAdminEmail().isBlank())
+                ? appProperties.getSeed().getAdminEmail()
+                : "admin@" + domain;
         String adminPassword = appProperties.getSeed().getAdminPassword();
 
         if (!userRepository.existsByEmail(adminEmail)) {
@@ -38,7 +41,7 @@ public class AdminSeeder {
             User admin = new User();
             admin.setEmail(adminEmail);
             admin.setPassword(passwordEncoder.encode(adminPassword));
-            admin.setFullName("Super Admin");
+            admin.setFullName(appProperties.getBranding().getAppName() + " Admin");
             admin.setRole(Role.SUPER_ADMIN);
             admin.setEmailVerified(true);
             admin.setPhoneVerified(true);
@@ -55,16 +58,16 @@ public class AdminSeeder {
         seedTeam("Withdrawal Review", "Financial Withdrawals Authorizations Queue", List.of("MANAGE_WITHDRAWALS"));
         seedTeam("System Config", "General System Setting Adjustments", List.of("MANAGE_SETTINGS"));
 
-        // Seed default employees e1@tradex.com, e2@tradex.com, e3@tradex.com
-        seedEmployee("e1@tradex.com", adminPassword, new HashSet<>(List.of(
+        // Seed default employees based on brand domain
+        seedEmployee("e1@" + domain, adminPassword, new HashSet<>(List.of(
                 Permission.MANAGE_USERS,
                 Permission.MANAGE_POINTS)), new HashSet<>(List.of("User Ops", "Points Team")));
 
-        seedEmployee("e2@tradex.com", adminPassword, new HashSet<>(List.of(
+        seedEmployee("e2@" + domain, adminPassword, new HashSet<>(List.of(
                 Permission.MANAGE_DEPOSITS,
                 Permission.MANAGE_WITHDRAWALS)), new HashSet<>(List.of("Deposit Review", "Withdrawal Review")));
 
-        seedEmployee("e3@tradex.com", adminPassword, new HashSet<>(List.of(
+        seedEmployee("e3@" + domain, adminPassword, new HashSet<>(List.of(
                 Permission.MANAGE_SETTINGS)), new HashSet<>(List.of("System Config")));
     }
 

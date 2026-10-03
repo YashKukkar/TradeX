@@ -48,11 +48,11 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             String fromEmail = settings.getSmtpFromEmail();
-            if (fromEmail == null || fromEmail.isBlank() || "noreply@tradex.com".equalsIgnoreCase(fromEmail.trim())) {
+            if (fromEmail == null || fromEmail.isBlank() || "noreply@tradex.com".equalsIgnoreCase(fromEmail.trim()) || "noreply@tradenows.com".equalsIgnoreCase(fromEmail.trim())) {
                 fromEmail = appProperties.getBranding().getSupportEmail();
             }
             String fromName = settings.getSmtpFromName();
-            if (fromName == null || fromName.isBlank() || "TradeX".equalsIgnoreCase(fromName.trim()) || "TradeX Support".equalsIgnoreCase(fromName.trim())) {
+            if (fromName == null || fromName.isBlank() || "TradeX".equalsIgnoreCase(fromName.trim()) || "TradeX Support".equalsIgnoreCase(fromName.trim()) || "TradeNows".equalsIgnoreCase(fromName.trim())) {
                 fromName = appProperties.getBranding().getAppName() + " Support";
             }
 

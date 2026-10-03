@@ -130,7 +130,19 @@ Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$PR
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$PROJECT_ROOT\tradex-app'; npm run dev"
 
 Write-Host ""
-Write-Host "Running:"
-Write-Host "  http://localhost:3000  (NextJS)"
-Write-Host "  http://localhost:5173  (TradeNows App)"
-Write-Host "  http://localhost:8080  (API)"
+Write-Host "Local Dev Server Processes Started:"
+Write-Host "  Landing Site: http://localhost:3000"
+Write-Host "  React App:    http://localhost:5173"
+Write-Host "  Backend API:  http://localhost:8080"
+
+$configPath = "$PROJECT_ROOT\config\app.json"
+if (Test-Path $configPath) {
+    try {
+        $appConfig = Get-Content $configPath -Raw | ConvertFrom-Json
+        Write-Host ""
+        Write-Host "Configured Target URLs (from config/app.json):" -ForegroundColor Cyan
+        Write-Host "  Portal (Login Target): $($appConfig.urls.portalUrl)"
+        Write-Host "  Landing Domain:        $($appConfig.urls.landingUrl)"
+        Write-Host "  API Endpoint:          $($appConfig.urls.apiUrl)"
+    } catch { }
+}

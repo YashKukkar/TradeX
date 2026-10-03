@@ -146,7 +146,10 @@ public class TransactionSeeder {
                 LocalDateTime now = LocalDateTime.now();
 
                 // Look up operational staff member (Meera Joshi - Deposit/Withdrawal reviewer)
-                User staffMeera = userRepository.findByEmail("e2@tradex.com").orElse(null);
+                String domain = appProperties.getBranding().getEmailDomain();
+                User staffMeera = userRepository.findByEmail("e2@" + domain)
+                                .or(() -> userRepository.findByEmail("e2@tradenows.com"))
+                                .orElse(null);
 
                 // u1 — approved deposit (submitted ~4h after registration, approved 12 mins later)
                 LocalDateTime u1DepCreated = u1.getCreatedAt().plusHours(4);

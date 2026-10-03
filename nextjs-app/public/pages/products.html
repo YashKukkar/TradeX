@@ -9,21 +9,22 @@
     content="NSE futures, MCX commodities and COMEX metals on TradeNows, with your wallet, bank accounts, referrals and support in one account." />
   <script>
     (function () {
-      var portalUrl = "http://localhost:5173";
       fetch("/branding/app.json").then(function(r){return r.json();}).then(function(d){
-        if (d && d.urls && d.urls.portalUrl) portalUrl = d.urls.portalUrl;
+        var portalUrl = (d && d.urls && d.urls.portalUrl) ? d.urls.portalUrl : "";
         if (d && d.brand && d.brand.appName) {
           document.querySelectorAll('[data-app-name]').forEach(function(e){ e.textContent = d.brand.appName; });
           document.querySelectorAll('[data-brand]').forEach(function(e){ e.textContent = d.brand.brandPrefix || d.brand.appName; if (d.brand.accentText) { var s = document.createElement('span'); s.textContent = d.brand.accentText; e.appendChild(s); } });
           document.title = document.title.replace('TradeNows', d.brand.appName);
         }
-        document.querySelectorAll('a[data-portal-login]').forEach(function(a){ a.href = portalUrl + '/login'; });
+        if (portalUrl) {
+          document.querySelectorAll('a[data-portal-login]').forEach(function(a){ a.href = portalUrl + '/login'; });
+        }
         if (localStorage.getItem("token")) {
-          window.location.href = portalUrl + "/dashboard";
+          window.location.href = portalUrl ? (portalUrl + "/dashboard") : "/dashboard";
         }
       }).catch(function(){
         if (localStorage.getItem("token")) {
-          window.location.href = portalUrl + "/dashboard";
+          window.location.href = "/dashboard";
         }
       });
     })();
@@ -52,7 +53,7 @@
         <li><a href="contact.html">Contact</a></li>
       </ul>
       <div class="nav-cta">
-        <a href="http://localhost:5173/login" data-portal-login class="btn btn-ghost">Log in</a>
+        <a href="/login" data-portal-login class="btn btn-ghost">Log in</a>
         <a href="/signup" class="btn btn-primary">Open account</a>
         <button class="mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button>
       </div>

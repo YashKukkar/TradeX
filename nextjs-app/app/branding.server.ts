@@ -29,9 +29,9 @@ export function loadServerBranding(): BrandConfig {
           faviconUrl: `/branding/favicon.svg?v=${version}`,
           faviconIcoUrl: `/branding/favicon.ico?v=${version}`,
           urls: {
-            portalUrl: u.portalUrl || DEFAULT_BRANDING.urls.portalUrl,
-            landingUrl: u.landingUrl || DEFAULT_BRANDING.urls.landingUrl,
-            apiUrl: u.apiUrl || DEFAULT_BRANDING.urls.apiUrl,
+            portalUrl: process.env.PORTAL_URL || process.env.NEXT_PUBLIC_PORTAL_URL || u.portalUrl || DEFAULT_BRANDING.urls.portalUrl,
+            landingUrl: process.env.LANDING_URL || process.env.NEXT_PUBLIC_LANDING_URL || u.landingUrl || DEFAULT_BRANDING.urls.landingUrl,
+            apiUrl: process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || u.apiUrl || DEFAULT_BRANDING.urls.apiUrl,
           },
           year: new Date().getFullYear(),
         };
