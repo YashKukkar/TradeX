@@ -171,19 +171,19 @@ export default function Referrals() {
                   <tbody>
                     {filtered.map(r => (
                       <tr key={r.id}>
-                        <td className={styles.emailCell}>{maskEmail(r.referredUserEmail)}</td>
-                        <td>
+                        <td data-label="Referred User" className={styles.emailCell}>{maskEmail(r.referredUserEmail)}</td>
+                        <td data-label="Level">
                           <span className={`${styles.levelBadge} ${styles["level" + r.level]}`}>
                             Level {r.level}
                           </span>
                         </td>
-                        <td className={styles.pointsCell}>+{(r.pointsAwarded ?? 0)}</td>
-                        <td>
+                        <td data-label="Points" className={styles.pointsCell}>+{(r.pointsAwarded ?? 0)}</td>
+                        <td data-label="Status">
                           <span className={`${styles.statusBadge} ${styles[r.status.toLowerCase()]}`}>
                             {r.status}
                           </span>
                         </td>
-                        <td className={styles.dateCell}>{formatDate(r.createdAt)}</td>
+                        <td data-label="Date" className={styles.dateCell}>{formatDate(r.createdAt)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -241,11 +241,11 @@ export default function Referrals() {
                   <tbody>
                     {transactions.map(tx => (
                       <tr key={tx.id}>
-                        <td className={styles.emailCell}>{getFriendlyTxType(tx.type)}</td>
-                        <td className={styles.pointsCell}>+{tx.amount}</td>
-                        <td style={{ fontWeight: 600 }}>{tx.balanceAfter}</td>
-                        <td style={{ color: "var(--muted)" }}>{maskEmail(tx.notes)}</td>
-                        <td className={styles.dateCell}>
+                        <td data-label="Event Type" className={styles.emailCell}>{getFriendlyTxType(tx.type)}</td>
+                        <td data-label="Points Change" className={styles.pointsCell}>+{tx.amount}</td>
+                        <td data-label="New Balance" style={{ fontWeight: 600 }}>{tx.balanceAfter}</td>
+                        <td data-label="Details" style={{ color: "var(--muted)" }}>{maskEmail(tx.notes)}</td>
+                        <td data-label="Date" className={styles.dateCell}>
                           {(() => {
                             const dateStr = formatDate(tx.createdAt);
                             const timeStr = formatTime(tx.createdAt);

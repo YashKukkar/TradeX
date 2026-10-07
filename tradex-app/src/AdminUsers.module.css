@@ -1103,3 +1103,102 @@
   letter-spacing: 0.06em;
   margin: 0 0 12px 0;
 }
+/* ── Mobile: tables become stacked cards (no hidden columns) ───── */
+@media (max-width: 640px) {
+  .tableWrap {
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 12px;
+  }
+
+  .table,
+  .table thead,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table {
+    overflow: visible;
+  }
+
+  /* header row is replaced by per-cell labels; keep it for screen readers */
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .table tbody tr,
+  .table tbody tr:nth-child(odd),
+  .table tbody tr:nth-child(even) {
+    margin-bottom: 12px;
+    padding: 4px 14px;
+    background: var(--surface) !important;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .table tbody tr:hover {
+    box-shadow: var(--shadow-sm);
+  }
+
+  .table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: auto !important;
+    max-width: none !important;
+    padding: 10px 0 !important;
+    text-align: right !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+    overflow-wrap: anywhere;
+  }
+
+  .table tbody td:last-child {
+    border-bottom: 0 !important;
+  }
+
+  .table tbody td[data-label]::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+  }
+
+  /* action columns have no label: push their controls to the right edge */
+  .table tbody td:not([data-label]) {
+    justify-content: flex-end;
+  }
+
+  .tableHeader {
+    padding: 16px;
+  }
+
+  .pagination {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 16px;
+    text-align: center;
+  }
+
+  .pagination > div {
+    justify-content: space-between;
+  }
+}

@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { type WalletTransaction } from "../utils/dashboardHelpers";
-import { formatDateTime, formatCurrency, formatTxType } from "../utils/formatters";
+import { formatDateTime, formatCurrency, formatTxType, amountScale } from "../utils/formatters";
 import styles from "../Dashboard.module.css";
 import adminStyles from "../AdminUsers.module.css";
 import DataTable, { type ColumnDef } from "./DataTable";
@@ -135,6 +135,20 @@ const COLUMNS: ColumnDef<WalletTransaction>[] = [
   },
 ];
 
+function SummaryStat({ label, value, tone }: { label: string; value: string; tone?: "primary" | "success" | "danger" }) {
+  return (
+    <div className={styles.summaryItem}>
+      <span className={styles.summaryLabel}>{label}</span>
+      <span
+        className={`${styles.summaryValue} ${tone ? styles["tone_" + tone] : ""} ${styles[amountScale(value) || "base"]}`}
+        title={value}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+
 export default function WalletActivityLog({ transactions }: WalletActivityLogProps) {
   const [activeTab, setActiveTab] = useState<"cash" | "bonus">("cash");
 
@@ -198,7 +212,7 @@ export default function WalletActivityLog({ transactions }: WalletActivityLogPro
             Wallet Activity log
           </h2>
 
-          <div style={{ width: "260px" }}>
+          <div style={{ width: "100%", maxWidth: "260px" }}>
             <SegmentedControl
               options={[
                 { value: "cash", label: "Cash Wallet" },
@@ -211,64 +225,22 @@ export default function WalletActivityLog({ transactions }: WalletActivityLogPro
         </div>
 
         {/* Compact Summary Row */}
-        {activeTab === "cash" ? (
-          <div
-            style={{
-              display: "flex",
-              gap: "24px",
-              padding: "16px 28px",
-              background: "var(--clr-white-a02)",
-              borderBottom: "1px solid var(--border)",
-              flexWrap: "wrap",
-            }}
-          >
-            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Current Balance</span>
-              <span style={{ fontSize: "var(--fs-lg)", color: "var(--primary-text)", fontWeight: "800" }}>₹{withdrawableBalance.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-            </div>
-            <div style={{ width: "1px", background: "var(--border)", margin: "4px 0" }} />
-            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Total Deposits</span>
-              <span style={{ fontSize: "var(--fs-lg)", color: "var(--success)", fontWeight: "800" }}>+₹{totalDeposits.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-            </div>
-            <div style={{ width: "1px", background: "var(--border)", margin: "4px 0" }} />
-            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Total Withdrawals</span>
-              <span style={{ fontSize: "var(--fs-lg)", color: "var(--danger)", fontWeight: "800" }}>-₹{totalWithdrawals.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-            </div>
-          </div>
-        ) : (
-          <div
-            style={{
-              display: "flex",
-              gap: "24px",
-              padding: "16px 28px",
-              background: "var(--clr-white-a02)",
-              borderBottom: "1px solid var(--border)",
-              flexWrap: "wrap",
-            }}
-          >
-            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Current Balance</span>
-              <span style={{ fontSize: "var(--fs-lg)", color: "var(--primary-text)", fontWeight: "800" }}>₹{bonusBalance.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-            </div>
-            <div style={{ width: "1px", background: "var(--border)", margin: "4px 0" }} />
-            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Total Bonuses</span>
-              <span style={{ fontSize: "var(--fs-lg)", color: "var(--success)", fontWeight: "800" }}>+₹{totalBonusesEarned.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-            </div>
-            <div style={{ width: "1px", background: "var(--border)", margin: "4px 0" }} />
-            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>Total Points Converted</span>
-              <span style={{ fontSize: "var(--fs-lg)", color: "var(--text)", fontWeight: "800" }}>₹{totalPointsConverted.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-            </div>
-            <div style={{ width: "1px", background: "var(--border)", margin: "4px 0" }} />
-            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", fontWeight: "700", textTransform: "uppercase" }}>First Deposit Bonus</span>
-              <span style={{ fontSize: "var(--fs-lg)", color: "var(--text)", fontWeight: "800" }}>₹{firstDepositBonusTotal.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-            </div>
-          </div>
-        )}
+        <div className={styles.summaryRow}>
+          {activeTab === "cash" ? (
+            <>
+              <SummaryStat label="Current Balance" value={formatCurrency(withdrawableBalance)} tone="primary" />
+              <SummaryStat label="Total Deposits" value={`+${formatCurrency(totalDeposits)}`} tone="success" />
+              <SummaryStat label="Total Withdrawals" value={`-${formatCurrency(totalWithdrawals)}`} tone="danger" />
+            </>
+          ) : (
+            <>
+              <SummaryStat label="Current Balance" value={formatCurrency(bonusBalance)} tone="primary" />
+              <SummaryStat label="Total Bonuses" value={`+${formatCurrency(totalBonusesEarned)}`} tone="success" />
+              <SummaryStat label="Points Converted" value={formatCurrency(totalPointsConverted)} />
+              <SummaryStat label="First Deposit Bonus" value={formatCurrency(firstDepositBonusTotal)} />
+            </>
+          )}
+        </div>
 
         <div className={adminStyles.transactionTableWrapper}>
           <DataTable

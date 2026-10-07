@@ -291,3 +291,104 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Balances must never spill out of their box.
+   The left column is the size container: when it is narrow (phones, or a tight desktop column)
+   the two balances stack as label ↔ amount rows; when it is roomy they sit side by side. */
+.leftColumn {
+  container-type: inline-size;
+}
+
+.balancesBox > * {
+  min-width: 0;
+}
+
+.balanceValueWithdrawable,
+.balanceValueBonus {
+  display: block;
+  white-space: nowrap;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+.balanceDivider {
+  width: 1px;
+  background: var(--border);
+}
+
+.balanceItemBonus {
+  padding-left: 10px;
+}
+
+/* Size steps for big amounts (class chosen by amountScale() from the formatted text) */
+.base {
+  font-variant-numeric: tabular-nums;
+}
+
+.balanceValueWithdrawable.long,
+.balanceValueBonus.long {
+  font-size: calc(var(--fs-4xl) * 0.8);
+}
+
+.balanceValueWithdrawable.xlong,
+.balanceValueBonus.xlong {
+  font-size: calc(var(--fs-4xl) * 0.62);
+}
+
+@container (max-width: 440px) {
+  .balancesBox {
+    flex-direction: column;
+    gap: 0;
+    padding: 4px 16px;
+  }
+
+  .balancesBox > div:not(.balanceDivider) {
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 0;
+  }
+
+  .balanceItemBonus {
+    padding-left: 0;
+  }
+
+  .balanceDivider {
+    width: 100%;
+    height: 1px;
+  }
+
+  .balanceValueWithdrawable,
+  .balanceValueBonus {
+    font-size: var(--fs-2xl);
+    text-align: right;
+    min-width: 0;
+  }
+
+  .balanceValueWithdrawable.long,
+  .balanceValueBonus.long {
+    font-size: calc(var(--fs-2xl) * 0.85);
+  }
+
+  .balanceValueWithdrawable.xlong,
+  .balanceValueBonus.xlong {
+    font-size: calc(var(--fs-2xl) * 0.7);
+  }
+}
+
+/* Narrow phones: give the three operation tiles a little more room for their labels */
+@media (max-width: 420px) {
+  .operationsGrid {
+    gap: 8px;
+  }
+
+  .opCard {
+    padding: 20px 6px;
+    gap: 14px;
+  }
+
+  .opTitle {
+    font-size: var(--fs-md);
+  }
+}

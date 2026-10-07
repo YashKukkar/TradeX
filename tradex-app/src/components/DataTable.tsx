@@ -99,6 +99,7 @@ export default function DataTable<T>({
                 {columns.map((col, i) => (
                   <td
                     key={i}
+                    data-label={col.noHeader ? undefined : col.label}
                     style={{
                       width: col.width,
                       maxWidth: col.width,

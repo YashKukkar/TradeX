@@ -127,7 +127,7 @@ if ($LASTEXITCODE -ne 0) {
 $env:_JAVA_OPTIONS = "-XX:-UsePerfData"
 
 $services = @(
-    @{ Title = "Backend";  Dir = "$PROJECT_ROOT\backend";    Cmd = "`$env:_JAVA_OPTIONS='-XX:-UsePerfData'; mvn spring-boot:run '-Dspring-boot.run.fork=false'" },
+    @{ Title = "Backend";  Dir = "$PROJECT_ROOT\backend";    Cmd = "`$env:_JAVA_OPTIONS='-XX:-UsePerfData'; `$env:JAVA_HOME='$($env:JAVA_HOME)'; `$env:PATH='$($env:JAVA_HOME)\bin;' + `$env:PATH; mvn spring-boot:run `"-Dspring-boot.run.fork=false`"" },
     @{ Title = "NextJS";   Dir = "$PROJECT_ROOT\nextjs-app"; Cmd = "npm run dev" },
     @{ Title = "Trading";  Dir = "$PROJECT_ROOT\tradex-app"; Cmd = "npm run dev" }
 )

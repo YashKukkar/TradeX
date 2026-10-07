@@ -698,3 +698,48 @@ button:not(:disabled):active,
     -webkit-overflow-scrolling: touch;
   }
 }
+/* ── Stepper (deposit flow) ──────────────────────────────────── */
+.step-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  background: var(--clr-white-a02);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  transition: opacity 0.2s;
+}
+
+.step-label {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  /* only the active step keeps its label; the rest shrink to numbered dots */
+  .step-item:not(.is-current) .step-label {
+    display: none;
+  }
+}
+
+/* ── Scrollable tab bars: hide the scrollbar, hint with a fade ── */
+@media (max-width: 640px) {
+  [class*="adminTabBar"] {
+    scrollbar-width: none;
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+
+  [class*="adminTabBar"]::-webkit-scrollbar {
+    display: none;
+  }
+}

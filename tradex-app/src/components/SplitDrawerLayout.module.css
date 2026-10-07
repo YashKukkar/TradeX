@@ -103,3 +103,45 @@
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
 }
+
+/* Phones: the two panes stack and the whole drawer scrolls as one page */
+@media (max-width: 768px) {
+  .drawer {
+    width: 100% !important;
+    max-width: 100vw !important;
+    height: 100dvh;
+    border-left: 0;
+  }
+
+  .header {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+
+  .title {
+    font-size: var(--fs-xl);
+    overflow-wrap: anywhere;
+  }
+
+  .bodySplit {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .leftPane,
+  .rightPane {
+    height: auto;
+    overflow: visible;
+    border-right: 0;
+    flex: none;
+  }
+
+  /* conversation first, filling the first screen so the reply box sits at its bottom */
+  .leftPane {
+    min-height: calc(100dvh - 150px);
+    border-bottom: 1px solid var(--border);
+  }
+}

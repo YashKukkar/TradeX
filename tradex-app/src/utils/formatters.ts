@@ -57,6 +57,16 @@ export function formatCurrency(amount: number | null | undefined, currencySymbol
   })}`;
 }
 
+/**
+ * Picks a size step for a formatted money string so very large amounts shrink instead of
+ * overflowing. "" = normal, "long" (>= 12 chars, e.g. ₹1,25,000.00), "xlong" (>= 15, e.g. ₹12,50,00,000.50).
+ */
+export function amountScale(formatted: string): "" | "long" | "xlong" {
+  if (formatted.length >= 15) return "xlong";
+  if (formatted.length >= 12) return "long";
+  return "";
+}
+
 export function formatNumber(val: number | null | undefined): string {
   if (val === undefined || val === null || isNaN(val)) return "0";
   return val.toLocaleString("en-IN");

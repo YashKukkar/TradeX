@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Modal from "./Modal";
+import { formatCurrency } from "../utils/formatters";
 import styles from "../AdminUsers.module.css";
 import type { PendingTransaction } from "./PendingTransactionsRegistry";
 
@@ -57,7 +58,7 @@ export default function ResolveTransactionModal({
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
             <span style={{ color: "var(--muted)" }}>Amount:</span>
-            <span style={{ fontWeight: "700", color: isReject ? "var(--danger)" : "var(--primary)" }}>₹{transaction.amount.toFixed(2)}</span>
+            <span style={{ fontWeight: "700", color: isReject ? "var(--danger)" : "var(--primary)" }}>{formatCurrency(transaction.amount)}</span>
           </div>
           {transaction.notes && (
             <div style={{ display: "flex", justifyContent: "space-between" }}>

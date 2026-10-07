@@ -7,6 +7,7 @@ import { getPrimaryAccountNumber } from "../utils/dashboardHelpers";
 import type { SystemSetting } from "../utils/dashboardHelpers";
 import styles from "../Dashboard.module.css";
 import cwStyles from "./CashWallet.module.css";
+import { formatCurrency, amountScale } from "../utils/formatters";
 
 interface CashWalletSectionProps {
   pointsBalance: number;
@@ -42,15 +43,21 @@ export default function CashWalletSection({
               <div className={cwStyles.balancesBox}>
                 <div className={styles.balanceItem} style={{ flex: 1 }}>
                   <span className={styles.balanceLabel}>Withdrawable Cash</span>
-                  <span className={cwStyles.balanceValueWithdrawable}>
-                    ₹{withdrawableBalance.toFixed(2)}
+                  <span
+                    className={`${cwStyles.balanceValueWithdrawable} ${cwStyles[amountScale(formatCurrency(withdrawableBalance)) || "base"]}`}
+                    title={formatCurrency(withdrawableBalance)}
+                  >
+                    {formatCurrency(withdrawableBalance)}
                   </span>
                 </div>
-                <div style={{ width: "1px", background: "var(--border)" }} />
-                <div className={styles.balanceItem} style={{ flex: 1, paddingLeft: "10px" }}>
+                <div className={cwStyles.balanceDivider} />
+                <div className={`${styles.balanceItem} ${cwStyles.balanceItemBonus}`} style={{ flex: 1 }}>
                   <span className={styles.balanceLabel}>Bonus Cash</span>
-                  <span className={cwStyles.balanceValueBonus}>
-                    ₹{bonusBalance.toFixed(2)}
+                  <span
+                    className={`${cwStyles.balanceValueBonus} ${cwStyles[amountScale(formatCurrency(bonusBalance)) || "base"]}`}
+                    title={formatCurrency(bonusBalance)}
+                  >
+                    {formatCurrency(bonusBalance)}
                   </span>
                 </div>
               </div>

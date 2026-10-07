@@ -974,3 +974,83 @@
   font-weight: 700;
   color: var(--muted);
 }
+
+/* ── Wallet activity summary ─────────────────────────────────── */
+.summaryRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 0;
+  padding: 16px 28px;
+  background: var(--clr-white-a02);
+  border-bottom: 1px solid var(--border);
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
+  padding-right: 24px;
+  margin-right: 24px;
+}
+
+.summaryItem:not(:last-child) {
+  border-right: 1px solid var(--border);
+}
+
+.summaryLabel {
+  font-size: var(--fs-xs);
+  color: var(--muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.summaryValue {
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* big amounts step down instead of wrapping or overflowing their tile */
+.summaryValue.long {
+  font-size: calc(var(--fs-lg) * 0.85);
+}
+
+.summaryValue.xlong {
+  font-size: calc(var(--fs-lg) * 0.7);
+}
+
+.base {
+  font-variant-numeric: tabular-nums;
+}
+
+.tone_primary { color: var(--primary-text); }
+.tone_success { color: var(--success); }
+.tone_danger { color: var(--danger); }
+
+@media (max-width: 900px) {
+  .summaryRow {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 14px 16px;
+  }
+
+  .summaryItem,
+  .summaryItem:not(:last-child) {
+    margin: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+  }
+
+  /* three tiles: balance on top, the other two side by side (1 + 2). Four tiles stay 2 × 2. */
+  .summaryItem:first-child:nth-last-child(3) {
+    grid-column: 1 / -1;
+  }
+}

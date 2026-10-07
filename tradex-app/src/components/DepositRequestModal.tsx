@@ -137,14 +137,14 @@ export default function DepositRequestModal({
           const currentStep = getStepNumber(step);
           if (currentStep > 0) {
             return (
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", background: "var(--clr-white-a02)", padding: "10px", borderRadius: "8px", border: "1px solid var(--border)" }}>
+              <div className="step-bar">
                 {[
                   { num: 1, label: "Amount" },
                   { num: 2, label: "Method" },
                   { num: 3, label: "Details" },
                   { num: 4, label: "Verify" }
                 ].map((s) => (
-                  <div key={s.num} style={{ display: "flex", alignItems: "center", gap: "6px", opacity: currentStep >= s.num ? 1 : 0.4, transition: "opacity 0.2s" }}>
+                  <div key={s.num} className={`step-item${currentStep === s.num ? " is-current" : ""}`} style={{ opacity: currentStep >= s.num ? 1 : 0.4 }}>
                     <span style={{
                       width: "20px",
                       height: "20px",
@@ -157,7 +157,7 @@ export default function DepositRequestModal({
                       fontSize: "var(--fs-xs)",
                       fontWeight: "800"
                     }}>{s.num}</span>
-                    <span style={{ fontSize: "var(--fs-xs)", fontWeight: "600" }}>{s.label}</span>
+                    <span className="step-label">{s.label}</span>
                   </div>
                 ))}
               </div>

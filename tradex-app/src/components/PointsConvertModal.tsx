@@ -147,7 +147,7 @@ export default function PointsConvertModal({
             />
             {convPoints && publicSettings?.pointsToCashConversionRate && (
               <span className={cwStyles.modalEstimate}>
-                Estimate Value: ₹{(parseFloat(convPoints) / publicSettings.pointsToCashConversionRate).toFixed(2)}
+                Estimate Value: {formatCurrency(parseFloat(convPoints) / publicSettings.pointsToCashConversionRate)}
               </span>
             )}
           </div>

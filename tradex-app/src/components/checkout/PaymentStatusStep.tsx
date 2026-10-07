@@ -1,4 +1,5 @@
 import Icon from "../Icon";
+import { formatCurrency } from "../../utils/formatters";
 import styles from "../WalletModal.module.css";
 
 interface PaymentStatusStepProps {
@@ -41,7 +42,7 @@ export default function PaymentStatusStep({
           Deposit Request Submitted
         </h4>
         <p className={styles.successDesc}>
-          Your deposit request of <strong>₹{amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</strong> has been successfully submitted and is pending admin approval.
+          Your deposit request of <strong>{formatCurrency(amount)}</strong> has been successfully submitted and is pending admin approval.
         </p>
         <button type="button" className={styles.doneBtn} onClick={onSuccessDone}>
           Return to Dashboard

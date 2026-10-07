@@ -226,7 +226,31 @@
     grid-template-columns: 1fr;
   }
   .statsRow {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+
+  /* filters become wrapping chips so the tickets themselves sit near the top */
+  .filterGroup {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .filterGroup h4 {
+    flex: 0 0 100%;
+  }
+
+  .filterGroup .filterBtn {
+    flex: 0 0 auto;
+    width: auto;
+    gap: var(--space-2);
+    padding: 8px 10px;
+    font-size: var(--fs-md);
+  }
+
+  .filterGroup select {
+    flex: 1 1 100%;
   }
 
   .ticketCard {

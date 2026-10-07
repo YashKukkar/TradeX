@@ -317,3 +317,120 @@
   font-weight: 500;
 }
 
+
+/* ── Mobile polish ───────────────────────────────────────────── */
+@media (max-width: 560px) {
+  /* 2×2 stat grid keeps the tables above the fold */
+  .statsRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 20px 0 24px;
+  }
+
+  /* the two main tabs share the row equally; they never need to scroll */
+  .tabsContainer {
+    gap: 6px;
+  }
+
+  .tabsContainer .tabBtn {
+    flex: 1 1 0;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: var(--fs-md);
+    text-align: center;
+  }
+
+  /* filter chips scroll sideways instead of being clipped */
+  .filterGroup {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  }
+
+  .tabsContainer::-webkit-scrollbar,
+  .filterGroup::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filterBtn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .filterGroup {
+    width: 100%;
+  }
+
+  /* tables → stacked cards */
+  .tableWrap {
+    overflow: visible;
+    padding: 12px;
+  }
+
+  .table,
+  .table thead,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table {
+    overflow: visible;
+  }
+
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .table tbody tr {
+    margin-bottom: 12px;
+    padding: 4px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: auto;
+    padding: 10px 0;
+    text-align: right;
+    border-bottom: 1px solid var(--border-subtle);
+    overflow-wrap: anywhere;
+  }
+
+  .table tbody td:last-child {
+    border-bottom: 0;
+  }
+
+  .table tbody td[data-label]::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+  }
+
+  .timestampContainer {
+    align-items: flex-end;
+  }
+}

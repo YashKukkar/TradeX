@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Icon from "./Icon";
 import type { UserInfo, UserProfile } from "../utils/dashboardHelpers";
+import { formatCurrency } from "../utils/formatters";
 import { hasPermission } from "../utils/permissions";
 import styles from "../AdminUsers.module.css";
 import AdminControlsSection from "./AdminControlsSection";
@@ -219,11 +220,11 @@ export default function AdminUserControlModal({
         <Row label="Points" value={(user.pointsBalance || 0).toLocaleString()} />
         <Row
           label="Withdrawable"
-          value={`₹${(user.withdrawableBalance ?? 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
+          value={formatCurrency(user.withdrawableBalance ?? 0)}
         />
         <Row
           label="Bonus"
-          value={`₹${(user.bonusBalance ?? 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
+          value={formatCurrency(user.bonusBalance ?? 0)}
         />
       </div>
     </div>

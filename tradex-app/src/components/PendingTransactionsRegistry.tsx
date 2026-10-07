@@ -4,6 +4,7 @@ import styles from "../AdminUsers.module.css";
 
 import LoadingState from "./LoadingState";
 import { formatDateTime, getDisplayName } from "../utils/dashboardHelpers";
+import { formatCurrency } from "../utils/formatters";
 import { exportCsvReport } from "../utils/api";
 import ResolveTransactionModal from "./ResolveTransactionModal";
 import type { UserProfile } from "../utils/dashboardHelpers";
@@ -83,7 +84,7 @@ const BASE_COLUMNS: ColumnDef<PendingTransaction>[] = [
     width: "160px",
     render: (t) => (
       <span style={{ fontWeight: 700, fontSize: "var(--fs-base)", color: "var(--text)" }}>
-        ₹{t.amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        {formatCurrency(t.amount)}
       </span>
     ),
   },
