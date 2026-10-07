@@ -15,17 +15,17 @@ DELETE FROM admin_audit_log;
 DELETE FROM bank_details;
 DELETE FROM users;
 
-INSERT INTO users (id, email, password, points_balance, referral_code, referral_path, referred_by_id, role, email_verified, phone_verified, phone_number, created_at, withdrawable_balance, bonus_balance, enabled, locked, expired, credentials_expired) 
-VALUES (100, 'root@example.com', 'pass', 0, 'ROOTREF', '.100.', null, 'USER', true, true, '+1234567890', CURRENT_TIMESTAMP, 0.00, 0.00, true, false, false, false);
+INSERT INTO users (id, email, password, points_balance, referral_code, referral_path, referred_by_id, role, email_verified, phone_verified, phone_number, created_at, withdrawable_balance, bonus_balance, enabled, locked, expired, credentials_expired, failed_login_attempts) 
+VALUES (100, 'root@example.com', 'pass', 0, 'ROOTREF', '.100.', null, 'USER', true, true, '+1234567890', CURRENT_TIMESTAMP, 0.00, 0.00, true, false, false, false, 0);
 
-INSERT INTO users (id, email, password, points_balance, referral_code, referral_path, referred_by_id, role, email_verified, phone_verified, phone_number, created_at, withdrawable_balance, bonus_balance, enabled, locked, expired, credentials_expired) 
-VALUES (101, 'l1@example.com', 'pass', 0, 'L1REF', '.100.101.', 100, 'USER', true, true, '+1234567891', CURRENT_TIMESTAMP, 0.00, 0.00, true, false, false, false);
+INSERT INTO users (id, email, password, points_balance, referral_code, referral_path, referred_by_id, role, email_verified, phone_verified, phone_number, created_at, withdrawable_balance, bonus_balance, enabled, locked, expired, credentials_expired, failed_login_attempts) 
+VALUES (101, 'l1@example.com', 'pass', 0, 'L1REF', '.100.101.', 100, 'USER', true, true, '+1234567891', CURRENT_TIMESTAMP, 0.00, 0.00, true, false, false, false, 0);
 
-INSERT INTO users (id, email, password, points_balance, referral_code, referral_path, referred_by_id, role, email_verified, phone_verified, phone_number, created_at, withdrawable_balance, bonus_balance, enabled, locked, expired, credentials_expired) 
-VALUES (102, 'l2@example.com', 'pass', 0, 'L2REF', '.100.101.102.', 101, 'USER', true, true, '+1234567892', CURRENT_TIMESTAMP, 0.00, 0.00, true, false, false, false);
+INSERT INTO users (id, email, password, points_balance, referral_code, referral_path, referred_by_id, role, email_verified, phone_verified, phone_number, created_at, withdrawable_balance, bonus_balance, enabled, locked, expired, credentials_expired, failed_login_attempts) 
+VALUES (102, 'l2@example.com', 'pass', 0, 'L2REF', '.100.101.102.', 101, 'USER', true, true, '+1234567892', CURRENT_TIMESTAMP, 0.00, 0.00, true, false, false, false, 0);
 
-INSERT INTO users (id, email, password, points_balance, referral_code, referral_path, referred_by_id, role, email_verified, phone_verified, phone_number, created_at, withdrawable_balance, bonus_balance, enabled, locked, expired, credentials_expired) 
-VALUES (103, 'l3@example.com', 'pass', 0, 'L3REF', '.100.101.102.103.', 102, 'USER', true, true, '+1234567893', CURRENT_TIMESTAMP, 0.00, 0.00, true, false, false, false);
+INSERT INTO users (id, email, password, points_balance, referral_code, referral_path, referred_by_id, role, email_verified, phone_verified, phone_number, created_at, withdrawable_balance, bonus_balance, enabled, locked, expired, credentials_expired, failed_login_attempts) 
+VALUES (103, 'l3@example.com', 'pass', 0, 'L3REF', '.100.101.102.103.', 102, 'USER', true, true, '+1234567893', CURRENT_TIMESTAMP, 0.00, 0.00, true, false, false, false, 0);
 
 INSERT INTO bank_details (id, user_id, account_number, ifsc_code, holder_name, bank_name, is_primary) VALUES (100, 100, 'ACC100', 'IFSC100', 'Root User', 'Test Bank', true);
 INSERT INTO bank_details (id, user_id, account_number, ifsc_code, holder_name, bank_name, is_primary) VALUES (101, 101, 'ACC101', 'IFSC101', 'L1 User', 'Test Bank', true);

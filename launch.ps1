@@ -112,8 +112,9 @@ if (-not (Test-Path "$PROJECT_ROOT\tradex-app\node_modules\.bin\vite.ps1")) {
     Pop-Location
 }
 
-# pre-flight doctor check
-Write-Host "Running pre-flight configuration doctor check..." -ForegroundColor Cyan
+# pre-flight configuration sync & doctor validation
+Write-Host "Synchronizing branding and running pre-flight doctor check..." -ForegroundColor Cyan
+node "$PROJECT_ROOT\scripts\sync-config.js"
 node "$PROJECT_ROOT\scripts\doctor.js"
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Pre-flight check failed! Please fix configuration mismatches above before starting." -ForegroundColor Red
@@ -125,9 +126,25 @@ if ($LASTEXITCODE -ne 0) {
 # Disabling PerfData globally for this session ensures Maven and Spring Boot will not hang.
 $env:_JAVA_OPTIONS = "-XX:-UsePerfData"
 
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "`$env:_JAVA_OPTIONS='-XX:-UsePerfData'; Set-Location '$PROJECT_ROOT\backend'; mvn spring-boot:run '-Dspring-boot.run.fork=false'"
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$PROJECT_ROOT\nextjs-app'; npm run dev"
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$PROJECT_ROOT\tradex-app'; npm run dev"
+$services = @(
+    @{ Title = "Backend";  Dir = "$PROJECT_ROOT\backend";    Cmd = "`$env:_JAVA_OPTIONS='-XX:-UsePerfData'; mvn spring-boot:run '-Dspring-boot.run.fork=false'" },
+    @{ Title = "NextJS";   Dir = "$PROJECT_ROOT\nextjs-app"; Cmd = "npm run dev" },
+    @{ Title = "Trading";  Dir = "$PROJECT_ROOT\tradex-app"; Cmd = "npm run dev" }
+)
+
+# Prefer one Windows Terminal window with a tab per service; fall back to separate PowerShell windows.
+if (Get-Command wt.exe -ErrorAction SilentlyContinue) {
+    # -EncodedCommand keeps ";" and quotes in the service commands from being parsed by wt as tab separators.
+    $tabArgs = $services | ForEach-Object {
+        $enc = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($_.Cmd))
+        "new-tab --title $($_.Title) -d `"$($_.Dir)`" powershell -NoExit -EncodedCommand $enc"
+    }
+    Start-Process wt.exe -ArgumentList ("-w 0 " + ($tabArgs -join " ; "))
+} else {
+    foreach ($svc in $services) {
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$($svc.Dir)'; $($svc.Cmd)"
+    }
+}
 
 Write-Host ""
 Write-Host "Local Dev Server Processes Started:"

@@ -6,15 +6,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>About — TradeNows</title>
   <meta name="description"
-    content="TradeNows is built for NSE futures, MCX and COMEX commodities traders, with a transparent wallet, referrals and support." />
+    content="Built for NSE futures, MCX and COMEX commodities traders, with a transparent wallet, referrals and support." />
+  <meta name="page-title" content="About" />
   <script>
     (function () {
       fetch("/branding/app.json").then(function(r){return r.json();}).then(function(d){
         var portalUrl = (d && d.urls && d.urls.portalUrl) ? d.urls.portalUrl : "";
-        if (d && d.brand && d.brand.appName) {
-          document.querySelectorAll('[data-app-name]').forEach(function(e){ e.textContent = d.brand.appName; });
-          document.querySelectorAll('[data-brand]').forEach(function(e){ e.textContent = d.brand.brandPrefix || d.brand.appName; if (d.brand.accentText) { var s = document.createElement('span'); s.textContent = d.brand.accentText; e.appendChild(s); } });
-          document.title = document.title.replace('TradeNows', d.brand.appName);
+        if (d && d.brand) {
+          var appName = d.brand.appName || "TradeNows";
+          document.querySelectorAll('[data-app-name]').forEach(function(e){ e.textContent = appName; });
+          document.querySelectorAll('[data-brand]').forEach(function(e){
+            e.textContent = d.brand.brandPrefix || appName;
+            if (d.brand.accentText) {
+              var s = document.createElement('span');
+              s.textContent = d.brand.accentText;
+              e.appendChild(s);
+            }
+          });
+          var metaPage = document.querySelector('meta[name="page-title"]');
+          var pageName = metaPage ? metaPage.getAttribute('content') : document.title.split('—')[0].trim();
+          document.title = pageName + ' — ' + appName;
         }
         if (portalUrl) {
           document.querySelectorAll('a[data-portal-login]').forEach(function(a){ a.href = portalUrl + '/login'; });
@@ -29,12 +40,13 @@
       });
     })();
   </script>
-  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg" />
+  <link rel="icon" type="image/svg+xml" href="/branding/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block">
   <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../branding/theme.css" />
 </head>
 
 <body>
@@ -42,8 +54,8 @@
   <header class="site-header">
     <div class="container nav">
       <a href="/" class="brand">
-        <img src="../assets/logo.svg" alt="" class="logo" />
-        <span class="brand-name" data-brand>Trade<span>Nows</span></span>
+        <img src="/branding/logo.svg" alt="" class="logo" />
+        <span class="brand-name" data-brand>Trade<span>Nows</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
       </a>
       <ul class="nav-links">
         <li><a href="/">Home</a></li>
@@ -139,8 +151,8 @@
       <div class="footer-grid">
         <div class="footer-brand">
           <a href="/" class="brand">
-            <img src="../assets/logo.svg" alt="" class="logo" />
-            <span class="brand-name" data-brand>Trade<span>Nows</span></span>
+            <img src="/branding/logo.svg" alt="" class="logo" />
+            <span class="brand-name" data-brand>Trade<span>Nows</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
           </a>
           <p>Trade with clarity. Move with confidence.</p>
           <div class="socials">

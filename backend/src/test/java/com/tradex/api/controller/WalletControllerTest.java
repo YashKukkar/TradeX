@@ -34,10 +34,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.tradex.api.config.AppProperties;
 import com.tradex.api.config.JacksonConfig;
 
 @WebMvcTest(WalletController.class)
-@Import({ SecurityConfig.class, JwtAuthenticationFilter.class, JacksonConfig.class })
+@Import({ SecurityConfig.class, JwtAuthenticationFilter.class, JacksonConfig.class, AppProperties.class, com.tradex.api.exception.GlobalExceptionHandler.class })
 @AutoConfigureMockMvc(addFilters = false)
 class WalletControllerTest {
 
@@ -89,6 +90,7 @@ class WalletControllerTest {
 
                 mockMvc.perform(post("/api/wallet/deposit")
                                 .principal(new UsernamePasswordAuthenticationToken("user@example.com", "password"))
+                                .header("Idempotency-Key", "test-key-1")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isOk())
@@ -118,6 +120,7 @@ class WalletControllerTest {
 
                 mockMvc.perform(post("/api/wallet/withdraw")
                                 .principal(new UsernamePasswordAuthenticationToken("user@example.com", "password"))
+                                .header("Idempotency-Key", "test-key-1")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isOk())
@@ -146,6 +149,7 @@ class WalletControllerTest {
 
                 mockMvc.perform(post("/api/wallet/convert-points")
                                 .principal(new UsernamePasswordAuthenticationToken("user@example.com", "password"))
+                                .header("Idempotency-Key", "test-key-1")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isOk())
@@ -175,5 +179,22 @@ class WalletControllerTest {
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$[0].amount").value(10))
                                 .andExpect(jsonPath("$[0].status").value("SUCCESS"));
+        }
+
+        @Test
+        @WithMockUser(username = "user@example.com", roles = "USER")
+        void testMoneyEndpointsRejectMissingIdempotencyKey() throws Exception {
+                for (String path : List.of("/api/wallet/deposit", "/api/wallet/withdraw")) {
+                        mockMvc.perform(post(path)
+                                        .principal(new UsernamePasswordAuthenticationToken("user@example.com", "password"))
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content("{\"amount\":100}"))
+                                        .andExpect(status().isBadRequest());
+                }
+                mockMvc.perform(post("/api/wallet/convert-points")
+                                .principal(new UsernamePasswordAuthenticationToken("user@example.com", "password"))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"points\":100}"))
+                                .andExpect(status().isBadRequest());
         }
 }

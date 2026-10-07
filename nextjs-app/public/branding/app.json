@@ -1,6 +1,5 @@
 {
   "$schema": "./schema.json",
-  "assetVersion": "1.0.0",
   "brand": {
     "appName": "TradeNows",
     "brandPrefix": "Trade",

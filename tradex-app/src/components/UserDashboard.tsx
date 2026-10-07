@@ -3,11 +3,14 @@ import Card from "./Card";
 import Modal from "./Modal";
 import styles from "../Dashboard.module.css";
 import { branding } from "../config";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { NavigateFunction } from "react-router-dom";
 import { useWalletData, usePublicSettings, useCurrentUser } from "../hooks/useDashboard";
 import CashWalletSection from "./CashWalletSection";
 import WalletActivityLog from "./WalletActivityLog";
+
+const REDIRECT_SECONDS = 5;
+const REDIRECT_URL = "https://www.google.com";
 
 interface UserDashboardProps {
   displayName: string;
@@ -43,6 +46,20 @@ export default function UserDashboard({
   bonusBalance,
 }: UserDashboardProps) {
   const [tradingInfoOpen, setTradingInfoOpen] = useState(false);
+  const [redirectSeconds, setRedirectSeconds] = useState(REDIRECT_SECONDS);
+
+  useEffect(() => {
+    if (!tradingInfoOpen) {
+      setRedirectSeconds(REDIRECT_SECONDS);
+      return;
+    }
+    if (redirectSeconds <= 0) {
+      window.location.href = REDIRECT_URL;
+      return;
+    }
+    const timer = setTimeout(() => setRedirectSeconds((s) => s - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [tradingInfoOpen, redirectSeconds]);
   const { data: user } = useCurrentUser();
   const primaryBank = user?.bankAccounts?.find((b: any) => b.isPrimary);
   const accountNumber = primaryBank?.accountNumber || "";
@@ -105,15 +122,15 @@ export default function UserDashboard({
       <Modal
         isOpen={tradingInfoOpen}
         onClose={() => setTradingInfoOpen(false)}
-        title="Trading platform coming soon"
-        subtitle="We're still setting up the trading platform."
+        title="Redirecting to Google"
+        subtitle="The trading platform is still being set up."
       >
         <p className={styles.tradeModalText}>
-          Soon this button will take you to the trading platform to trade NSE futures, MCX and COMEX.
+          We are redirecting you to Google in {redirectSeconds} second{redirectSeconds === 1 ? "" : "s"}.
           Your wallet, points and referrals here stay exactly as they are.
         </p>
         <button type="button" className={styles.tradeBtn} onClick={() => setTradingInfoOpen(false)}>
-          Got it
+          Cancel
         </button>
       </Modal>
 

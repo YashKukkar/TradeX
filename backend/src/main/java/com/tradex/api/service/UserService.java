@@ -1,7 +1,6 @@
 package com.tradex.api.service;
 
 import com.tradex.api.mapper.UserMapper;
-import com.tradex.api.config.AppProperties;
 import com.tradex.api.dto.AddBankAccountRequest;
 import com.tradex.api.dto.AuthRequest;
 import com.tradex.api.dto.AuthResponse;
@@ -67,7 +66,6 @@ public class UserService {
     private final VerificationService verificationService;
     private final JwtUtil jwtUtil;
     private final UserMapper userMapper;
-    private final AppProperties appProperties;
 
     // ── User Retrieval & Profiling ───────────────────────────────────────────
 
@@ -172,27 +170,11 @@ public class UserService {
         }
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            int attempts = user.getFailedLoginAttempts() + 1;
-            user.setFailedLoginAttempts(attempts);
-            int maxAttempts = appProperties.getAuth().getMaxFailedLoginAttempts();
-            int lockoutMinutes = appProperties.getAuth().getLockoutDurationMinutes();
-
-            if (attempts >= maxAttempts) {
-                user.setLocked(true);
-                user.setLockedUntil(LocalDateTime.now().plusMinutes(lockoutMinutes));
-                userRepository.save(user);
-                log.warn("[AUTH_LOCKOUT] Account {} locked for {} minutes after {} failed attempts",
-                        AuthUtils.maskEmail(normalizedEmail), lockoutMinutes, attempts);
-                throw new ForbiddenException("Account locked for " + lockoutMinutes + " minutes due to " + attempts
-                        + " consecutive failed login attempts. Please try again later or contact support.");
-            } else {
-                userRepository.save(user);
-                int remaining = maxAttempts - attempts;
-                log.warn("[AUTH_FAILED] Incorrect password for {} (Attempt {} of {})",
-                        AuthUtils.maskEmail(normalizedEmail), attempts, maxAttempts);
-                throw new BadCredentialsException(
-                        "Invalid email or password. " + remaining + " attempt(s) remaining before account lockout.");
-            }
+            // Brute-force protection is per email+IP in AuthRateLimiter. Failures are
+            // deliberately NOT
+            // counted against the account, so a third party cannot lock a real user out.
+            log.warn("[AUTH_FAILED] Incorrect password for {}", AuthUtils.maskEmail(normalizedEmail));
+            throw new BadCredentialsException("Invalid email or password");
         }
 
         if (user.getFailedLoginAttempts() > 0 || user.getLockedUntil() != null) {

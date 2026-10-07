@@ -7,7 +7,6 @@ export interface BrandConfig {
   pointsName: string;
   supportEmail: string;
   legalName: string;
-  assetVersion: string;
   logoUrl: string;
   faviconUrl: string;
   faviconIcoUrl: string;
@@ -21,7 +20,6 @@ export interface BrandConfig {
 
 const b = (appConfig as any).brand || {};
 const u = (appConfig as any).urls || {};
-const version = (appConfig as any).assetVersion || "1.0.0";
 
 export const DEFAULT_BRANDING: BrandConfig = {
   appName: b.appName || "TradeNows",
@@ -30,10 +28,9 @@ export const DEFAULT_BRANDING: BrandConfig = {
   pointsName: b.pointsName || "TradeNows Points",
   supportEmail: b.supportEmail || "support@tradenows.com",
   legalName: b.legalName || "TradeNows",
-  assetVersion: version,
-  logoUrl: `/branding/logo.svg?v=${version}`,
-  faviconUrl: `/branding/favicon.svg?v=${version}`,
-  faviconIcoUrl: `/branding/favicon.ico?v=${version}`,
+  logoUrl: `/branding/logo.svg`,
+  faviconUrl: `/branding/favicon.svg`,
+  faviconIcoUrl: `/branding/favicon.ico`,
   urls: {
     portalUrl: u.portalUrl || "https://control.tradenows.com",
     landingUrl: u.landingUrl || "https://tradenows.com",

@@ -21,7 +21,7 @@ public class WalletTransactionHelper {
     private final UserRepository userRepository;
     private final WalletTransactionRepository walletTransactionRepository;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void logFailedTransaction(@NonNull Long userId, BigDecimal amount, BigDecimal balance, WalletTransactionType type, String message) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));

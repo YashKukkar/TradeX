@@ -1,0 +1,10 @@
+{
+  "name": "tradex-platform",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "brand:sync": "node scripts/sync-config.js && node scripts/doctor.js",
+    "doctor": "node scripts/doctor.js",
+    "sync-config": "node scripts/sync-config.js"
+  }
+}

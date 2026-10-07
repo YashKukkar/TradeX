@@ -14,10 +14,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class AuthRateLimiter {
 
-    // 10 login requests per minute per IP
-    private final Cache<String, AtomicInteger> loginIpCache = Caffeine.newBuilder()
-            .expireAfterWrite(1, TimeUnit.MINUTES)
-            .maximumSize(50_000)
+    // Failed logins per email, fixed window. After MAX_LOGIN_FAILURES wrong passwords the email is paused
+    // until the window ends. Short on purpose: it slows guessing without locking the real owner out for long.
+    private static final int MAX_LOGIN_FAILURES = 5;
+    private final Cache<String, AtomicInteger> loginFailureCache = Caffeine.newBuilder()
+            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .maximumSize(100_000)
             .build();
 
     // 3 forgot-password requests per 5 minutes per Email
@@ -32,13 +34,20 @@ public class AuthRateLimiter {
             .maximumSize(50_000)
             .build();
 
-    public void checkLoginRateLimit(String clientIp) {
-        if (clientIp == null || clientIp.isBlank()) return;
-        AtomicInteger counter = loginIpCache.get(clientIp, k -> new AtomicInteger(0));
-        if (counter != null && counter.incrementAndGet() > 10) {
-            log.warn("[RATE_LIMIT] Exceeded login rate limit from IP: {}", clientIp);
-            throw new TooManyRequestsException("Too many login requests. Please try again in 1 minute.");
+    public void checkLoginAllowed(String email) {
+        AtomicInteger failures = loginFailureCache.getIfPresent(AuthUtils.normalizeEmail(email));
+        if (failures != null && failures.get() >= MAX_LOGIN_FAILURES) {
+            log.warn("[RATE_LIMIT] Too many failed logins for {}", AuthUtils.maskEmail(email));
+            throw new TooManyRequestsException("Too many failed login attempts. Please try again in a few minutes or reset your password.");
         }
+    }
+
+    public void recordLoginFailure(String email) {
+        loginFailureCache.get(AuthUtils.normalizeEmail(email), k -> new AtomicInteger(0)).incrementAndGet();
+    }
+
+    public void clearLoginFailures(String email) {
+        loginFailureCache.invalidate(AuthUtils.normalizeEmail(email));
     }
 
     public void checkForgotPasswordRateLimit(String email) {

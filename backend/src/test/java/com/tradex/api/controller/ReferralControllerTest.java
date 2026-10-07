@@ -22,10 +22,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.tradex.api.config.AppProperties;
 import com.tradex.api.config.JacksonConfig;
 
 @WebMvcTest(ReferralController.class)
-@Import({ SecurityConfig.class, JwtAuthenticationFilter.class, JacksonConfig.class })
+@Import({ SecurityConfig.class, JwtAuthenticationFilter.class, JacksonConfig.class, AppProperties.class })
 @AutoConfigureMockMvc(addFilters = false)
 class ReferralControllerTest {
 

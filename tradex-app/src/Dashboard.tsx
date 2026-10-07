@@ -1,12 +1,10 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense, lazy } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Dashboard.module.css";
 import Icon from "./components/Icon";
 import { useToast } from "./context/ToastContext";
 import DashboardSkeleton from "./components/DashboardSkeleton";
 import VerificationModal from "./components/VerificationModal";
-import AdminDashboard from "./components/AdminDashboard";
-import UserDashboard from "./components/UserDashboard";
 import { getDisplayName, formatFullDate } from "./utils/dashboardHelpers";
 import { isAdminRole } from "./utils/permissions";
 import { safeStorage } from "./utils/api";
@@ -18,6 +16,10 @@ import {
 } from "./hooks/useDashboard";
 import { config } from "./config";
 import BrandLogo from "./components/BrandLogo";
+
+// Admin and user views are mutually exclusive, so each is fetched only for the role that needs it.
+const AdminDashboard = lazy(() => import("./components/AdminDashboard"));
+const UserDashboard = lazy(() => import("./components/UserDashboard"));
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -204,6 +206,7 @@ export default function Dashboard() {
       </header>
 
       <main className={styles.main}>
+        <Suspense fallback={<DashboardSkeleton />}>
         {isAdmin ? (
           <AdminDashboard
             displayName={displayName}
@@ -228,6 +231,7 @@ export default function Dashboard() {
             bonusBalance={user?.bonusBalance ?? 0}
           />
         )}
+        </Suspense>
       </main>
 
       {showVerifyModal && verifyTarget && (

@@ -4,10 +4,6 @@
   "type": "object",
   "required": ["brand", "urls"],
   "properties": {
-    "assetVersion": {
-      "type": "string",
-      "description": "Cache-busting version token appended to asset requests (e.g. '1.0.0')"
-    },
     "brand": {
       "type": "object",
       "required": ["appName", "supportEmail"],

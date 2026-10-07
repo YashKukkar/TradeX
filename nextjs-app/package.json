@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "brand:sync": "node ../scripts/sync-config.js && node ../scripts/doctor.js",
     "doctor": "node ../scripts/doctor.js",
     "predev": "node ../scripts/sync-config.js",
     "dev": "next dev",
-    "prebuild": "node ../scripts/doctor.js && node ../scripts/sync-config.js",
+    "prebuild": "npm run brand:sync",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

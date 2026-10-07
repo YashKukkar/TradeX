@@ -5,7 +5,6 @@ export interface BrandConfig {
   pointsName: string;
   supportEmail: string;
   legalName: string;
-  assetVersion: string;
   logoUrl: string;
   faviconUrl: string;
   emailDomain: string;
@@ -18,8 +17,25 @@ import appConfig from "../../../config/app.json";
 
 const b = (appConfig as any).brand || {};
 const u = (appConfig as any).urls || {};
-const version = (appConfig as any).assetVersion || "1.0.0";
 const defaultEmail = b.supportEmail || "support@tradenows.com";
+
+// `npm run dev` talks to the local stack; production builds use the URLs in config/app.json.
+// Any of these can be overridden with VITE_API_URL / VITE_PORTAL_URL / VITE_LANDING_URL.
+const viteEnv = (import.meta as any).env || {};
+const LOCAL_URLS = {
+  portalUrl: "http://localhost:5173",
+  landingUrl: "http://localhost:3000",
+  apiUrl: "http://localhost:8080/api",
+};
+
+function resolveUrls(configured: Record<string, string | undefined>) {
+  const base = viteEnv.DEV ? LOCAL_URLS : {};
+  return {
+    portalUrl: viteEnv.VITE_PORTAL_URL || (base as any).portalUrl || configured.portalUrl || "https://control.tradenows.com",
+    landingUrl: viteEnv.VITE_LANDING_URL || (base as any).landingUrl || configured.landingUrl || "https://tradenows.com",
+    apiUrl: viteEnv.VITE_API_URL || (base as any).apiUrl || configured.apiUrl || "https://api.tradenows.com/api",
+  };
+}
 
 const DEFAULT_BRANDING: BrandConfig = {
   appName: b.appName || "TradeNows",
@@ -28,13 +44,10 @@ const DEFAULT_BRANDING: BrandConfig = {
   pointsName: b.pointsName || "TradeNows Points",
   supportEmail: defaultEmail,
   legalName: b.legalName || "TradeNows",
-  assetVersion: version,
-  logoUrl: `/branding/logo.svg?v=${version}`,
-  faviconUrl: `/branding/favicon.svg?v=${version}`,
+  logoUrl: `/branding/logo.svg`,
+  faviconUrl: `/branding/favicon.svg`,
   emailDomain: defaultEmail.split("@")[1] || "tradenows.com",
-  portalUrl: u.portalUrl || "https://control.tradenows.com",
-  landingUrl: u.landingUrl || "https://tradenows.com",
-  apiUrl: u.apiUrl || "https://api.tradenows.com/api",
+  ...resolveUrls(u),
 };
 
 export let branding: BrandConfig = { ...DEFAULT_BRANDING };
@@ -46,7 +59,6 @@ export async function initBranding(): Promise<BrandConfig> {
       const data = await res.json();
       const b = data.brand || {};
       const u = data.urls || {};
-      const version = data.assetVersion || "1.0.0";
 
       const appName = b.appName || "TradeNows";
       const brandPrefix = b.brandPrefix || (b.appName ? b.appName : "Trade");
@@ -60,13 +72,10 @@ export async function initBranding(): Promise<BrandConfig> {
         pointsName: b.pointsName || "TradeNows Points",
         supportEmail,
         legalName: b.legalName || "TradeNows",
-        assetVersion: version,
-        logoUrl: `/branding/logo.svg?v=${version}`,
-        faviconUrl: `/branding/favicon.svg?v=${version}`,
+              logoUrl: `/branding/logo.svg`,
+        faviconUrl: `/branding/favicon.svg`,
         emailDomain: supportEmail.split("@")[1] || "tradenows.com",
-        portalUrl: u.portalUrl || DEFAULT_BRANDING.portalUrl,
-        landingUrl: u.landingUrl || DEFAULT_BRANDING.landingUrl,
-        apiUrl: u.apiUrl || DEFAULT_BRANDING.apiUrl,
+        ...resolveUrls(u),
       };
 
       document.title = `${branding.appName} — Trade with clarity`;

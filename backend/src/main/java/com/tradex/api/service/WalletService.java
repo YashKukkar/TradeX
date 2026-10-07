@@ -8,6 +8,7 @@ import com.tradex.api.repository.WalletTransactionRepository;
 import com.tradex.api.util.DataFormatter;
 import com.tradex.api.util.WalletTransactionHelper;
 import com.tradex.api.exception.AppException.*;
+import com.tradex.api.util.IdempotencyGuard;
 import com.tradex.api.config.AppProperties;
 import lombok.extern.slf4j.Slf4j;
 
@@ -65,7 +66,7 @@ public class WalletService {
             if (existing.isPresent()) {
                 log.info("Duplicate deposit request detected for key {}. Returning cached transaction.",
                         idempotencyKey);
-                return new WalletTransactionDTO(existing.get());
+                return new WalletTransactionDTO(IdempotencyGuard.ownedBy(existing.get(), email, WalletTransactionType.DEPOSIT));
             }
         }
 
@@ -96,14 +97,16 @@ public class WalletService {
         return withdraw(email, amount, null);
     }
 
-    @Transactional
+    // noRollbackFor: rejected withdrawals commit their FAILED audit row in this same transaction.
+    // A REQUIRES_NEW insert would block on the user row lock held here (lock wait timeout -> 500).
+    @Transactional(noRollbackFor = BadRequestException.class)
     public WalletTransactionDTO withdraw(String email, BigDecimal amount, String idempotencyKey) {
         if (idempotencyKey != null && !idempotencyKey.isBlank()) {
             Optional<WalletTransaction> existing = walletTransactionRepository.findByIdempotencyKey(idempotencyKey);
             if (existing.isPresent()) {
                 log.info("Duplicate withdrawal request detected for key {}. Returning cached transaction.",
                         idempotencyKey);
-                return new WalletTransactionDTO(existing.get());
+                return new WalletTransactionDTO(IdempotencyGuard.ownedBy(existing.get(), email, WalletTransactionType.WITHDRAWAL));
             }
         }
 
@@ -297,7 +300,7 @@ public class WalletService {
                 if (existing.isPresent()) {
                     log.warn("Concurrent duplicate request prevented by DB unique constraint for idempotency key: {}",
                             idempotencyKey);
-                    return existing.get();
+                    return IdempotencyGuard.ownedBy(existing.get(), tx.getUser() != null ? tx.getUser().getEmail() : null, tx.getType());
                 }
             }
             throw ex;

@@ -36,7 +36,11 @@ public class AdminSeeder {
                 : "admin@" + domain;
         String adminPassword = appProperties.getSeed().getAdminPassword();
 
+        boolean hasAdminPassword = adminPassword != null && !adminPassword.isBlank();
         if (!userRepository.existsByEmail(adminEmail)) {
+            if (!hasAdminPassword) {
+                log.warn("ADMIN_PASSWORD is not set. Skipping admin seeding for {}; set it and restart to create the admin.", adminEmail);
+            } else {
             log.info("Seeding default admin user: {}", adminEmail);
             User admin = new User();
             admin.setEmail(adminEmail);
@@ -47,6 +51,7 @@ public class AdminSeeder {
             admin.setPhoneVerified(true);
 
             userRepository.save(admin);
+            }
         } else {
             log.info("Super admin user already exists. Skipping super admin credentials seeding.");
         }
@@ -58,7 +63,12 @@ public class AdminSeeder {
         seedTeam("Withdrawal Review", "Financial Withdrawals Authorizations Queue", List.of("MANAGE_WITHDRAWALS"));
         seedTeam("System Config", "General System Setting Adjustments", List.of("MANAGE_SETTINGS"));
 
-        // Seed default employees based on brand domain
+        // Demo employees (e1/e2/e3) share the seed password, so they only exist when demo data is enabled.
+        if (!appProperties.getSeed().isDemoEnabled() || !hasAdminPassword) {
+            log.info("Demo data disabled (or no seed password): skipping default employee accounts.");
+            return;
+        }
+
         seedEmployee("e1@" + domain, adminPassword, new HashSet<>(List.of(
                 Permission.MANAGE_USERS,
                 Permission.MANAGE_POINTS)), new HashSet<>(List.of("User Ops", "Points Team")));
@@ -112,7 +122,6 @@ public class AdminSeeder {
         } else {
             final String finalEmpName = empName;
             userRepository.findByEmail(email).ifPresent(emp -> {
-                emp.setPassword(passwordEncoder.encode(password));
                 emp.setFullName(finalEmpName);
                 emp.setRole(Role.EMPLOYEE);
                 emp.setEmailVerified(true);

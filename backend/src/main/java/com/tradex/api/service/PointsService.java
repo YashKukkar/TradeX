@@ -1,5 +1,7 @@
 package com.tradex.api.service;
 
+import com.tradex.api.util.IdempotencyGuard;
+
 import com.tradex.api.dto.WalletTransactionDTO;
 import com.tradex.api.entity.*;
 import com.tradex.api.enums.*;
@@ -44,7 +46,7 @@ public class PointsService {
             if (existing.isPresent()) {
                 log.info("Duplicate points conversion request detected for key {}. Returning cached transaction.",
                         idempotencyKey);
-                return new WalletTransactionDTO(existing.get());
+                return new WalletTransactionDTO(IdempotencyGuard.ownedBy(existing.get(), email, WalletTransactionType.POINTS_CONVERSION));
             }
         }
 
@@ -135,7 +137,7 @@ public class PointsService {
                 Optional<WalletTransaction> existing = walletTransactionRepository.findByIdempotencyKey(idempotencyKey);
                 if (existing.isPresent()) {
                     log.warn("Concurrent duplicate points conversion prevented by DB constraint for idempotency key: {}", idempotencyKey);
-                    return existing.get();
+                    return IdempotencyGuard.ownedBy(existing.get(), tx.getUser() != null ? tx.getUser().getEmail() : null, WalletTransactionType.POINTS_CONVERSION);
                 }
             }
             throw ex;

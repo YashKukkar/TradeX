@@ -2,6 +2,7 @@ package com.tradex.api.controller;
 
 import com.tradex.api.dto.WalletTransactionDTO;
 import com.tradex.api.exception.AppException;
+import com.tradex.api.util.IdempotencyGuard;
 import com.tradex.api.service.WalletService;
 import com.tradex.api.service.PointsService;
 import jakarta.validation.Valid;
@@ -48,8 +49,9 @@ public class WalletController {
     public ResponseEntity<WalletTransactionDTO> deposit(
             Principal principal,
             @Valid @RequestBody WalletAmountRequest request,
-            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+            @RequestHeader(value = "Idempotency-Key", required = false) String rawIdempotencyKey) {
         String email = getUserEmail(principal);
+        String idempotencyKey = IdempotencyGuard.requireKey(rawIdempotencyKey);
         log.info("Deposit request for user {} with amount {} and idempotency key {}", email, request.amount(),
                 idempotencyKey);
         WalletTransactionDTO tx = walletService.deposit(email, request.amount(), idempotencyKey);
@@ -60,8 +62,9 @@ public class WalletController {
     public ResponseEntity<WalletTransactionDTO> withdraw(
             Principal principal,
             @Valid @RequestBody WalletAmountRequest request,
-            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+            @RequestHeader(value = "Idempotency-Key", required = false) String rawIdempotencyKey) {
         String email = getUserEmail(principal);
+        String idempotencyKey = IdempotencyGuard.requireKey(rawIdempotencyKey);
         log.info("Withdrawal request for user {} with amount {} and idempotency key {}", email, request.amount(),
                 idempotencyKey);
         WalletTransactionDTO tx = walletService.withdraw(email, request.amount(), idempotencyKey);
@@ -72,8 +75,9 @@ public class WalletController {
     public ResponseEntity<WalletTransactionDTO> convertPoints(
             Principal principal,
             @Valid @RequestBody ConvertPointsRequest request,
-            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+            @RequestHeader(value = "Idempotency-Key", required = false) String rawIdempotencyKey) {
         String email = getUserEmail(principal);
+        String idempotencyKey = IdempotencyGuard.requireKey(rawIdempotencyKey);
         log.info("Points conversion request for user {} with points {} and idempotency key {}", email, request.points(),
                 idempotencyKey);
         WalletTransactionDTO tx = pointsService.convertPoints(email, request.points(), idempotencyKey);

@@ -5,7 +5,6 @@ import com.tradex.api.dto.AuthResponse;
 import com.tradex.api.entity.User;
 import com.tradex.api.enums.Role;
 import com.tradex.api.enums.VerificationType;
-import com.tradex.api.exception.AppException.ForbiddenException;
 import com.tradex.api.repository.UserRepository;
 import com.tradex.api.repository.VerificationTokenRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,48 +56,20 @@ class AuthSecurityIntegrationTest {
     }
 
     @Test
-    void testSuccessfulLoginResetsFailedAttempts() {
-        // 1. Fail once
-        assertThrows(BadCredentialsException.class, () ->
-                userService.login(new AuthRequest(testEmail, "WrongPass1")));
+    void testWrongPasswordNeverLocksTheAccount() {
+        // Failures are throttled per email+IP in AuthRateLimiter; they must not lock
+        // the real owner out.
+        for (int i = 0; i < 6; i++) {
+            final String wrong = "Wrong" + i;
+            assertThrows(BadCredentialsException.class, () -> userService.login(new AuthRequest(testEmail, wrong)));
+        }
 
-        User userAfterFail = userRepository.findByEmail(testEmail).orElseThrow();
-        assertEquals(1, userAfterFail.getFailedLoginAttempts());
+        User user = userRepository.findByEmail(testEmail).orElseThrow();
+        assertFalse(user.isLocked());
+        assertNull(user.getLockedUntil());
 
-        // 2. Successful login with correct credentials
         AuthResponse response = userService.login(new AuthRequest(testEmail, correctPassword));
         assertNotNull(response.token());
-
-        User userAfterSuccess = userRepository.findByEmail(testEmail).orElseThrow();
-        assertEquals(0, userAfterSuccess.getFailedLoginAttempts());
-        assertNull(userAfterSuccess.getLockedUntil());
-        assertFalse(userAfterSuccess.isLocked());
-    }
-
-    @Test
-    void testAccountLockoutAfterThreeFailedAttempts() {
-        // Attempt 1
-        assertThrows(BadCredentialsException.class, () ->
-                userService.login(new AuthRequest(testEmail, "Wrong1")));
-        assertEquals(1, userRepository.findByEmail(testEmail).orElseThrow().getFailedLoginAttempts());
-
-        // Attempt 2
-        assertThrows(BadCredentialsException.class, () ->
-                userService.login(new AuthRequest(testEmail, "Wrong2")));
-        assertEquals(2, userRepository.findByEmail(testEmail).orElseThrow().getFailedLoginAttempts());
-
-        // Attempt 3 -> Triggers lockout
-        assertThrows(ForbiddenException.class, () ->
-                userService.login(new AuthRequest(testEmail, "Wrong3")));
-
-        User lockedUser = userRepository.findByEmail(testEmail).orElseThrow();
-        assertTrue(lockedUser.isLocked());
-        assertNotNull(lockedUser.getLockedUntil());
-        assertEquals(3, lockedUser.getFailedLoginAttempts());
-
-        // Attempt 4 even with correct password is now blocked by lock
-        assertThrows(ForbiddenException.class, () ->
-                userService.login(new AuthRequest(testEmail, correctPassword)));
     }
 
     @Test
@@ -109,7 +80,8 @@ class AuthSecurityIntegrationTest {
         testUser.setFailedLoginAttempts(3);
         userRepository.save(testUser);
 
-        // Next login attempt with correct password automatically clears lock and succeeds
+        // Next login attempt with correct password automatically clears lock and
+        // succeeds
         AuthResponse response = userService.login(new AuthRequest(testEmail, correctPassword));
         assertNotNull(response.token());
 
@@ -150,7 +122,8 @@ class AuthSecurityIntegrationTest {
 
         // Create reset token
         verificationService.createVerificationToken(testUser, VerificationType.PASSWORD_RESET);
-        var tokenEntity = verificationTokenRepository.findByUserAndType(testUser, VerificationType.PASSWORD_RESET).orElseThrow();
+        var tokenEntity = verificationTokenRepository.findByUserAndType(testUser, VerificationType.PASSWORD_RESET)
+                .orElseThrow();
         assertNotNull(tokenEntity);
     }
 
@@ -166,7 +139,8 @@ class AuthSecurityIntegrationTest {
 
         // Regenerate OTP
         verificationService.createVerificationToken(testUser, VerificationType.EMAIL);
-        var updatedToken = verificationTokenRepository.findByUserAndType(testUser, VerificationType.EMAIL).orElseThrow();
+        var updatedToken = verificationTokenRepository.findByUserAndType(testUser, VerificationType.EMAIL)
+                .orElseThrow();
 
         assertNotEquals(firstHash, updatedToken.getToken(), "New OTP must replace and invalidate the old OTP hash");
         assertEquals(0, updatedToken.getAttempts(), "Attempts counter must be reset on new OTP generation");
@@ -174,8 +148,8 @@ class AuthSecurityIntegrationTest {
 
     @Test
     void testShortPasswordEvaluatesWithoutValidationError() {
-        // 3-character password should evaluate against BCrypt and return BadCredentialsException (not a 400 validation error)
-        assertThrows(BadCredentialsException.class, () ->
-                userService.login(new AuthRequest(testEmail, "123")));
+        // 3-character password should evaluate against BCrypt and return
+        // BadCredentialsException (not a 400 validation error)
+        assertThrows(BadCredentialsException.class, () -> userService.login(new AuthRequest(testEmail, "123")));
     }
 }

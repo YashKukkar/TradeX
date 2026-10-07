@@ -1,0 +1,17 @@
+/* Auto-generated from config/app.json by sync-config.js. Do not edit directly. */
+:root {
+  --color-brand: hsl(18, 62%, 44%);
+  --color-brand-hover: hsl(18, 62%, 36%);
+  --color-brand-active: hsl(18, 62%, 29%);
+  --color-brand-strong: hsl(18, 62%, 32%);
+  --color-brand-tint: hsl(18, 62%, 96%);
+  --color-brand-tint-2: hsl(18, 62%, 92%);
+  --color-brand-border: hsl(18, 62%, 85%);
+
+  --orange-600: var(--color-brand);
+  --orange-700: var(--color-brand-hover);
+  --orange-800: var(--color-brand-active);
+  --orange-100: var(--color-brand-tint);
+  --orange-200: var(--color-brand-tint-2);
+  --orange-300: var(--color-brand-border);
+}

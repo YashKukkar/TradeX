@@ -15,6 +15,7 @@ import com.tradex.api.security.SecurityService;
 import com.tradex.api.security.AuthRateLimiter;
 import com.tradex.api.repository.UserRepository;
 import com.tradex.api.util.AuthUtils;
+import org.springframework.security.authentication.BadCredentialsException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -51,16 +52,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request, HttpServletRequest httpRequest, HttpServletResponse response) {
-        String clientIp = httpRequest.getHeader("X-Forwarded-For");
-        if (clientIp == null || clientIp.isBlank()) {
-            clientIp = httpRequest.getRemoteAddr();
-        }
-        authRateLimiter.checkLoginRateLimit(clientIp);
-
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request, HttpServletResponse response) {
         String normalizedEmail = AuthUtils.normalizeEmail(request.email());
+        authRateLimiter.checkLoginAllowed(normalizedEmail);
         log.info("Processing login request for email: {}", AuthUtils.maskEmail(normalizedEmail));
-        AuthResponse resp = userService.login(request);
+        AuthResponse resp;
+        try {
+            resp = userService.login(request);
+        } catch (BadCredentialsException e) {
+            authRateLimiter.recordLoginFailure(normalizedEmail);
+            throw e;
+        }
+        authRateLimiter.clearLoginFailures(normalizedEmail);
         securityService.setTokenCookie(response, resp.token());
         return ResponseEntity.ok(resp);
     }

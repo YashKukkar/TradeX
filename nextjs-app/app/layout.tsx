@@ -1,7 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { serverBranding as branding } from "./branding.server";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 const inter = Inter({
   variable: "--font-inter",
@@ -41,8 +47,12 @@ export default function RootLayout({
         <link rel="icon" href={branding.faviconUrl} type="image/svg+xml" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
         <link rel="stylesheet" href="/css/styles.css" />
+        <link rel="stylesheet" href="/branding/theme.css" />
       </head>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        {children}
+        <script src="/js/main.js" defer></script>
+      </body>
     </html>
   );
 }

@@ -4,10 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "brand:sync": "node ../scripts/sync-config.js && node ../scripts/doctor.js",
     "doctor": "node ../scripts/doctor.js",
     "predev": "node ../scripts/sync-config.js",
     "dev": "vite",
-    "prebuild": "node ../scripts/doctor.js && node ../scripts/sync-config.js",
+    "prebuild": "npm run brand:sync",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },

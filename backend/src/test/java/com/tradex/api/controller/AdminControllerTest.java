@@ -47,10 +47,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.tradex.api.config.AppProperties;
 import com.tradex.api.config.JacksonConfig;
 
 @WebMvcTest(AdminController.class)
-@Import({ SecurityConfig.class, JwtAuthenticationFilter.class, JacksonConfig.class })
+@Import({ SecurityConfig.class, JwtAuthenticationFilter.class, JacksonConfig.class, AppProperties.class })
 @AutoConfigureMockMvc(addFilters = false)
 
 class AdminControllerTest {

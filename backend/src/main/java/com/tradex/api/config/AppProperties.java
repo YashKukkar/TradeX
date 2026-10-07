@@ -59,8 +59,6 @@ public class AppProperties {
     @Getter
     @Setter
     public static class Auth {
-        private int maxFailedLoginAttempts = 3;
-        private int lockoutDurationMinutes = 60;
         private int maxOtpResendAttemptsPerHour = 5;
     }
 

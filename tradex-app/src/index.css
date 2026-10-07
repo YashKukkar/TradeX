@@ -9,27 +9,31 @@
   color-scheme: light;
 
   /* ── Layer 1: primitives ─────────────────────────────────────── */
-  --ink-900: #14213d;      /* text / navy */
+  --ink-900: #14213d;
+  /* text / navy */
   --ink-800: #243556;
-  --ink-600: #4f5b6e;      /* muted text */
-  --ink-500: #6b7487;      /* placeholder */
+  --ink-600: #4f5b6e;
+  /* muted text */
+  --ink-500: #6b7487;
+  /* placeholder */
   --ink-300: #cdd2db;
   --ink-200: #e1e4ea;
   --ink-100: #eceef2;
-  --ink-50:  #f3f4f6;
+  --ink-50: #f3f4f6;
 
-  --orange-600: #b5552b;   /* brand */
-  --orange-700: #9c4724;
-  --orange-800: #843b1e;
-  --orange-100: #faece3;
-  --orange-200: #f6e6dd;
-  --orange-300: #ecd5c6;
+  --orange-600: var(--color-brand, #b5552b);
+  /* brand */
+  --orange-700: var(--color-brand-hover, #9c4520);
+  --orange-800: var(--color-brand-active, #823818);
+  --orange-100: var(--color-brand-tint, #f8eee8);
+  --orange-200: var(--color-brand-tint-2, #f1ded2);
+  --orange-300: var(--color-brand-border, #e3bea8);
 
   --green-700: #166534;
   --amber-700: #92400e;
-  --red-700:   #b91c1c;
-  --sky-700:   #075985;
-  --indigo-600:#4a55a2;
+  --red-700: #b91c1c;
+  --sky-700: #075985;
+  --indigo-600: #4a55a2;
 
   /* ── Layer 2: semantic roles (consumed by components) ───────── */
   --bg: var(--ink-50);
@@ -46,7 +50,8 @@
 
   --primary: var(--orange-600);
   --primary-2: var(--orange-700);
-  --primary-text: var(--orange-700);   /* brand-coloured TEXT (AA on white and tints) */
+  --primary-text: var(--orange-700);
+  /* brand-coloured TEXT (AA on white and tints) */
   --primary-bg: var(--orange-100);
   --primary-border: var(--orange-300);
   --on-primary: #ffffff;
@@ -109,8 +114,10 @@
   --radius: 12px;
   --radius-md: 10px;
   --radius-lg: 16px;
-  --btn-radius: 8px;         /* in-app buttons (forms, modals) */
-  --btn-radius-pill: 9999px;  /* hero calls to action */
+  --btn-radius: 8px;
+  /* in-app buttons (forms, modals) */
+  --btn-radius-pill: 9999px;
+  /* hero calls to action */
   /* Type scale: use these instead of raw px */
   --fs-xs: 11px;
   --fs-sm: 12px;
@@ -427,13 +434,13 @@ input[type="number"] {
 
 /* Global Tactile Form Controls */
 :where(input[type="text"],
-input[type="number"],
-input[type="email"],
-input[type="password"],
-input[type="search"],
-input[type="date"],
-select,
-textarea) {
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="date"],
+  select,
+  textarea) {
   background: var(--surface);
   box-shadow: none;
   border: 1px solid var(--border);
@@ -443,13 +450,13 @@ textarea) {
 }
 
 :where(input[type="text"],
-input[type="number"],
-input[type="email"],
-input[type="password"],
-input[type="search"],
-input[type="date"],
-select,
-textarea):focus {
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="date"],
+  select,
+  textarea):focus {
   box-shadow: var(--shadow-recessed-focus);
   border-color: var(--primary) !important;
   outline: none;
@@ -475,16 +482,22 @@ textarea:-webkit-autofill {
   transition: background-color 9999s ease-out 0s;
 }
 
-input, textarea {
+input,
+textarea {
   caret-color: var(--primary);
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
 
-button, input, select, textarea {
+button,
+input,
+select,
+textarea {
   font-family: inherit;
 }
 
@@ -657,4 +670,31 @@ button:not(:disabled):active,
 .btn-link:hover {
   background: var(--brand-a20) !important;
   border-color: var(--primary) !important;
+}
+
+/* ── Global Mobile Rules (44px touch targets & zero horizontal overflow) ── */
+@media (max-width: 640px) {
+  html, body {
+    overflow-x: hidden;
+  }
+
+  button,
+  [role="button"],
+  .btn,
+  .actionBtn,
+  .btn-primary,
+  .btn-secondary,
+  .primaryBtn,
+  .secondaryBtn,
+  .cancelBtn {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }

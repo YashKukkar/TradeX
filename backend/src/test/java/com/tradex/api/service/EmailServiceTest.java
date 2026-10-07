@@ -42,6 +42,7 @@ class EmailServiceTest {
         otpProperties.setExpiryMinutes(5);
 
         lenient().when(appProperties.getOtp()).thenReturn(otpProperties);
+        lenient().when(appProperties.getBranding()).thenReturn(new AppProperties.Branding());
     }
 
     @Test
